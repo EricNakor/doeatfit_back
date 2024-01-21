@@ -10,13 +10,13 @@ public class CalculatorController {
     @GetMapping("calculator")
     public String calculator()
     {
-        return "calculator";
+        return "calculator/calculator";
     }
 
     // 결과
-    @GetMapping("result")
+    @GetMapping("calculator/result")
     public String result()
     {
-        return "result";
+        return "calculator/result";
     }
 }
