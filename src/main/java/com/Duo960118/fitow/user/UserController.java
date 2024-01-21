@@ -1,7 +1,9 @@
 package com.Duo960118.fitow.user;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserController {
@@ -10,83 +12,64 @@ public class UserController {
     @GetMapping("signIn")
     public String signIn()
     {
-        return "signIn";
+        return "user/signIn";
     }
 
     // 회원 탈퇴
     @GetMapping("signOut")
     public String signOut()
     {
-        return "signOut";
+        return "user/signOut";
     }
 
     // 로그인
     @GetMapping("logIn")
     public String logIn()
     {
-        return "login";
-    }
-
-    // 로그아웃
-    @GetMapping("logOut")
-    public String logOut()
-    {
-        return "logout";
+        return "user/login";
     }
 
     // 마이 페이지
     @GetMapping("myPage")
-    public String myPage()
+    public String myPage(HttpServletRequest req)
     {
-        return "myPage";
+        req.setAttribute("contentPage","/user/myPage.html");
+        return "user/myPage";
     }
 
     // 신고 및 문의
-    @GetMapping("contact")
+    @GetMapping("myPage/contact")
     public String contact()
     {
-        return "contact";
+        return "user/contact";
     }
 
     // 신고 및 문의 자세히 보기
-    @GetMapping("contactDetail")
+    @GetMapping("myPage/contactDetail")
     public String contactDetail()
     {
-        return "contactDetail";
+        return "user/contactDetail";
     }
 
-    // 신고 및 문의 게시
-    @GetMapping("postContact")
-    public String postContact()
+    // 프로필
+    @GetMapping("myPage/profile")
+    public String profile()
     {
-        return "postContact";
+        return "user/profile";
     }
 
     // 프로필 수정
-    @GetMapping("editProfile")
+    @GetMapping("myPage/editProfile")
     public String editProfile()
     {
-        return "editProfile";
+        return "user/editProfile";
     }
 
-    // 비밀번호 수정
-    @GetMapping("editPw")
-    public String editPw()
+    // history
+    @GetMapping("myPage/history")
+    public String history()
     {
-        return "editPw";
+        return "user/history";
     }
 
-    // 닉네임 수정
-    @GetMapping("editNickName")
-    public String editNickName()
-    {
-        return "editNickName";
-    }
-
-    // 프로필 이미지 수정
-    @GetMapping("editProfileImg")
-    public String editProfileImg()
-    {
-        return "editProfileImg";
-    }
 }
