@@ -9,12 +9,12 @@ public class NoticeController {
     @GetMapping("notice")
     public String notice()
     {
-        return "notice";
+        return "notice/notice";
     }
 
     @GetMapping("noticeDetail")
     public String noticeDetail()
     {
-        return "noticeDetail";
+        return "notice/noticeDetail";
     }
 }
