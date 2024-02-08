@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko">
+<head>
+    <title>Fitow</title>
+</head>
+<body>
+<header>
+    <h1>메뉴 로고 프로필</h1>
+    <a href="/">홈</a>
+    <a href="/calculator">계산기</a>
+    <a href="/workout">운동추천</a>
+    <a href="/notice">공지</a>
+    <a href="/myPage">마이페이지</a>
+    <a href="/admin">관리자페이지</a>
+</header>
+<main>
+    <div id="content">여기는 index입니다.</div>
+</main>
+    <!--    <th:include page="${contentPage }"></th:include>-->
+    <!--얘랑 얘랑 뭐가 다른거지???-->
+    <th:block th:replace="${contentPage}"></th:block>
+<footer>
+    <p>Copyright &copy; 2023.960118Duo</p>
+</footer>
+</body>
+</html>
