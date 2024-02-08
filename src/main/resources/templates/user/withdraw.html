@@ -1,0 +1,11 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!--<meta name="_csrf_header" th:content="${_csrf.headerName}">-->
+<!--<meta name="_csrf" th:content="${_csrf.token}">-->
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script src="/js/requestWithdraw.js"></script>
+<body>
+회원탈퇴 페이지입니다.
+<input type="password" id="passwd" placeholder="비밀번호">
+<button type="submit" onclick="requestWithdraw()">탈퇴</button>
+</body>
+</html>
