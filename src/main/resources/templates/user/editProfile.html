@@ -1,0 +1,32 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="kr">
+<!--<meta name="_csrf_header" th:content="${_csrf.headerName}">-->
+<!--<meta name="_csrf" th:content="${_csrf.token}">-->
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/js/editProfile.js"></script>
+    <script src="/js/valid.js"></script>
+    <link rel="shortcut icon" href="#">
+</head>
+<body>
+프로필 수정 페이지 입니다.
+
+<h2>닉네임 수정</h2>
+<form>
+    현재 닉네임<input type="text" th:value="${userInfo.nickName}" readonly><br>
+    <input type="text" id="newNickName" placeholder="변경할 닉네임">
+    <button type="button" id="chkNickNameBtn" onclick="checkNickName(newNickName.value)">중복확인</button>
+    <button type="button" onclick="editNickName()">닉네임 변경</button>
+    <input type="text" id="isNickNameEdited" value="">
+</form>
+
+<h2>비밀번호 수정</h2>
+<form>
+    <input type="password" id="currentPasswd" placeholder="현재 비밀번호">
+    <input type="password" id="newPasswd" placeholder="변경 비밀번호">
+    <button type="button" onclick="editPasswd()">비밀번호 변경</button>
+    <input type="text" id="isPasswdEdited" value="">
+</form>
+
+
+</body>
+</html>
