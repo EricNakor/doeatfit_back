@@ -1,28 +1,28 @@
 package com.Duo960118.fitow.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
+// @Embeddable: 다른 Entity에서 필드로 선언하여 사용
+// @MappedSuperclass: 다른 Entity에서 상속하여 사용
 @Getter
-@MappedSuperclass
+@Embeddable
+//@MappedSuperclass
 // Entity 칼럼 상속
 // 테이블과 매핑하지 않고 부모 클래스를 상속받는 자식 클래스에게 매핑 정보(엔티티 칼럼)만 제공하고 싶으면
 // @MappedSuperclass를 사용하면 된다.
 public class UuidEntity {
-    @Id
-    // DB 테이블의 유일한 값 == PK
     @UuidGenerator
     /*PK 값에 대한 생성 전략
     @Id와 함께 엔티티 또는 매핑된 슈퍼클래스의 PK 속성 또는 필드에 적용 할 수 있음*/
     /*public UuidGenerator() {
     \this.uuid = UUID.randomUUID();
     \}*/
-    @Column(columnDefinition = "BINARY(16)")
+    @Column(columnDefinition = "BINARY(16)",unique = true,updatable = false)
     /*컬럼타입을 BINARY(16)으로 하지 않으면 공백이 들어가며 원하는 동작이 이루어지지 않는다고 한다.
     @Column 어노테이션을 꼭 사용할 필요는 없으며, DB의 컬럼 타입이 BINARY(16) 이면 된다.
     **UUID 크기 최소화하기

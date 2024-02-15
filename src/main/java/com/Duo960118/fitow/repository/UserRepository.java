@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     // 이메일 찾기
     @Query(value = "SELECT email FROM user WHERE name = :name AND gender = :gender AND birth = :birth", nativeQuery = true)
     List<String> findByNameAndGenderAndBirth(@Param("name") String name, @Param("gender") boolean gender, @Param("birth") LocalDate birth);
+
+    Optional<UserEntity> findByNickName(String nickName);
 }

@@ -135,6 +135,11 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @Override
+    public UserEntity findByNickName(String nickName) {
+        return userRepository.findByNickName(nickName).orElseThrow();
+    }
+
 
     // 이메일  찾기
     @Override

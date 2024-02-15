@@ -48,4 +48,8 @@ public interface UserService {
     // 프로필 이미지 이름 수정
     @Transactional
     boolean editProfileImgName(String email, String profileImg);
+
+    // 닉네임으로 UserEntity 찾기
+    @Transactional
+    UserEntity findByNickName(String nickName);
 }
