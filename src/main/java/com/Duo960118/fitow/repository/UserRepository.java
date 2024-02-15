@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.repository;
 
+import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

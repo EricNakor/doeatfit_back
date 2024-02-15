@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    // 이메일  찾기
+    // 이메일 찾기
     @Override
     @Transactional
     public List<String> findEmail(UserDto.FindEmailRequestDto findEmailRequest) {

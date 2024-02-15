@@ -81,6 +81,7 @@ public class UserDto {
         private LocalDate birth;
     }
 
+    // Email 찾기 DTO
     @Getter
     @Setter
     @RequiredArgsConstructor
@@ -88,6 +89,7 @@ public class UserDto {
         private final List<String> emails;
     }
 
+    // 탈퇴 DTO
     @Getter
     @Setter
     public static class WithdrawRequestDto {

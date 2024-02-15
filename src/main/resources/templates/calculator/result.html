@@ -1,5 +1,22 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="kr">
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/js/calculator/calculate.js"></script>
+    <link rel="shortcut icon" href="#">
+    <meta charset="UTF-8">
+    <title>계산 결과</title>
+</head>
 <body>
-계산 결과 페이지 입니다.
+영양소 별 하루 권장 섭취량
+<p><strong>탄:</strong> <span id="carb" th:text="${#numbers.formatDecimal(result.carb,1,1)}"></span></p>
+<p><strong>단:</strong> <span id="protein" th:text="${#numbers.formatDecimal(result.protein,1,1)}"></span></p>
+<p><strong>지:</strong> <span id="fat" th:text="${#numbers.formatDecimal(result.fat,1,1)}"></span></p>
+
+
+<input type="radio" name="meal" id="3meal" value="3" onclick="mealPerDay()">3끼식
+<input type="radio" name="meal" id="4meal" value="4" onclick="mealPerDay()">4끼식
+<input type="radio" name="meal" id="5meal" value="5" onclick="mealPerDay()">5끼식
+<h4 id="mealResult"></h4>
 </body>
 </html>
