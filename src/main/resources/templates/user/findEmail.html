@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!--<meta name="_csrf_header" th:content="${_csrf.headerName}">-->
+<!--<meta name="_csrf" th:content="${_csrf.token}">-->
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/js/findEmail.js"></script>
+    <link rel="shortcut icon" href="#">
+    <title></title>
+</head>
+<body>
+<div>
+    <input type="text" placeholder="이름" th:value="*{findEmailRequest.name}" id="name">
+</div>
+<div>
+    성별<input type="checkbox" th:value="*{findEmailRequest.gender}" id="gender">
+</div>
+<div>
+    <input type="date" th:value="*{findEmailRequest.birth}" id="birth">
+</div>
+<div>
+    <button type="button" onclick="findEmail()">이메일 찾기</button>
+</div>
+
+찾은 이메일 목록
+<p id="demo"></p><br>
+
+</body>
+</html>
