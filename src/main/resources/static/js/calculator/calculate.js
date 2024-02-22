@@ -14,8 +14,9 @@ function calculate() {
             "height": $('#height').val(),
             "weight": $('#weight').val(),
             "bmr": $('#bmr').val(),
-            "activityLevel": $('#activityLevel').val(),
-            "dietGoal": $('#dietGoal').val()
+            "activityLevel": document.getElementById('activityLevel').value,
+            "dietGoal": document.getElementById('dietGoal').value
+            //todo: js에서 ENUM값을 넘기지 못함 확인 필요
         }),
         success: function (data) {
             location.href = '/calculator/result/' + data.uuid;
