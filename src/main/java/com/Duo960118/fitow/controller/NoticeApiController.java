@@ -37,9 +37,8 @@ public class NoticeApiController {
         return ResponseEntity.ok().body(result);
     }
     // 공지 검색
-    @GetMapping("noitces")
-    public ResponseEntity<List<NoticeDto.NoticeInfoDto>> searchNotice(@RequestParam("categoryString") String categoryString, @RequestParam("searchString") String searchString){
-        NoticeEntity.NoticeCategoryEnum noticeCategory = NoticeEntity.NoticeCategoryEnum.valueOf(categoryString);
+    @GetMapping("notices/search")
+    public ResponseEntity<List<NoticeDto.NoticeInfoDto>> searchNotice(@RequestParam("noticeCategory") NoticeEntity.NoticeCategoryEnum noticeCategory, @RequestParam("searchString") String searchString){
         return ResponseEntity.ok().body(noticeService.searchNotice(noticeCategory,searchString));
     }
     // 공지 작성
