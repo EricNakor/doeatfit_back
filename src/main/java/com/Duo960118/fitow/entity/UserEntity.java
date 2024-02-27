@@ -31,25 +31,22 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long userId;
-
     @Column(unique = true)
     private String email;
     private String passwd;
     private String name;
-
     @Column(unique = true)
     private String nickName;
     private boolean gender;
     private LocalDate birth;
     private String profileImg;
     private UserRoleEnum role;
-
     @CreatedDate
     private LocalDate joinDate;
     private LocalDate passwdEditDate;
 
     // 최초 가입 시 가입 일자 = 비밀번호 수정 일자
-    @PrePersist
+    @PrePersist // Entity에 저장하기 전에 실행
     public void setPwEditDate() {
         this.passwdEditDate = this.joinDate;
     }

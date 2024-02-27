@@ -1,4 +1,4 @@
-package com.Duo960118.fitow.home;
+package com.Duo960118.fitow.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;

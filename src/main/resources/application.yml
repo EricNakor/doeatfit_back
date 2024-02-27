@@ -43,3 +43,5 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
   profile_img_dir: C:\Users\ericn\Desktop\fitow\images\profile\
+  report_file_dir: C:\Users\ericn\Desktop\fitow\images\report\
+  reply_file_dir: C:\Users\ericn\Desktop\fitow\images\reply\

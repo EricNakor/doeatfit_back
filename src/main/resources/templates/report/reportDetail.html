@@ -1,0 +1,15 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<p><strong>상태:</strong> <span th:text="${reportDetail.reportStatus}"></span></p>
+<p><strong>카테고리:</strong> <span th:text="${reportDetail.reportCategory}"></span></p>
+<p><strong>작성일:</strong> <span th:text="${#temporals.format(reportDetail.getReportDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+<h1 th:text="${reportDetail.title}"></h1>
+<p th:text="${reportDetail.content}"></p>
+<p><strong>첨부파일:</strong> <span th:text="${reportDetail.reportFiles}"></span></p>
+<p><strong>-----------------------------------------------------------</strong></p>
+<p><strong>답변:</strong><span th:text="${reportDetail.reply}"></span></p>
+<p><strong>첨부파일:</strong> <span th:text="${reportDetail.replyFiles}"></span></p>
+
+<a href="/my-page/reports">목록</a>
+</body>
+</html>

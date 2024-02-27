@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script src="/js/report/replyReport.js"></script>
+    <title>신고 및 문의 답변</title>
+</head>
+<body>
+<h1>신고 및 문의 답변</h1>
+<p><strong>카테고리:</strong> <span th:text="${reportDetail.reportCategory}"></span></p>
+<p><strong>작성일:</strong> <span th:text="${#temporals.format(reportDetail.getReportDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+<h1 th:text="${reportDetail.title}"></h1>
+<p th:text="${reportDetail.content}"></p>
+<p><strong>-----------------------------------------------------------</strong></p>
+<form th:object="${reply}">
+    <label for="status">상태:</label>
+    <select id="status" th:field="*{reportStatus}">
+        <option th:each="statusEnum : ${reportStatusEnums}" th:value="${statusEnum}" th:text="${statusEnum}"></option>
+    </select><br>
+    <label for="reply">답변:</label>
+    <textarea id="reply" th:field="*{reply}" required></textarea>
+    <br>
+    <input type="file" id="replyFiles" th:field="*{replyFiles}" multiple>
+    <br>
+    <input type="button" value="답변하기" onclick="replyReport()">
+</form>
+
+<a href="/reports/all">목록</a>
+</body>
+</html>

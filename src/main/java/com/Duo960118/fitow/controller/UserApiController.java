@@ -1,15 +1,18 @@
 package com.Duo960118.fitow.controller;
 
-import com.Duo960118.fitow.entity.StatusResponseDto;
-import com.Duo960118.fitow.entity.CustomUserDetails;
-import com.Duo960118.fitow.entity.UserDto;
+import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.service.UserFacade;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,7 +43,7 @@ public class UserApiController {
 
     // 회원탈퇴
     @DeleteMapping("/user/withdraw")
-    public StatusResponseDto withdraw(@RequestBody UserDto.WithdrawRequestDto withdrawRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails, HttpSession session){
+    public StatusResponseDto withdraw(@RequestBody UserDto.WithdrawRequestDto withdrawRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails, HttpSession session) {
         // 탈퇴 후 세션 끊기
         session.invalidate();
         withdrawRequest.setEmail(customUserDetails.getUsername());
@@ -89,4 +92,5 @@ public class UserApiController {
     public Resource loadProfileImg(@PathVariable("filename") String filename) {
         return userFacade.loadProfileImg(filename);
     }
+
 }
