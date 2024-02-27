@@ -1,4 +1,4 @@
-package com.Duo960118.fitow.admin;
+package com.Duo960118.fitow.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
@@ -32,9 +32,9 @@ public class AdminController {
         req.setAttribute("contentPage", "/admin/manageNotice.html");
         return "/admin/adminIndex";
     }
-    @GetMapping(value = "/admin/manageWorkOut")
-    public String manageWorkOut(HttpServletRequest req) {
-        req.setAttribute("contentPage", "/admin/manageWorkOut.html");
+    @GetMapping(value = "/admin/manageWorkout")
+    public String manageWorkout(HttpServletRequest req) {
+        req.setAttribute("contentPage", "/admin/manageWorkout.html");
         return "/admin/adminIndex";
     }
 

@@ -1,0 +1,68 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<script src="/js/workout/editWorkout.js"></script>
+<script src="/js/workout/deleteWorkout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<head>
+    <title>운동 수정</title>
+</head>
+<body>
+<h1>운동 작성</h1>
+<form th:object="${workout}" >
+    <label for="workoutName">운동 이름:</label><br>
+    <input type="text" id="workoutName" th:field="*{workoutName}" required><br>
+
+    <label for="workoutDifficulty">난이도</label>
+    <select id="workoutDifficulty" th:field="*{workoutDifficulty}">
+        <option th:each="difficultyEnum : ${difficultyEnums}"
+                th:value="${difficultyEnum}" th:text="${difficultyEnum.desc}"></option>
+    </select><br>
+
+    <div>주동근</div>
+    <div th:each="muscleEnum : ${muscleEnums}">
+        <input type="checkbox" th:id="${muscleEnum}" th:value="${muscleEnum}" th:field="*{agonistMuscles}" >
+        <label th:for="${muscleEnum}" th:text="${muscleEnum.desc}"></label>
+    </div>
+
+    <div>길항근</div>
+    <div th:each="muscleEnum : ${muscleEnums}">
+        <input type="checkbox" th:id="${muscleEnum}" th:value="${muscleEnum}" th:field="*{antagonistMuscles}" >
+        <label th:for="${muscleEnum}" th:text="${muscleEnum.desc}"></label>
+    </div>
+
+    <div>협응근</div>
+    <div th:each="muscleEnum : ${muscleEnums}">
+        <input type="checkbox" th:id="${muscleEnum}" th:value="${muscleEnum}" th:field="*{synergistMuscles}" >
+        <label th:for="${muscleEnum}" th:text="${muscleEnum.desc}"></label>
+    </div>
+
+    <input type="file" name="file" id="mediaFile" placeholder="운동 영상">
+
+    <div id="inputFields" th:each="description : *{descriptions}">
+        <div class="input-group">
+            <input type="text" name="stringList" class="string-input" th:value="${description}" placeholder="Enter a string" />
+            <button class="removeButton">-</button>
+        </div>
+    </div>
+    <button id="addButton">+</button>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function() {
+            $('#addButton').click(function(event) {
+                event.preventDefault();
+                $('<div class="input-group"><input type="text" name="stringList" class="string-input" placeholder="Enter a string" /><button class="removeButton">-</button></div>').appendTo('#inputFields');
+            });
+
+            $(document).on('click', '.removeButton', function(event) {
+                event.preventDefault();
+                $(this).parent('.input-group').remove();
+            });
+        });
+        /*]]>*/
+    </script>
+
+    <input type="button" value="작성하기" onclick="editWorkout()">
+</form>
+<input type="button" value="삭제" onclick="deleteWorkout()">
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.Duo960118.fitow.notice;
+package com.Duo960118.fitow.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

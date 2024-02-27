@@ -1,3 +1,4 @@
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.2'
@@ -30,8 +31,36 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	annotationProcessor 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+    // enum을 내가 원하는 내용을 담아 json으로 내보내려고
+    // BEGINNER -> {"desc":"초급"}
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Querydsl 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// queryDSL 추가 : QueryDSL 빌드 옵션
+def querydslDir = "src/main/generated/querydsl"
+
+sourceSets {
+    main{
+        java{
+            srcDirs = [ querydslDir ]
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory = file(querydslDir)
+}
+
+clean.doLast {
+    file(querydslDir).deleteDir()
 }
