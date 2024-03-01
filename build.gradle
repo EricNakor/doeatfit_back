@@ -50,11 +50,7 @@ tasks.named('test') {
 def querydslDir = "src/main/generated/querydsl"
 
 sourceSets {
-    main{
-        java{
-            srcDirs = [ querydslDir ]
-        }
-    }
+    main.java.srcDirs += [ querydslDir ]
 }
 
 tasks.withType(JavaCompile).configureEach {
