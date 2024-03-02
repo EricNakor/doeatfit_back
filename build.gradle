@@ -24,12 +24,16 @@ dependencies {
     implementation 'org.projectlombok:lombok'
     // Spring Context Support
     implementation 'org.springframework:spring-context-support'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    annotationProcessor 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+	testImplementation 'org.springframework.security:spring-security-test'
+	annotationProcessor 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+    // enum을 내가 원하는 내용을 담아 json으로 내보내려고
+    // BEGINNER -> {"desc":"초급"}
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
     // Querydsl 추가
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"

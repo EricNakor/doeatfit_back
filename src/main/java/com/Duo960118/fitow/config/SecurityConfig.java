@@ -25,8 +25,8 @@ public class SecurityConfig {
 //        return (web) -> web.ignoring().requestMatchers("/예외처리하고 싶은 url", "/예외처리하고 싶은 url");
 //    }
 
-    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**", "api/notices", "api/notices/{id}","/calculator/**"};
-    String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth", "/api/calculate"};
+    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**", "api/notices", "api/notices/{id}","/calculator/**","api/workouts/**"};
+    String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth", "/api/calculate","api/workouts/**"};
 
     @Bean
     // 스프링 시큐리티의 세부 설정
