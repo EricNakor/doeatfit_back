@@ -22,9 +22,9 @@ import java.util.UUID;
 @Service
 public class UserFacade {
     private final UploadConfig uploadConfig;
-    private final SecurityServiceImpl securityService;
+    private final SecurityService securityService;
     private final EmailSendService emailSendService;
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
     public static String tempPasswdGenerator(int spSize, int allSize, int numSize) {

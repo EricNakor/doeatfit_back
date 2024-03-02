@@ -20,7 +20,7 @@
         <label for="email">아이디</label>
         <input type="email"
                class="form-control" id="email"
-               maxlength="50"  placeholder="아이디를 입력해주세요" required>
+               maxlength="50" placeholder="아이디를 입력해주세요" required>
         <button type="button" id="chkEmailBtn" onclick="checkEmail()">중복확인</button>
         <input type="text" id="duplicatedEmail" value="">
     </div>
@@ -46,8 +46,10 @@
     <div>
         <input type="text" id="duplicatedNickName" value="">
     </div>
-    <div>
-        성별<input type="checkbox" id="gender" th:value="*{joinRequest.gender}">
+    <div>성별</div>
+    <div th:each="userGenderEnum : ${userGenderEnums}">
+        <input type="radio" th:id="${userGenderEnum}" th:value="${userGenderEnum}" name="gender">
+        <label th:for="${userGenderEnum}" th:text="${userGenderEnum}"></label>
     </div>
     <div>
         <input type="date" id="birth">

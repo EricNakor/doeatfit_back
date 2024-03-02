@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private Collection<? extends GrantedAuthority> authorities;
     private final String nickName;
     private final String name;
-    private final boolean gender;
+    private final UserEntity.UserGender gender;
     private final LocalDate birth;
     private final LocalDate joinDate;
     private final LocalDate passwdEditDate;
@@ -38,7 +38,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.passwd = userEntity.getPasswd();
         this.nickName = userEntity.getNickName();
         this.name = userEntity.getName();
-        this.gender = userEntity.isGender();
+        this.gender = userEntity.getGender();
         this.birth = userEntity.getBirth();
         this.joinDate = userEntity.getJoinDate();
         this.passwdEditDate = userEntity.getPasswdEditDate();

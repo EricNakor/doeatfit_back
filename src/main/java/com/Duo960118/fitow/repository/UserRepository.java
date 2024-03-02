@@ -23,9 +23,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByNickName(String nickName);
 
     // 가입정보 찾기
-    boolean existsByEmailAndNameAndGenderAndBirth(String email, String name, boolean gender, LocalDate birth);
+    boolean existsByEmailAndNameAndGenderAndBirth(String email, String name, UserEntity.UserGender gender, LocalDate birth);
 
     // 이메일 찾기
     @Query(value = "SELECT email FROM user WHERE name = :name AND gender = :gender AND birth = :birth", nativeQuery = true)
-    List<String> findByNameAndGenderAndBirth(@Param("name") String name, @Param("gender") boolean gender, @Param("birth") LocalDate birth);
+    List<String> findByNameAndGenderAndBirth(@Param("name") String name, @Param("gender") UserEntity.UserGender gender, @Param("birth") LocalDate birth);
 }

@@ -39,7 +39,7 @@ public class UserEntity {
 
     @Column(unique = true)
     private String nickName;
-    private boolean gender;
+    private UserGender gender;
     private LocalDate birth;
     private String profileImg;
     private UserRoleEnum role;
@@ -56,7 +56,7 @@ public class UserEntity {
 
     // 회원가입 엔티티 생성자
     @Builder
-    public UserEntity(String email, String passwd, String name, String nickName, boolean gender, LocalDate birth, String profileImg, UserRoleEnum role, LocalDate passwdEditDate) {
+    public UserEntity(String email, String passwd, String name, String nickName, UserGender gender, LocalDate birth, String profileImg, UserRoleEnum role, LocalDate passwdEditDate) {
         this.email = email;
         this.passwd = passwd;
         this.name = name;
@@ -97,6 +97,12 @@ public class UserEntity {
         }
 
         private final String value;
+    }
+
+    @Getter
+    public enum UserGender{
+        MALE,
+        FEMALE
     }
 
 }

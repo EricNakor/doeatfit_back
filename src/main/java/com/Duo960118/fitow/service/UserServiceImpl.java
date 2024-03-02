@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
                     .passwd(passwordEncoder.encode(joinRequest.getPasswd()))
                     .name(joinRequest.getName())
                     .nickName(joinRequest.getNickName())
-                    .gender(joinRequest.isGender())
+                    .gender(joinRequest.getGender())
                     .birth(joinRequest.getBirth())
                     .role(UserEntity.UserRoleEnum.NORMAL)
                     .build();
@@ -140,13 +140,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public List<String> findEmail(UserDto.FindEmailRequestDto findEmailRequest) {
-        return userRepository.findByNameAndGenderAndBirth(findEmailRequest.getName(), findEmailRequest.isGender(), findEmailRequest.getBirth());
+        return userRepository.findByNameAndGenderAndBirth(findEmailRequest.getName(), findEmailRequest.getGender(), findEmailRequest.getBirth());
     }
 
     // 가입정보 찾기
     @Override
     @Transactional
     public boolean findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto) {
-        return userRepository.existsByEmailAndNameAndGenderAndBirth(userInfoDto.getEmail(), userInfoDto.getName(), userInfoDto.isGender(), userInfoDto.getBirth());
+        return userRepository.existsByEmailAndNameAndGenderAndBirth(userInfoDto.getEmail(), userInfoDto.getName(), userInfoDto.getGender(), userInfoDto.getBirth());
     }
 }
