@@ -45,7 +45,7 @@ public class NoticeController {
     }
 
     // 공지 작성 페이지
-    @GetMapping("post-notice")
+    @GetMapping("notices/post")
     public String postNotice(@ModelAttribute("notice") NoticeDto.PostNoticeRequestDto notice, Model model)
     {
         model.addAttribute("categoryEnums", NoticeEntity.NoticeCategoryEnum.values());
@@ -54,7 +54,7 @@ public class NoticeController {
     }
 
     // 공지 수정 페이지
-    @GetMapping("edit-notice/{uuid}")
+    @GetMapping("notices/edit/{uuid}")
     public String editNotice(@PathVariable("uuid") UUID uuid, Model model)
     {
         NoticeDto.NoticeDetailDto noticeDetail = noticeService.getNoticeDetail(uuid);

@@ -77,6 +77,4 @@ public class NoticeApiController {
     public NoticeDto.NoticeDetailDto getNoticeDetail(@PathVariable("uuid") UUID uuid){
         return noticeService.getNoticeDetail(uuid);
     }
-
-
 }

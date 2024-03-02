@@ -13,7 +13,7 @@
         <option th:each="categoryEnum : ${categoryEnums}" th:value="${categoryEnum}" th:text="${categoryEnum}"></option>
     </select><br>
     <textarea id="content" th:field="*{content}" required></textarea><br>
-    <input type="button" value="작성하기" onclick="editNotice()">
+    <input type="button" value="작성하기" onclick="postNotice()">
 </form>
 </body>
 </html>

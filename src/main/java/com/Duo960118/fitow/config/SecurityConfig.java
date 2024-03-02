@@ -30,7 +30,7 @@ public class SecurityConfig {
     String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth"};
 
     // admin 권한이 필요한 url
-    String[] adminAuthorityRequired = {"/api/notices/**","/post-notice","/edit-notice"};
+    String[] adminAuthorityRequired = {"/api/notices/**","/notices/post","/notices/edit"};
 
     @Bean
     // 스프링 시큐리티의 세부 설정
@@ -60,11 +60,16 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 );
+
         // notice 작성,수정,삭제 시 admin 권한 확인
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET,"/api/notices/**").permitAll()
                         .requestMatchers(adminAuthorityRequired).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
+                );
+
+        // 위에서 필터된 이외의 주소는 인가 되었는지만 확인
+        http
+                .authorizeHttpRequests((authorize)->authorize
                         .anyRequest().authenticated()
                 );
 
