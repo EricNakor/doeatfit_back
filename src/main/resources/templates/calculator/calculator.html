@@ -1,0 +1,64 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/js/calculator/calculate.js"></script>
+    <link rel="shortcut icon" href="#">
+</head>
+<body>
+하루 섭취량 계산기
+<table>
+    <tr style="width: 100px;">
+        <td>
+            <div>성별</div>
+            <div th:each="genderEnum : ${genderEnums}">
+                <input type="radio" th:id="${genderEnum}" th:value="${genderEnum}" name="gender" th:checked= "${genderEnum}== ${gender}">
+                <label th:for="${genderEnum}" th:text="${genderEnum}"></label>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="age" id="age" th:value="${age}" placeholder="나이" min="0" max="130" autocomplete="off"><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="height" id="height" placeholder="신장 cm" min="0" max="250" step="0.1"
+                   autocomplete="off"><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="weight" id="weight" placeholder="체중 kg" min="0" max="250" step="0.1"
+                   autocomplete="off"><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="bmr" id="bmr" placeholder="기초대사량 kcal" min="0" max="5000"
+                   autocomplete="off"><br>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2">
+            <select name="activityLevel">
+                <option th:each="activityLevel : ${activityLevelEnums}" th:value="${activityLevel}" th:text="${activityLevel}"></option>
+            </select><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <select name="dietGoal">
+                <option th:each="dietGoal : ${dietGoalEnums}" th:value="${dietGoal}" th:text="${dietGoal}"></option>
+            </select><br>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button type="button" id="calculate" onclick="calculate()">계산하기</button>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

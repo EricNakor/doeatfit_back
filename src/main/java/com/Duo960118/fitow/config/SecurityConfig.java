@@ -25,8 +25,8 @@ public class SecurityConfig {
 //        return (web) -> web.ignoring().requestMatchers("/예외처리하고 싶은 url", "/예외처리하고 싶은 url");
 //    }
 
-    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**", "api/notices", "api/notices/{id}"};
-    String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth"};
+    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**", "api/notices", "api/notices/{id}","/calculator/**"};
+    String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth", "/api/calculate"};
 
     @Bean
     // 스프링 시큐리티의 세부 설정
@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .passwordParameter("passwd")
                         .loginPage("/login")
                         .permitAll()
-                        .defaultSuccessUrl("/my-page"))
+                        .defaultSuccessUrl("/my-page", true))
                 // 스프링 시큐리티 로그인 설정 담당
                 // 로그인 페이지 URL과 로그인 성공 시 이동할 페이지 설정
                 .logout((logout) -> logout

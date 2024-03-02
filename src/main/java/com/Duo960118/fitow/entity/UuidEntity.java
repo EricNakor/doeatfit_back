@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -9,13 +10,12 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
 
 @Getter
+@Embeddable
 @MappedSuperclass
 // Entity 칼럼 상속
 // 테이블과 매핑하지 않고 부모 클래스를 상속받는 자식 클래스에게 매핑 정보(엔티티 칼럼)만 제공하고 싶으면
 // @MappedSuperclass를 사용하면 된다.
 public class UuidEntity {
-    @Id
-    // DB 테이블의 유일한 값 == PK
     @UuidGenerator
     /*PK 값에 대한 생성 전략
     @Id와 함께 엔티티 또는 매핑된 슈퍼클래스의 PK 속성 또는 필드에 적용 할 수 있음*/
