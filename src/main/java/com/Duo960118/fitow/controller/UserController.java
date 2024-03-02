@@ -71,19 +71,7 @@ public class UserController {
         return "user/findUserInfo";
     }
 
-    // 신고 및 문의
-    @GetMapping("my-page/contacts")
-    public String contact() {
-        return "user/contacts";
-    }
-
-    // 신고 및 문의 자세히 보기
-    @GetMapping("my-page/contacts/{id}")
-    public String showContactDetail() {
-        return "user/contactDetail";
-    }
-
-//     프로필
+    // 프로필
     @GetMapping("my-page/profile")
     public String editProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
         if (customUserDetails == null) {
@@ -92,12 +80,4 @@ public class UserController {
         model.addAttribute("userInfo", customUserDetails.getUserInfo());
         return "user/editProfile";
     }
-
-    // 식단 및 운동 기록
-    // 아직 구현하지 않음
-    @GetMapping("my-page/history")
-    public String history() {
-        return "user/history";
-    }
-
 }
