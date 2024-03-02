@@ -1,0 +1,25 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<script src="/js/notice/findNotice.js"></script>
+<body>
+<h1>공지사항 페이지 입니다.</h1>
+
+    <table>
+    <thead>
+    <tr>
+        <th>카테고리</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+    </tr>
+    </thead>
+    <tbody th:each="notice : ${notices}">
+    <tr>
+        <td th:text="${notice.category}"></td>
+        <td><a th:href="@{'/notices/' + ${notice.uuid}}" th:text="${notice.title}"></a></td>
+        <td th:text="${notice.author}"></td>
+        <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

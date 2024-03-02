@@ -1,0 +1,21 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<script src="/js/notice/editNotice.js"></script>
+<script src="/js/notice/deleteNotice.js"></script>
+<head>
+    <title>공지사항 수정</title>
+</head>
+<body>
+<h1>공지사항 수정</h1>
+<form th:object="${notice}" >
+    <label for="title">제목:</label><br>
+    <input type="text" id="title" th:field="*{title}" required><br>
+    <label for="category">카테고리:</label>
+    <select id="category" th:field="*{category}">
+        <option th:each="categoryEnum : ${categoryEnums}" th:value="${categoryEnum}" th:text="${categoryEnum}"></option>
+    </select><br>
+    <textarea id="content" th:field="*{content}" required></textarea><br>
+    <input type="button" value="수정하기" onclick="editNotice()" >
+</form>
+<input type="button" value="삭제" onclick="deleteNotice()">
+</body>
+</html>

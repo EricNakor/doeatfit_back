@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.config;
 
+import com.Duo960118.fitow.entity.UserEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,8 +26,11 @@ public class SecurityConfig {
 //        return (web) -> web.ignoring().requestMatchers("/예외처리하고 싶은 url", "/예외처리하고 싶은 url");
 //    }
 
-    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**", "api/notices", "api/notices/{id}","/calculator/**","api/workouts/**"};
+    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**","/calculator/**","api/workouts/**","/api/notices/**"};
     String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth", "/api/calculate","api/workouts/**"};
+
+    // admin 권한이 필요한 url
+    String[] adminAuthorityRequired = {"/api/notices/**","/notices/post","/notices/edit"};
 
     @Bean
     // 스프링 시큐리티의 세부 설정
@@ -39,14 +43,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET, noAuthGet).permitAll()
                         .requestMatchers(noAuth).permitAll()
-                        .requestMatchers("/css/**","/js/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/css/**","/js/**","/error").permitAll()
+                        )
                 .formLogin((formLogin) -> formLogin
                         .usernameParameter("email")
                         .passwordParameter("passwd")
                         .loginPage("/login")
                         .permitAll()
-                        .defaultSuccessUrl("/my-page", true))
+                        .defaultSuccessUrl("/my-page",true))
                 // 스프링 시큐리티 로그인 설정 담당
                 // 로그인 페이지 URL과 로그인 성공 시 이동할 페이지 설정
                 .logout((logout) -> logout
@@ -55,6 +59,18 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                );
+
+        // notice 작성,수정,삭제 시 admin 권한 확인
+        http
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(adminAuthorityRequired).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
+                );
+
+        // 위에서 필터된 이외의 주소는 인가 되었는지만 확인
+        http
+                .authorizeHttpRequests((authorize)->authorize
+                        .anyRequest().authenticated()
                 );
 
         // 로그아웃 설정 담당
