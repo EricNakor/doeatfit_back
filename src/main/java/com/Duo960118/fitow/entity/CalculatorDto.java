@@ -16,7 +16,7 @@ public class CalculatorDto {
     @NoArgsConstructor
     public static class CalcRequestDto {
         private int age;
-        private boolean gender;
+        private GenderEnum gender;
         private float height;
         private float weight;
         private int bmr;
@@ -40,7 +40,7 @@ public class CalculatorDto {
     public static class CalcResultDto {
         private final UUID uuid;
         private final int age;
-        private final boolean gender;
+        private final GenderEnum gender;
         private final float height;
         private final float weight;
         private final int bmr;

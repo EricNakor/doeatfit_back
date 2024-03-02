@@ -20,7 +20,7 @@ public class CalculateInfoEntity {
     @Column(updatable = false)
     private long calcId;
     private int age;
-    private boolean gender;
+    private GenderEnum gender;
     private float height;
     private float weight;
     private int bmr;
@@ -40,7 +40,7 @@ public class CalculateInfoEntity {
 
     // 계산정보 엔티티 생성자
     @Builder
-    public CalculateInfoEntity(UserEntity userEntity, int age, boolean gender, float height, float weight, int bmr, activityLevelEnum activityLevel, dietGoalEnum dietGoal, double carb, double protein, double fat) {
+    public CalculateInfoEntity(UserEntity userEntity, int age, GenderEnum gender, float height, float weight, int bmr, activityLevelEnum activityLevel, dietGoalEnum dietGoal, double carb, double protein, double fat) {
         this.userEntity = userEntity;
         this.age = age;
         this.gender = gender;

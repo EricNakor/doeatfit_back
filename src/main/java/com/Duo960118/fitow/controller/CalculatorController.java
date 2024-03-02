@@ -1,9 +1,6 @@
 package com.Duo960118.fitow.controller;
 
-import com.Duo960118.fitow.entity.CalculateInfoEntity;
-import com.Duo960118.fitow.entity.CalculatorDto;
-import com.Duo960118.fitow.entity.CustomUserDetails;
-import com.Duo960118.fitow.entity.UserEntity;
+import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.service.CalculatorService;
 import com.Duo960118.fitow.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +27,14 @@ public class CalculatorController {
     public String calculator(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
         model.addAttribute("activityLevelEnums", CalculateInfoEntity.activityLevelEnum.values());
         model.addAttribute("dietGoalEnums", CalculateInfoEntity.dietGoalEnum.values());
+        model.addAttribute("genderEnums", GenderEnum.values());
+
+        // 만 나이 설정
+        model.addAttribute("age", calculatorService.calculateAge(customUserDetails.getUserInfo().getBirth()));
+
+        // 성별 설정
+        model.addAttribute("gender", customUserDetails.getUserInfo().getGender());
+
         if (customUserDetails == null) {
             return "unExpectedError";
         }
@@ -56,5 +62,4 @@ public class CalculatorController {
         model.addAttribute("result", calculatorService.getCalcResult(uuid));
         return "calculator/result";
     }
-
 }

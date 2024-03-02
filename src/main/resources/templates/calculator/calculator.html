@@ -7,49 +7,53 @@
 <body>
 하루 섭취량 계산기
 <table>
-<tr style="width: 100px;">
-    <td><input type="radio" name="gender" id="male" value="false" checked>남성</td>
-    <td><input type="radio" name="gender" id="female" value="true">여성</td>
-</tr>
-<tr>
-    <td colspan="2">
-<!--        <input type="date" name="birth" id="birth" min="0" max="130" autocomplete="off" ><br>-->
-<!--        <input type="date" name="birth" id="birth" min="0" max="130" autocomplete="off" ><br>-->
-        <input type="number" name="age" id="age" placeholder="나이" min="0" max="130" autocomplete="off"><br>
-    </td>
-</tr>
-<tr>
-    <td colspan="2">
-        <input type="number" name="height" id="height" placeholder="신장 cm" min="0" max="250" step="0.1"
-               autocomplete="off"><br>
-    </td>
-</tr>
-<tr>
-    <td colspan="2">
-        <input type="number" name="weight" id="weight" placeholder="체중 kg" min="0" max="250" step="0.1"
-               autocomplete="off"><br>
-    </td>
-</tr>
-<tr>
-    <td colspan="2">
-        <input type="number" name="bmr" id="bmr" placeholder="기초대사량 kcal" min="0" max="5000"
-               autocomplete="off"><br>
-    </td>
-</tr>
-<tr>
-    <td colspan="2">
-        <select name="activityLevel" id="activityLevel">
-            <option th:each="activityLevel : ${activityLevelEnums}" th:value="${activityLevel}" th:text="${activityLevel}"></option>
-        </select><br>
-    </td>
-</tr>
+    <tr style="width: 100px;">
+        <td>
+            <div>성별</div>
+            <div th:each="genderEnum : ${genderEnums}">
+                <input type="radio" th:id="${genderEnum}" th:value="${genderEnum}" name="gender" th:checked= "${genderEnum}== ${gender}">
+                <label th:for="${genderEnum}" th:text="${genderEnum}"></label>
+            </div>
+        </td>
+    </tr>
     <tr>
-    <td colspan="2">
-        <select name="dietGoal" id="dietGoal">
-            <option th:each="dietGoal : ${dietGoalEnums}" th:value="${dietGoal}" th:text="${dietGoal}"></option>
-        </select><br>
-    </td>
-</tr>
+        <td colspan="2">
+            <input type="number" name="age" id="age" th:value="${age}" placeholder="나이" min="0" max="130" autocomplete="off"><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="height" id="height" placeholder="신장 cm" min="0" max="250" step="0.1"
+                   autocomplete="off"><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="weight" id="weight" placeholder="체중 kg" min="0" max="250" step="0.1"
+                   autocomplete="off"><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="number" name="bmr" id="bmr" placeholder="기초대사량 kcal" min="0" max="5000"
+                   autocomplete="off"><br>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2">
+            <select name="activityLevel">
+                <option th:each="activityLevel : ${activityLevelEnums}" th:value="${activityLevel}" th:text="${activityLevel}"></option>
+            </select><br>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <select name="dietGoal">
+                <option th:each="dietGoal : ${dietGoalEnums}" th:value="${dietGoal}" th:text="${dietGoal}"></option>
+            </select><br>
+        </td>
+    </tr>
     <tr>
         <td>
             <button type="button" id="calculate" onclick="calculate()">계산하기</button>

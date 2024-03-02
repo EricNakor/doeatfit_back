@@ -11,7 +11,7 @@ public class CalculatorMapper {
     public static CalculatorDto.CalcResultDto entityToCalcResultDto(CalculateInfoEntity calculatorEntity) {
         return new CalculatorDto.CalcResultDto(
                 calculatorEntity.getUuidEntity().getUuid(), calculatorEntity.getAge(),
-                calculatorEntity.isGender(), calculatorEntity.getHeight(), calculatorEntity.getWeight(),
+                calculatorEntity.getGender(), calculatorEntity.getHeight(), calculatorEntity.getWeight(),
                 calculatorEntity.getBmr(), calculatorEntity.getActivityLevel(), calculatorEntity.getDietGoal(),
                 calculatorEntity.getCarb(), calculatorEntity.getProtein(), calculatorEntity.getFat(),
                 calculatorEntity.getCalcDate()

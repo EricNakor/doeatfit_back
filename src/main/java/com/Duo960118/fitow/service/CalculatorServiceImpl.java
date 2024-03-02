@@ -1,8 +1,6 @@
 package com.Duo960118.fitow.service;
 
-import com.Duo960118.fitow.entity.CalculatorDto;
-import com.Duo960118.fitow.entity.CalculateInfoEntity;
-import com.Duo960118.fitow.entity.UserEntity;
+import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.mapper.CalculatorMapper;
 import com.Duo960118.fitow.repository.CalculatorRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,27 +17,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class CalculatorServiceImpl implements CalculatorService {
-    private final UserServiceImpl userService;
     private final CalculatorRepository calculatorRepository;
 
     //todo: front에서 계산하기
-//    @Override
-//    public int calculateAge(UserDto.GenderBirthDto genderBirth) {
-//        LocalDate now = LocalDate.now();
-//        LocalDate userBirth = genderBirth.getBirth();
-//        return Period.between(userBirth, now).getYears();
-//    }
+    @Override
+    public int calculateAge(LocalDate birth) {
+        return Period.between(birth, LocalDate.now()).getYears();
+    }
 
-    // todo:gender enum 만들기
     // BMR 이 없을 경우 BMR 추정치 계산
-    public int calculateGenderBmr(int age, boolean gender, float weight, float height) {
-        if (gender) {
-            return (int) (65.5 + 9.6 * weight + 1.7 * height - 4.7 * age);
+    public int calculateGenderBmr(int age, GenderEnum gender, float weight, float height) {
+        if (gender == GenderEnum.FEMALE) {
+            return (int) (655 + 9.6 * weight + 1.7 * height - 4.7 * age);
         } else {
             return (int) (66 + 13.7 * weight + 5 * height - 6.8 * age);
         }
+        //todo: 헤리스-베네딕트 공식 > 1984개정
+        //      미플린 세인트 지어 공식 > 1990 이후 최고의 예측 공식
+        //      캐치 맥아들 공식
+        //      커닝햄 공식
     }
-
 
     // 유지 칼로리
     public double calcStandardDiet(CalculatorDto.CalcRequestDto calcRequest) {
@@ -93,7 +92,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         // bmr 값이 없을 때
         // todo: front에서 bmr값 안적으면 0 으로 넣어서 보내기
         if (calcRequest.getBmr() == 0) {
-            int bmr = calculateGenderBmr(calcRequest.getAge(), calcRequest.isGender(), calcRequest.getWeight(), calcRequest.getHeight());
+            int bmr = calculateGenderBmr(calcRequest.getAge(), calcRequest.getGender(), calcRequest.getWeight(), calcRequest.getHeight());
             calcRequest.setBmr(bmr);
         }
         double goalDiet = calcGoalDiet(calcRequest);
@@ -106,7 +105,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         CalculateInfoEntity calculatorEntity = CalculateInfoEntity.builder()
                 .userEntity(userEntity)
                 .age(calcRequest.getAge())
-                .gender(calcRequest.isGender())
+                .gender(calcRequest.getGender())
                 .height(calcRequest.getHeight())
                 .weight(calcRequest.getWeight())
                 .bmr(calcRequest.getBmr())
@@ -154,4 +153,5 @@ public class CalculatorServiceImpl implements CalculatorService {
                 .stream().map(CalculatorMapper::entityToCalcResultDto).collect(Collectors.toList());
 
     }
+
 }

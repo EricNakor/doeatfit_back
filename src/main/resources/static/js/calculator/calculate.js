@@ -9,13 +9,13 @@ function calculate() {
         contentType: "application/json",
         dataType: 'json',
         data: JSON.stringify({
-            "gender": $('#gender').val(),
+            "gender": $('input[name=gender]:checked').val(),
             "age": $('#age').val(),
             "height": $('#height').val(),
             "weight": $('#weight').val(),
             "bmr": $('#bmr').val(),
-            "activityLevel": document.getElementById('activityLevel').value,
-            "dietGoal": document.getElementById('dietGoal').value
+            "activityLevel": $('select[name=activityLevel]').val(),
+            "dietGoal": $('select[name=dietGoal]').val()
             //todo: js에서 ENUM값을 넘기지 못함 확인 필요
         }),
         success: function (data) {
