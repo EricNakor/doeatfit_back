@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/js/report/searchReport.js"></script>
+    <title>신고 및 문의 게시판</title>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>신고 및 문의 게시판</h1>
+    </header>
+    <form id="search-form">
+        <label for="category">구분: </label>
+        <select id="category" name="category">
+            <option value="">전체</option>
+            <option th:each="categoryEnum : ${reportCategoryEnums}" th:value="${categoryEnum}"
+                    th:text="${categoryEnum}"></option>
+        </select><br>
+        <label for="status">상태:</label>
+        <select id="status" name="status">
+            <option value="">전체</option>
+            <option th:each="statusEnum : ${reportStatusEnums}" th:value="${statusEnum}"
+                    th:text="${statusEnum}"></option>
+        </select><br>
+        <label>
+            이메일:<input type="text" name="email" placeholder="Email">
+        </label>
+        <button type="submit">검색</button>
+    </form>
+    <div id="results">
+        <section class="list-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>카테고리</th>
+                    <th>제목</th>
+                    <th>작성자 이메일</th>
+                    <th>작성일</th>
+                    <th>상태</th>
+                    <th>답변일</th>
+                </tr>
+                </thead>
+                <tbody th:each="report : ${searchReport}">
+                <tr>
+                    <td th:text="${report.reportCategory}"></td>
+                    <td><a th:href="@{'/reports/reply/' + ${report.uuid}}" th:text="${report.title}"></a></td>
+                    <td th:text="${report.email}"></td>
+                    <td th:text="${#temporals.format(report.getReportDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${report.reportStatus}"></td>
+                    <td th:text="${#temporals.format(report.replyDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+</body>
+</html>

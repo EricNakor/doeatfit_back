@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.entity.ReportDto;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.config.UploadConfig;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
