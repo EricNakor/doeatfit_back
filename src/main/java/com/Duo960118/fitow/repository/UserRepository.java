@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.repository;
 
+import com.Duo960118.fitow.entity.GenderEnum;
 import com.Duo960118.fitow.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,9 +24,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByNickName(String nickName);
 
     // 가입정보 찾기
-    boolean existsByEmailAndNameAndGenderAndBirth(String email, String name, UserEntity.UserGender gender, LocalDate birth);
+    boolean existsByEmailAndNameAndGenderAndBirth(String email, String name, GenderEnum gender, LocalDate birth);
 
     // 이메일 찾기
     @Query(value = "SELECT email FROM user WHERE name = :name AND gender = :gender AND birth = :birth", nativeQuery = true)
-    List<String> findByNameAndGenderAndBirth(@Param("name") String name, @Param("gender") UserEntity.UserGender gender, @Param("birth") LocalDate birth);
+    List<String> findByNameAndGenderAndBirth(@Param("name") String name, @Param("gender") GenderEnum gender, @Param("birth") LocalDate birth);
 }

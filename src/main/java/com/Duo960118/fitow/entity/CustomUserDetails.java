@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private Collection<? extends GrantedAuthority> authorities;
     private final String nickName;
     private final String name;
-    private final UserEntity.UserGender gender;
+    private final GenderEnum gender;
     private final LocalDate birth;
     private final LocalDate joinDate;
     private final LocalDate passwdEditDate;

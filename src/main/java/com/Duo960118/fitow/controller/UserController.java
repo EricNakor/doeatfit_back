@@ -1,8 +1,8 @@
 package com.Duo960118.fitow.controller;
 
 import com.Duo960118.fitow.entity.CustomUserDetails;
+import com.Duo960118.fitow.entity.GenderEnum;
 import com.Duo960118.fitow.entity.UserDto;
-import com.Duo960118.fitow.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,7 +18,7 @@ public class UserController {
     @GetMapping("join")
     public String join(@ModelAttribute("joinRequest") UserDto.JoinRequestDto joinRequest, Model model) {
         // 성별 enum 설정
-        model.addAttribute("userGenderEnums", UserEntity.UserGender.values());
+        model.addAttribute("userGenderEnums", GenderEnum.values());
         return "user/join";
     }
 
@@ -66,7 +66,7 @@ public class UserController {
     @GetMapping("find/email")
     public String findEmail(@ModelAttribute("findEmailRequest") UserDto.FindEmailRequestDto findEmailRequest, Model model) {
         // 성별 enum 설정
-        model.addAttribute("userGenderEnums", UserEntity.UserGender.values());
+        model.addAttribute("userGenderEnums", GenderEnum.values());
         return "user/findEmail";
     }
 
@@ -74,7 +74,7 @@ public class UserController {
     @GetMapping("find/info")
     public String findUserInfo(@ModelAttribute("findUserInfoRequest") UserDto.FindUserInfoRequestDto findUserInfoRequest, Model model) {
         // 성별 enum 설정
-        model.addAttribute("userGenderEnums", UserEntity.UserGender.values());
+        model.addAttribute("userGenderEnums", GenderEnum.values());
         return "user/findUserInfo";
     }
 
