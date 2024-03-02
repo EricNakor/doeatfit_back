@@ -11,11 +11,11 @@ function findUserInfo() {
                 data :JSON.stringify({
                     "email" : $('#email').val(),
                     "name" : $('#name').val(),
-                    "gender" : $('#gender').val(),
+                    "gender" : $('input[name=gender]:checked').val(),
                     "birth" : $('#birth').val()
                 }),
                 success : function(data) {
-                   if (data.success == true) {
+                   if (data.success === true) {
                            alert("있어요.");
                            setTempPasswd();
                        } else {
@@ -31,7 +31,6 @@ function findUserInfo() {
 
 // 임시 비밀번호 설정
 function setTempPasswd() {
-            var email =
              $.ajax({
                 url:"/api/user/send-temp-passwd",
                 type : "post",

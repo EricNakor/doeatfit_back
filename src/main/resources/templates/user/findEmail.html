@@ -12,8 +12,10 @@
 <div>
     <input type="text" placeholder="이름" th:value="*{findEmailRequest.name}" id="name">
 </div>
-<div>
-    성별<input type="checkbox" th:value="*{findEmailRequest.gender}" id="gender">
+<div>성별</div>
+<div th:each="userGenderEnum : ${userGenderEnums}">
+    <input type="radio" th:id="${userGenderEnum}" th:value="${userGenderEnum}" name="gender">
+    <label th:for="${userGenderEnum}" th:text="${userGenderEnum}"></label>
 </div>
 <div>
     <input type="date" th:value="*{findEmailRequest.birth}" id="birth">
@@ -24,6 +26,5 @@
 
 찾은 이메일 목록
 <p id="demo"></p><br>
-
 </body>
 </html>

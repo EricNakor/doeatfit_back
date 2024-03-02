@@ -1,7 +1,6 @@
 // 회원 가입
 function requestJoin() {
-    let gender = $('#gender').val() === "on";
-    let passwd = $('#passwd1').val()
+    let passwd = $('#passwd1').val();
 
     if (passwd !== $('#passwd2').val()) {
         alert("비밀번호를 다시 확인해주세요.");
@@ -18,7 +17,7 @@ function requestJoin() {
             "passwd": passwd,
             "name": $('#name').val(),
             "nickName": $('#nickName').val(),
-            "gender": gender,
+            "gender": $('input[name=gender]:checked').val(),
             "birth": $('#birth').val()
         }),
         success: function (data) {

@@ -18,9 +18,8 @@ public class UserDto {
         private String passwd;
         private String name;
         private String nickName;
-        private boolean gender;
+        private UserEntity.UserGender gender;
         private LocalDate birth;
-
     }
 
     // 이메일 찾기 DTO
@@ -28,7 +27,7 @@ public class UserDto {
     @Setter
     public static class FindEmailRequestDto {
         private String name;
-        private boolean gender;
+        private UserEntity.UserGender gender;
         private LocalDate birth;
     }
 
@@ -63,7 +62,7 @@ public class UserDto {
         private String email;
         private String nickName;
         private String name;
-        private boolean gender;
+        private UserEntity.UserGender gender;
         private LocalDate birth;
         private LocalDate joinDate;
         private LocalDate passwdEditDate;
@@ -77,7 +76,7 @@ public class UserDto {
         // 내부 클래스 static..? 공부해보기
         private String email;
         private String name;
-        private boolean gender;
+        private UserEntity.UserGender gender;
         private LocalDate birth;
     }
 

@@ -2,6 +2,7 @@ package com.Duo960118.fitow.controller;
 
 import com.Duo960118.fitow.entity.CustomUserDetails;
 import com.Duo960118.fitow.entity.UserDto;
+import com.Duo960118.fitow.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,9 @@ public class UserController {
 
     // 회원가입
     @GetMapping("join")
-    public String join(@ModelAttribute("joinRequest") UserDto.JoinRequestDto joinRequest) {
+    public String join(@ModelAttribute("joinRequest") UserDto.JoinRequestDto joinRequest, Model model) {
+        // 성별 enum 설정
+        model.addAttribute("userGenderEnums", UserEntity.UserGender.values());
         return "user/join";
     }
 
@@ -42,7 +45,7 @@ public class UserController {
 
     // 마이페이지
     @GetMapping("my-page")
-    public String myPage(@AuthenticationPrincipal CustomUserDetails customUserDetails,  Model model) {
+    public String myPage(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
         // todo: spring security interceptor 공부할때 어떤 방향으로 할지 정하기
         // 현재 인증된 유저 정보가 없을 때??
         if (customUserDetails == null) {
@@ -61,29 +64,21 @@ public class UserController {
 
     // 이메일 찾기
     @GetMapping("find/email")
-    public String findEmail(@ModelAttribute("findEmailRequest") UserDto.FindEmailRequestDto findEmailRequest) {
+    public String findEmail(@ModelAttribute("findEmailRequest") UserDto.FindEmailRequestDto findEmailRequest, Model model) {
+        // 성별 enum 설정
+        model.addAttribute("userGenderEnums", UserEntity.UserGender.values());
         return "user/findEmail";
     }
 
     // 가입정보 찾기
     @GetMapping("find/info")
-    public String findUserInfo(@ModelAttribute("findUserInfoRequest") UserDto.FindUserInfoRequestDto findUserInfoRequest) {
+    public String findUserInfo(@ModelAttribute("findUserInfoRequest") UserDto.FindUserInfoRequestDto findUserInfoRequest, Model model) {
+        // 성별 enum 설정
+        model.addAttribute("userGenderEnums", UserEntity.UserGender.values());
         return "user/findUserInfo";
     }
 
-    // 신고 및 문의
-    @GetMapping("my-page/contacts")
-    public String contact() {
-        return "user/contacts";
-    }
-
-    // 신고 및 문의 자세히 보기
-    @GetMapping("my-page/contacts/{id}")
-    public String showContactDetail() {
-        return "user/contactDetail";
-    }
-
-//     프로필
+    // 프로필
     @GetMapping("my-page/profile")
     public String editProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
         if (customUserDetails == null) {
@@ -92,12 +87,4 @@ public class UserController {
         model.addAttribute("userInfo", customUserDetails.getUserInfo());
         return "user/editProfile";
     }
-
-    // 식단 및 운동 기록
-    // 아직 구현하지 않음
-    @GetMapping("my-page/history")
-    public String history() {
-        return "user/history";
-    }
-
 }
