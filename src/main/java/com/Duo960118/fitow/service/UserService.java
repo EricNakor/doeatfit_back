@@ -52,4 +52,12 @@ public interface UserService {
     // 닉네임으로 UserEntity 찾기
     @Transactional
     UserEntity findByNickName(String nickName);
+
+    // 모든 유저 조회
+    @Transactional
+    List<UserDto.UserInfoDto> getAllUser();
+
+    // 유저 롤 수정
+    @Transactional
+    UserDto.UserInfoDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest);
 }

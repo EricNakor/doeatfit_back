@@ -2,13 +2,16 @@ package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
+import com.Duo960118.fitow.mapper.UserMapper;
 import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -140,6 +143,29 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByNickName(nickName).orElseThrow();
     }
 
+    // 모든 유저 조회
+    @Override
+    public List<UserDto.UserInfoDto> getAllUser() {
+        return userRepository.findAll().stream().map(UserMapper::entityToUserInfoDto).collect(Collectors.toList());
+    }
+
+    // 유저 롤 수정
+    @Override
+    public UserDto.UserInfoDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest) {
+        UserEntity userEntity = userRepository.findByEmail(editUserRoleRequest.getEmail()).orElseThrow(()->new UsernameNotFoundException("존재하지 않는 이메일"));
+        userEntity.updateUserRole(editUserRoleRequest.getNewUserRole());
+
+        return new UserDto.UserInfoDto(
+                userEntity.getEmail(),
+                userEntity.getNickName(),
+                userEntity.getName(),
+                userEntity.getGender(),
+                userEntity.getBirth(),
+                userEntity.getJoinDate(),
+                userEntity.getPasswdEditDate(),
+                userEntity.getProfileImg()
+                );
+    }
 
     // 이메일  찾기
     @Override
@@ -154,4 +180,6 @@ public class UserServiceImpl implements UserService {
     public boolean findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto) {
         return userRepository.existsByEmailAndNameAndGenderAndBirth(userInfoDto.getEmail(), userInfoDto.getName(), userInfoDto.getGender(), userInfoDto.getBirth());
     }
+
+    // todo: querydsl 이용해서 어드민 페이지에서 역할 과 이름, 이메일로 검색하는 기능 구현
 }
