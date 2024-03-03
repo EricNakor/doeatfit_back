@@ -85,6 +85,11 @@ public class UserEntity {
         this.profileImg = profileImg;
     }
 
+    // 회원 롤 변경
+    public void updateUserRole(UserRoleEnum role){
+        this.role = role;
+    }
+
     // 회원 롤
     @Getter
     public enum UserRoleEnum {

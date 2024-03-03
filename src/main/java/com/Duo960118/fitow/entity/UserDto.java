@@ -1,8 +1,6 @@
 package com.Duo960118.fitow.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -58,6 +56,7 @@ public class UserDto {
     // 마이페이지 DTO
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class UserInfoDto {
         private String email;
         private String nickName;
@@ -67,6 +66,17 @@ public class UserDto {
         private LocalDate joinDate;
         private LocalDate passwdEditDate;
         private String profileImg;
+
+        public UserInfoDto(String email, String nickName, String name, GenderEnum gender, LocalDate birth, LocalDate joinDate, LocalDate passwdEditDate, String profileImg) {
+            this.email = email;
+            this.nickName = nickName;
+            this.name = name;
+            this.gender = gender;
+            this.birth = birth;
+            this.joinDate = joinDate;
+            this.passwdEditDate = passwdEditDate;
+            this.profileImg = profileImg;
+        }
     }
 
     // 가입정보 찾기 DTO
@@ -92,5 +102,11 @@ public class UserDto {
     public static class WithdrawRequestDto {
         private String email;
         private String passwd;
+    }
+
+    @Getter
+    public static class EditUserRoleRequestDto{
+        private String email;
+        private UserEntity.UserRoleEnum newUserRole;
     }
 }

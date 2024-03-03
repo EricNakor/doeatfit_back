@@ -48,4 +48,12 @@ public interface UserService {
     // 프로필 이미지 이름 수정
     @Transactional
     boolean editProfileImgName(String email, String profileImg);
+
+    // 모든 유저 조회
+    @Transactional
+    List<UserDto.UserInfoDto> getAllUser();
+
+    // 유저 롤 수정
+    @Transactional
+    UserDto.UserInfoDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest);
 }
