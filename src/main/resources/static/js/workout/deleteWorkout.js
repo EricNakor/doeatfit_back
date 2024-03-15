@@ -1,6 +1,6 @@
 function deleteWorkout() {
     const uuid = document.URL.substring(document.URL.lastIndexOf('/') + 1);
-    fetch('/api/workouts/' + uuid, {
+    fetch('/api/def-cms/workouts/' + uuid, {
         method: 'DELETE'
     }).then(function(response) {
         if (response.ok) {

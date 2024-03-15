@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
@@ -192,5 +193,25 @@ public class UserFacade {
     // 이메일 찾기를 위한 가입정보 대조
     public boolean findUserInfo(UserDto.FindUserInfoRequestDto userInfoRequest) {
         return userService.findUserInfo(userInfoRequest);
+    }
+
+    // 유저 롤 수정
+    public UserDto.UserInfoDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest) {
+        UserEntity userEntity = userService.findByEmail(editUserRoleRequest.getEmail());
+        userEntity.updateUserRole(editUserRoleRequest.getNewUserRole());
+
+        securityService.syncAuthenticationUser();
+
+        return new UserDto.UserInfoDto(
+                userEntity.getEmail(),
+                userEntity.getNickName(),
+                userEntity.getName(),
+                userEntity.getGender(),
+                userEntity.getBirth(),
+                userEntity.getJoinDate(),
+                userEntity.getPasswdEditDate(),
+                userEntity.getProfileImg(),
+                userEntity.getRole()
+        );
     }
 }

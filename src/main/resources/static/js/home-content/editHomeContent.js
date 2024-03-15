@@ -1,26 +1,27 @@
-function editNotice() {
+function editHomeContent(){
     const uuid = document.URL.substring(document.URL.lastIndexOf('/') + 1);
-    const notice = {
-        title: document.getElementById('title').value,
+    const homeContent = {
+        isBeingUsed: document.getElementById('isBeingUsed').checked,
         category: document.getElementById('category').value,
         content: document.getElementById('content').value
     };
 
-    fetch("/api/def-cms/notices/" + uuid, {
+    console.log(homeContent);
+    fetch("/api/def-cms/home-contents/" + uuid, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(notice)
+        body: JSON.stringify(homeContent)
     }).then(function(response) {
         if (response.ok) {
             return response.json();
         }
         else {
-            alert("공지사항 수정에 실패하였습니다.");
+            alert("홈 컨텐츠 수정에 실패하였습니다.");
         }
     }).then(function(data) {
-        location.href = "/notices/" + uuid;
+        location.href = "/def-cms/home-contents";
     }).catch(function(error) {
         console.error("Error:", error);
     });

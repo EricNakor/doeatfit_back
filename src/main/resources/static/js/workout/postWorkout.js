@@ -42,7 +42,7 @@ function postWorkout(){
         formData.append('mediaFile', fileInput.files[0]);
     }
 
-    fetch('/api/workouts', {
+    fetch('/api/def-cms/workouts', {
         method: 'POST',
         body: formData
     }).then(function(response) {

@@ -1,7 +1,7 @@
 $('#search-form').on('submit', function (e) {
     e.preventDefault();
     $.ajax({
-        url: "api/reports/search",
+        url: "api/def-cms/reports/search",
         type: "get",
         data: $(this).serialize(),
         success: function (data) {

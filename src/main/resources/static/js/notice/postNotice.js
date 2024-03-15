@@ -5,7 +5,7 @@ function postNotice() {
         content: document.getElementById('content').value
     };
 
-    fetch('/api/notices', {
+    fetch('/api/def-cms/notices', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

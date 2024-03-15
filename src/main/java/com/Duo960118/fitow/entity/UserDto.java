@@ -66,8 +66,9 @@ public class UserDto {
         private LocalDate joinDate;
         private LocalDate passwdEditDate;
         private String profileImg;
+        private UserEntity.UserRoleEnum role;
 
-        public UserInfoDto(String email, String nickName, String name, GenderEnum gender, LocalDate birth, LocalDate joinDate, LocalDate passwdEditDate, String profileImg) {
+        public UserInfoDto(String email, String nickName, String name, GenderEnum gender, LocalDate birth, LocalDate joinDate, LocalDate passwdEditDate, String profileImg, UserEntity.UserRoleEnum role) {
             this.email = email;
             this.nickName = nickName;
             this.name = name;
@@ -76,8 +77,10 @@ public class UserDto {
             this.joinDate = joinDate;
             this.passwdEditDate = passwdEditDate;
             this.profileImg = profileImg;
+            this.role = role;
         }
     }
+
 
     // 가입정보 찾기 DTO
     @Getter
@@ -107,6 +110,7 @@ public class UserDto {
     }
 
     @Getter
+    @Setter
     public static class EditUserRoleRequestDto{
         private String email;
         private UserEntity.UserRoleEnum newUserRole;

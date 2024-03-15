@@ -29,7 +29,7 @@ public class WorkoutApiController {
     private final WorkoutService workoutService;
 
     // 운동 추가
-    @PostMapping("workouts")
+    @PostMapping("def-cms/workouts")
     public ResponseEntity<WorkoutDto.PostWorkoutResponseDto> postWorkout(@RequestPart(value="mediaFile", required = false) MultipartFile multipartFile, @RequestPart(value="postWorkoutRequest") WorkoutDto.PostWorkoutRequestDto postWorkoutRequest){
         return ResponseEntity
                 .ok()
@@ -38,7 +38,7 @@ public class WorkoutApiController {
 
     // 운동 수정
     // 파일 업로드가 필요한 요청은
-    @PutMapping("workouts/{uuid}")
+    @PutMapping("def-cms/workouts/{uuid}")
     public ResponseEntity<WorkoutDto.PostWorkoutResponseDto> editWorkout(@PathVariable("uuid") UUID uuid, @RequestPart(value="mediaFile", required=false) MultipartFile multipartFile, @RequestPart(value="editWorkoutRequest") WorkoutDto.PostWorkoutRequestDto editWorkoutRequest){
         return ResponseEntity
                 .ok()
@@ -46,7 +46,7 @@ public class WorkoutApiController {
     }
 
     // 운동 삭제
-    @DeleteMapping("workouts/{uuid}")
+    @DeleteMapping("def-cms/workouts/{uuid}")
     public ResponseEntity<StatusResponseDto> deleteWorkout(@PathVariable("uuid") UUID uuid){
         return ResponseEntity.ok()
                 .body(new StatusResponseDto( workoutService.deleteWorkout(uuid)));

@@ -2,6 +2,7 @@ package com.Duo960118.fitow.controller;
 
 import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.service.UserFacade;
+import com.Duo960118.fitow.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -21,6 +22,7 @@ import java.util.UUID;
 // RestController는 JSON 형식(ResponseBody)으로 자동으로 반환
 public class UserApiController {
     private final UserFacade userFacade;
+    private final UserService userService;
 
     // 회원가입
     @PostMapping("/user/join")
@@ -93,4 +95,11 @@ public class UserApiController {
         return userFacade.loadProfileImg(filename);
     }
 
+    // 역할 수정
+    @PutMapping("def-cms/user/role")
+    public ResponseEntity<UserDto.UserInfoDto> editUserRole(@RequestBody UserDto.EditUserRoleRequestDto editUserRoleRequest){
+        return ResponseEntity
+                .ok()
+                .body(userFacade.editUserRole(editUserRoleRequest));
+    }
 }

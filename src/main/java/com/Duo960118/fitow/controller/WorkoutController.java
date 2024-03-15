@@ -50,15 +50,15 @@ public class WorkoutController {
     }
 
     // 운동 작성
-    @GetMapping("/workouts/post")
+    @GetMapping("def-cms/workouts/post")
     public String postWorkout(@ModelAttribute("workout") WorkoutDto.PostWorkoutRequestDto workout, Model model){
         model.addAttribute("muscleEnums", WorkoutEntity.MuscleEnum.values());
         model.addAttribute("difficultyEnums", WorkoutEntity.DifficultyEnum.values());
         return "/workout/postWorkout";
     }
-    
+
     // 운동 수정
-    @GetMapping("/workouts/edit/{uuid}")
+    @GetMapping("def-cms/workouts/edit/{uuid}")
     public String editWorkout(@PathVariable("uuid") UUID uuid,Model model){
         WorkoutDto.WorkoutDetailDto workoutDetail = workoutService.getWorkoutDetail(uuid);
 

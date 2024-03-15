@@ -44,8 +44,16 @@ public class NoticeController {
         return "/notice/noticeDetail";
     }
 
+    // 이 uuid를 가진 공지 조회 (수정 가능)
+    @GetMapping("def-cms/notices/{uuid}")
+    public String getNoticeDetailEditable(@PathVariable("uuid") UUID uuid,Model model){
+        model.addAttribute("noticeDetail",noticeService.getNoticeDetail(uuid));
+
+        return "/notice/noticeDetailEditable";
+    }
+
     // 공지 작성 페이지
-    @GetMapping("notices/post")
+    @GetMapping("def-cms/notices/post")
     public String postNotice(@ModelAttribute("notice") NoticeDto.PostNoticeRequestDto notice, Model model)
     {
         model.addAttribute("categoryEnums", NoticeEntity.NoticeCategoryEnum.values());
@@ -54,7 +62,7 @@ public class NoticeController {
     }
 
     // 공지 수정 페이지
-    @GetMapping("notices/edit/{uuid}")
+    @GetMapping("def-cms/notices/edit/{uuid}")
     public String editNotice(@PathVariable("uuid") UUID uuid, Model model)
     {
         NoticeDto.NoticeDetailDto noticeDetail = noticeService.getNoticeDetail(uuid);

@@ -37,7 +37,9 @@ spring:
       filter:
         enabled: true #form태그에는 PUT, DELETE를 지원하지 않아 GET으로 처리됨. 타임리프 th:method 사용하여 처리
   thymeleaf:
+    # thymeleaf layout
     prefix: file:src/main/resources/templates/
+    suffix: .html
   servlet:
     multipart:
       max-file-size: 5MB

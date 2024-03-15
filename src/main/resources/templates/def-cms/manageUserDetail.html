@@ -1,0 +1,20 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<script src="/js/user/editRole.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<body>
+<p><strong>이름:</strong> <span th:text="${userInfo.name}"></span></p>
+<p><strong>닉네임:</strong> <span th:text="${userInfo.nickName}"></span></p>
+<p><strong>성별:</strong> <span th:text="${userInfo.gender}"></span></p>
+<p><strong>생년월일:</strong> <span th:text="${#temporals.format(userInfo.birth, 'yyyy-MM-dd')}"></span></p>
+<p><strong>이메일:</strong><input type="text" id="email" th:value="${userInfo.email}" readonly></p>
+<img width="150" th:src="@{/api/user/profile-img/} + ${userInfo?.profileImg}" alt=""/>
+<select id="roleEnum" th:field="*{userInfo.role}">
+    <option th:each="userRole : ${userRoles}" th:value="${userRole}" th:text="${userRole}"></option>
+</select><br>
+<p></p>
+<p><strong>가입일:</strong> <span th:text="${#temporals.format(userInfo.joinDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+<p><strong>비밀번호 수정일:</strong> <span th:text="${#temporals.format(userInfo.passwdEditDate, 'yyyy-MM-dd  HH:mm')}"></span></p>
+<input type="button" value="수정하기" onclick="editRole()">
+<a href="/def-cms/users">목록으로 돌아가기</a>
+</body>
+</html>

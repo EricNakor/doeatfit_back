@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HomeController {
-
     @GetMapping(value = "/")
     public String home(HttpServletRequest req) {
         req.setAttribute("contentPage", "home.html");

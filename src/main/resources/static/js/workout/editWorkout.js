@@ -44,7 +44,7 @@ function editWorkout(){
     formData.append("editWorkoutRequest", new Blob([JSON.stringify(workout)], {type: "application/json"}));
 
     $.ajax({
-        url: '/api/workouts/' + uuid,
+        url: '/api/def-cms/workouts/' + uuid,
         type: 'PUT',
         data: formData,
         processData: false,

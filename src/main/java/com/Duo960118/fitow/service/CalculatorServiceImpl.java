@@ -73,7 +73,6 @@ public class CalculatorServiceImpl implements CalculatorService {
                 result = calcStandDiet * 0.8;
             }
             case KEEP -> {
-
                 result = calcStandDiet;
             }
             case GAIN -> {
@@ -153,5 +152,4 @@ public class CalculatorServiceImpl implements CalculatorService {
                 .stream().map(CalculatorMapper::entityToCalcResultDto).collect(Collectors.toList());
 
     }
-
 }

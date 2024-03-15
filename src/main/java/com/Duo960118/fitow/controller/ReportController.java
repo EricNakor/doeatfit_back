@@ -25,7 +25,7 @@ import java.util.UUID;
 public class ReportController {
     private final ReportService reportService;
 
-    @GetMapping("reports/all")
+    @GetMapping("def-cms/reports/all")
     public String getAllReports(@RequestParam(value = "status", required = false) ReportEntity.ReportStatusEnum status,
                                 @RequestParam(value = "category", required = false) ReportEntity.ReportCategoryEnum category,
                                 @RequestParam(value = "email", required = false) String email,
@@ -43,7 +43,7 @@ public class ReportController {
     }
 
     // 신고 답변
-    @GetMapping("reports/reply/{uuid}")
+    @GetMapping("def-cms/reports/reply/{uuid}")
     public String replyReport(@PathVariable("uuid") UUID uuid, Model model, @ModelAttribute("reply")ReportDto.ReplyReportDto replyReport) {
         model.addAttribute("reportDetail", reportService.getReportDetail(uuid));
         ReportDto.ReportDetailDto reportDetail = reportService.getReportDetail(uuid);

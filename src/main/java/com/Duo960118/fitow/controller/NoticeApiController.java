@@ -42,7 +42,7 @@ public class NoticeApiController {
         return ResponseEntity.ok().body(noticeService.searchNotice(noticeCategory,searchString));
     }
     // 공지 작성
-    @PostMapping("notices")
+    @PostMapping("def-cms/notices")
     public ResponseEntity<NoticeDto.PostNoticeResponseDto> postNotice(@RequestBody NoticeDto.PostNoticeRequestDto postNoticeRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails){
         postNoticeRequest.setNickName(customUserDetails.getUserInfo().getNickName());
         return ResponseEntity.ok()
@@ -50,7 +50,7 @@ public class NoticeApiController {
     }
 
     // 공지 삭제
-    @DeleteMapping("notices/{uuid}")
+    @DeleteMapping("def-cms/notices/{uuid}")
     public ResponseEntity<StatusResponseDto> deleteNotice(@PathVariable("uuid") UUID uuid){
 
         return ResponseEntity.ok()
@@ -59,7 +59,7 @@ public class NoticeApiController {
 
     // 공지 수정
     // todo: security config에 admin 권한 확인 필요
-    @PutMapping("notices/{uuid}")
+    @PutMapping("def-cms/notices/{uuid}")
     public ResponseEntity<StatusResponseDto> editNotice(@PathVariable("uuid") UUID uuid,@RequestBody NoticeDto.PostNoticeRequestDto editNoticeRequest){
         return  ResponseEntity.ok()
                 .body(new StatusResponseDto(noticeService.editNotice(uuid,editNoticeRequest)));

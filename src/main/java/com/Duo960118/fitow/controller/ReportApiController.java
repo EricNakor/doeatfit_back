@@ -56,14 +56,14 @@ public class ReportApiController {
     }
 
     // 신고 삭제
-    @DeleteMapping("reports/{uuid}")
+    @DeleteMapping("def-cms/reports/{uuid}")
     public ResponseEntity<StatusResponseDto> deleteReport(@PathVariable("uuid") UUID uuid) {
         reportService.deleteReport(uuid);
         return ResponseEntity.ok().body(new StatusResponseDto(reportService.deleteReport(uuid)));
     }
 
     // 신고 답변
-    @PutMapping("reports/reply/{uuid}")
+    @PutMapping("def-cms/reports/reply/{uuid}")
     public ResponseEntity<StatusResponseDto> replyReport(@PathVariable("uuid") UUID uuid,
                                                          @RequestPart(value = "replyReportDto") ReportDto.ReplyReportDto replyReport,
                                                          @RequestPart(value = "replyFiles", required = false) List<MultipartFile> multipartFile) {
@@ -71,7 +71,7 @@ public class ReportApiController {
     }
 
     // 신고 전체 문의 리스트
-    @GetMapping("reports")
+    @GetMapping("def-cms/reports")
     public ResponseEntity<List<ReportDto.ReportInfoDto>> reports(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         List<ReportDto.ReportInfoDto> result = reportService.getAllReport(pageRequest);
@@ -80,7 +80,7 @@ public class ReportApiController {
     }
 
     // 필터 검색
-    @GetMapping("reports/search")
+    @GetMapping("def-cms/reports/search")
     public ResponseEntity<Page<ReportDto.ReportInfoDto>> searchReports(
             @RequestParam(value = "status", required = false) ReportEntity.ReportStatusEnum status,
             @RequestParam(value = "category", required = false) ReportEntity.ReportCategoryEnum category,

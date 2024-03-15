@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserEntity findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("존재하지 않는 이메일"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("존재하지 않는 회원"));
     }
 
     // 이메일 중복확인
@@ -149,22 +149,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserMapper::entityToUserInfoDto).collect(Collectors.toList());
     }
 
-    // 유저 롤 수정
-    @Override
-    public UserDto.UserInfoDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest) {
-        UserEntity userEntity = userRepository.findByEmail(editUserRoleRequest.getEmail()).orElseThrow(()->new UsernameNotFoundException("존재하지 않는 이메일"));
-        userEntity.updateUserRole(editUserRoleRequest.getNewUserRole());
 
-        return new UserDto.UserInfoDto(
-                userEntity.getEmail(),
-                userEntity.getNickName(),
-                userEntity.getName(),
-                userEntity.getGender(),
-                userEntity.getBirth(),
-                userEntity.getJoinDate(),
-                userEntity.getPasswdEditDate(),
-                userEntity.getProfileImg()
-                );
+
+    @Override
+    public UserDto.UserInfoDto getUserInfo(String email) {
+        return  UserMapper.entityToUserInfoDto(userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("존재하지 않는 회원")));
     }
 
     // 이메일  찾기

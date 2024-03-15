@@ -12,8 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import java.util.List;
-
 // todo: 기능 구현 완료 후 JWT 도입 필요
 // todo: Back-end 유효성 검사 추가
 @Configuration
@@ -26,11 +24,13 @@ public class SecurityConfig {
 //        return (web) -> web.ignoring().requestMatchers("/예외처리하고 싶은 url", "/예외처리하고 싶은 url");
 //    }
 
-    String[] noAuthGet = {"/", "/login", "/find/**", "/join", "/notices", "/api/email/verify", "/api/user/check/**","/calculator/**","api/workouts/**","/api/notices/**"};
-    String[] noAuth = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth", "/api/calculate","api/workouts/**"};
+    // 인증이 필요없는 url
+    String[] noAuth = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**"};
+    String[] noAuthApi = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth","/api/email/verify", "/api/user/check/**", "/api/workouts/**", "/api/notices/**"};
 
     // admin 권한이 필요한 url
-    String[] adminAuthorityRequired = {"/api/notices/**","/notices/post","/notices/edit"};
+    String[] adminAuthRequired = {"/def-cms/**" };
+    String[] adminAuthRequiredApi={"/api/def-cms/**"};
 
     @Bean
     // 스프링 시큐리티의 세부 설정
@@ -41,8 +41,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET, noAuthGet).permitAll()
                         .requestMatchers(noAuth).permitAll()
+                        .requestMatchers(noAuthApi).permitAll()
                         .requestMatchers("/css/**","/js/**","/error").permitAll()
                         )
                 .formLogin((formLogin) -> formLogin
@@ -61,10 +61,11 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                 );
 
-        // notice 작성,수정,삭제 시 admin 권한 확인
+        // admin 권한 확인 (ex. notice 작성,수정,삭제 시)
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(adminAuthorityRequired).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
+                        .requestMatchers(adminAuthRequired).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
+                        .requestMatchers(adminAuthRequiredApi).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
                 );
 
         // 위에서 필터된 이외의 주소는 인가 되었는지만 확인

@@ -20,7 +20,7 @@ function replyReport() {
     }
 
     $.ajax({
-        url: "/api/reports/reply/" + uuid,
+        url: "/api/def-cms/reports/reply/" + uuid,
         type: "put",
         dataType: 'json',
         contentType: false,

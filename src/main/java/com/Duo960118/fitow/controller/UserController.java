@@ -123,5 +123,4 @@ public class UserController {
 
         return "report/reportPost";
     }
-
 }

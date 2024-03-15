@@ -1,6 +1,6 @@
 function deleteNotice() {
     const uuid = document.URL.substring(document.URL.lastIndexOf('/') + 1);
-    fetch('/api/notices/' + uuid, {
+    fetch('/api/def-cms/notices/' + uuid, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'

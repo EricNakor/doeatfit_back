@@ -15,7 +15,8 @@ public class UserMapper {
                 userEntity.getBirth(),
                 userEntity.getJoinDate(),
                 userEntity.getPasswdEditDate(),
-                userEntity.getProfileImg()
+                userEntity.getProfileImg(),
+                userEntity.getRole()
         );
     }
 }
