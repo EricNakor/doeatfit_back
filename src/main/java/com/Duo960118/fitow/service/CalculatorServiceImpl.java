@@ -4,6 +4,7 @@ import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.mapper.CalculatorMapper;
 import com.Duo960118.fitow.repository.CalculatorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 public class CalculatorServiceImpl implements CalculatorService {
     private final CalculatorRepository calculatorRepository;
 
-    //todo: front에서 계산하기
     @Override
     public int calculateAge(LocalDate birth) {
         return Period.between(birth, LocalDate.now()).getYears();
@@ -32,10 +32,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         } else {
             return (int) (66 + 13.7 * weight + 5 * height - 6.8 * age);
         }
-        //todo: 헤리스-베네딕트 공식 > 1984개정
-        //      미플린 세인트 지어 공식 > 1990 이후 최고의 예측 공식
-        //      캐치 맥아들 공식
-        //      커닝햄 공식
+
     }
 
     // 유지 칼로리
@@ -67,10 +64,10 @@ public class CalculatorServiceImpl implements CalculatorService {
         double result = 0.0;
         switch (calcRequest.getDietGoal()) {
             case HIGH_LOSS -> {
-                result = calcStandDiet * 0.9;
+                result = calcStandDiet * 0.8;
             }
             case LOSS -> {
-                result = calcStandDiet * 0.8;
+                result = calcStandDiet * 0.9;
             }
             case KEEP -> {
                 result = calcStandDiet;
@@ -85,6 +82,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         return result;
     }
 
+    @Override
     @Transactional
     // 유지 칼로리, 다이어트 목표를 이용한 일일 권장 섭취량 계산
     public CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest, UserEntity userEntity) {
@@ -101,8 +99,9 @@ public class CalculatorServiceImpl implements CalculatorService {
         double fat = (goalDiet * 0.2) / 9;
 
         // 저장할 데이터 빌드
-        CalculateInfoEntity calculatorEntity = CalculateInfoEntity.builder()
+        CalculateInfoEntity normalCalcEntity = CalculateInfoEntity.builder()
                 .userEntity(userEntity)
+                .calcCategory(CalculateInfoEntity.calcCategoryEnum.NORMAL)
                 .age(calcRequest.getAge())
                 .gender(calcRequest.getGender())
                 .height(calcRequest.getHeight())
@@ -115,9 +114,9 @@ public class CalculatorServiceImpl implements CalculatorService {
                 .fat(fat)
                 .build();
         // 리포지토리 저장
-        calculatorRepository.save(calculatorEntity);
+        calculatorRepository.save(normalCalcEntity);
         // 반환
-        return new CalculatorDto.CalcResponseDto(calculatorEntity.getUuidEntity().getUuid(), carb, protein, fat);
+        return new CalculatorDto.CalcResponseDto(normalCalcEntity.getUuidEntity().getUuid(), carb, protein, fat);
     }
 
     @Override
@@ -135,6 +134,57 @@ public class CalculatorServiceImpl implements CalculatorService {
 
         // 매퍼
         return calculateInfoEntity.stream().map(CalculatorMapper::entityToCalcResultDto).collect(Collectors.toList());
+    }
+
+    @Override
+    // 로딩, 벤딩할 값 리스트
+    public List<CalculatorDto.AdvancedCalcListDto> getAdvancedCalcList(UserEntity userEntity, PageRequest pageRequest) {
+        Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, pageRequest);
+
+        return calculateInfoEntity.stream().map(CalculatorMapper::entityToAdvancedCalcListDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    // 로딩, 벤딩 계산하기
+    public CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest, UserEntity userEntity) {
+
+        CalculateInfoEntity calculateEntity = calculatorRepository.findByUuidEntityUuid(calcRequest.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 결과"));
+
+        double advancedCarb, advancedProtein, advancedFat;
+        switch (calcRequest.getCalcCategory()) {
+            case LOADING:
+                advancedCarb = calculateEntity.getCarb() * 2;
+                advancedProtein = 0;
+                advancedFat = 0;
+                break;
+            case BANTING:
+                advancedCarb = calculateEntity.getCarb() / 2;
+                advancedProtein = calculateEntity.getProtein();
+                advancedFat = calculateEntity.getFat();
+                break;
+            default:
+                throw new IllegalArgumentException("알 수 없는 카테고리: " + calcRequest.getCalcCategory());
+        }
+        // 저장할 데이터 빌드
+        CalculateInfoEntity advancedCalcEntity = CalculateInfoEntity.builder()
+                .userEntity(userEntity)
+                .calcCategory(calcRequest.getCalcCategory())
+                .age(calculateEntity.getAge())
+                .gender(calculateEntity.getGender())
+                .height(calculateEntity.getHeight())
+                .weight(calculateEntity.getWeight())
+                .bmr(calculateEntity.getBmr())
+                .activityLevel(calculateEntity.getActivityLevel())
+                .dietGoal(calculateEntity.getDietGoal())
+                .carb(advancedCarb)
+                .protein(advancedProtein)
+                .fat(advancedFat)
+                .build();
+        // 리포지토리 저장
+        calculatorRepository.save(advancedCalcEntity);
+        // 반환
+        return new CalculatorDto.CalcResponseDto(advancedCalcEntity.getUuidEntity().getUuid(), advancedCarb, advancedProtein, advancedFat);
     }
 
     // 계산 결과 삭제

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <html lang="ko">
 <head>
     <title>Fitow</title>
@@ -16,7 +16,7 @@
         <a href="/reports/all">신고 전체 조회</a><br>
         <a href="/notices">공지 전체 조회</a>
         <a href="/notices/post">공지 작성</a>
-        <a href="/calculator">계산기</a>
+        <a href="/calculator/normal">계산기</a>
         <a href="/calculator/history">계산 기록</a><br>
         <a href="/workouts">운동 추천</a>
         <a href="/workouts/post">운동 작성</a>
@@ -32,9 +32,9 @@
 <main>
     <div id="content">여기는 index입니다.</div>
 </main>
-<!--    <th:include page="${contentPage }"></th:include>-->
-<!--얘랑 얘랑 뭐가 다른거지???-->
-<th:block th:replace="${contentPage}"></th:block>
+    <!--    <th:include page="${contentPage }"></th:include>-->
+    <!--얘랑 얘랑 뭐가 다른거지???-->
+    <th:block th:replace="${contentPage}"></th:block>
 <footer>
     <p>Copyright &copy; 2023.960118Duo</p>
 </footer>

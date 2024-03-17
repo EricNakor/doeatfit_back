@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/js/calculator/calculate.js"></script>
+    <link rel="shortcut icon" href="#">
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>선택</th>
+        <th>계산일자</th>
+        <th>기초대사량</th>
+        <th>탄수화물</th>
+        <th>단백질</th>
+        <th>지방</th>
+    </tr>
+    </thead>
+    <tbody th:each="result : ${lists}">
+    <tr>
+        <td><label>
+            <input type="radio" name="list" th:value="${result.uuid}">
+        </label></td>
+        <td th:text="${#temporals.format(result.calcDate, 'yyyy-MM-dd')}"></td>
+        <td><a th:href="@{'/calculator/result/' + ${result.uuid}}" th:text="${result.bmr}"></a></td>
+        <td th:text="${#numbers.formatDecimal(result.carb,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(result.protein,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(result.fat,1,1)}"></td>
+    </tr>
+</table>
+<div>옵션</div>
+<div th:each="category : ${categoryEnums}">
+    <input type="radio" th:id="${category}" th:value="${category}" id="option" name="category">
+    <label th:for="${category}" th:text="${category}"></label>
+</div>
+<button id="calculate" onclick="advancedCalculate()">계산하기</button>
+</body>
+</html>

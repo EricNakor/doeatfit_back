@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name="CALCINFO")
+@Table(name = "CALCINFO")
 @EntityListeners(AuditingEntityListener.class)
 public class CalculateInfoEntity {
     @Id
@@ -37,10 +37,12 @@ public class CalculateInfoEntity {
     private UuidEntity uuidEntity;
     @CreatedDate
     private LocalDate calcDate;
+    private calcCategoryEnum calcCategory;
 
     // 계산정보 엔티티 생성자
     @Builder
-    public CalculateInfoEntity(UserEntity userEntity, int age, GenderEnum gender, float height, float weight, int bmr, activityLevelEnum activityLevel, dietGoalEnum dietGoal, double carb, double protein, double fat) {
+    public CalculateInfoEntity(UserEntity userEntity, int age, GenderEnum gender, float height, float weight, int bmr,
+                               activityLevelEnum activityLevel, dietGoalEnum dietGoal, double carb, double protein, double fat, calcCategoryEnum calcCategory) {
         this.userEntity = userEntity;
         this.age = age;
         this.gender = gender;
@@ -52,11 +54,12 @@ public class CalculateInfoEntity {
         this.carb = carb;
         this.protein = protein;
         this.fat = fat;
+        this.calcCategory = calcCategory;
     }
 
     // 활동량
     @Getter
-    public enum activityLevelEnum{
+    public enum activityLevelEnum {
         VERY_LOW,
         LOW,
         NORMAL,
@@ -66,12 +69,20 @@ public class CalculateInfoEntity {
 
     // 목표
     @Getter
-    public enum dietGoalEnum{
+    public enum dietGoalEnum {
         HIGH_LOSS,
         LOSS,
         KEEP,
         GAIN,
         HIGH_GAIN
+    }
+
+    // 세부 계산
+    @Getter
+    public enum calcCategoryEnum {
+        NORMAL,
+        LOADING,
+        BANTING
     }
 
 }

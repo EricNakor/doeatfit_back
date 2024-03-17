@@ -1,10 +1,10 @@
 // var token = $("meta[name='_csrf']").attr('content');
 // var header = $("meta[name='_csrf_header']").attr('content');
 
-// 계산하기
+// 일반 계산하기
 function calculate() {
     $.ajax({
-        url: "/api/calculate",
+        url: "/api/calculate/normal",
         type: "post",
         contentType: "application/json",
         dataType: 'json',
@@ -25,6 +25,23 @@ function calculate() {
         //     xhr.setRequestHeader(header, token);
         // }
     });
+}
+
+// 고급 계산하기
+function advancedCalculate() {
+    $.ajax({
+        url: "/api/calculate/advanced",
+        type: "post",
+        contentType: "application/json",
+        dataType: 'json',
+        data: JSON.stringify({
+            "uuid": $("input[name='list']:checked").val(),
+            "calcCategory": $('input[name=category]:checked').val()
+        }),
+        success:function (data){
+            location.herf = '/calculator/history'
+        }
+    })
 }
 
 // 결과 삭제하기
