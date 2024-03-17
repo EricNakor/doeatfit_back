@@ -28,10 +28,17 @@ public class CalculatorApiController {
     // ex) HTTP 200 ok + data{ ... }
 
     // 일일 섭취량 계산
-    @PostMapping("/calculate")
+    @PostMapping("/calculate/normal")
     public ResponseEntity<CalculatorDto.CalcResponseDto> calculateDailyIntake(@RequestBody CalculatorDto.CalcRequestDto calcRequest, @AuthenticationPrincipal CustomUserDetails userDetails) {
         UserEntity userEntity = userService.findByEmail(userDetails.getUsername());
         return ResponseEntity.ok().body(calculatorService.calculate(calcRequest, userEntity));
+    }
+
+    // 벤딩, 로딩 계산
+    @PostMapping("/calculate/advanced")
+    public ResponseEntity<CalculatorDto.CalcResponseDto> calculateAdvance(@RequestBody CalculatorDto.AdvancedCalcRequestDto calcRequest, @AuthenticationPrincipal CustomUserDetails userDetails, UUID uuid) {
+        UserEntity userEntity = userService.findByEmail(userDetails.getUsername());
+        return ResponseEntity.ok().body(calculatorService.calculateAdvanced(calcRequest, userEntity));
     }
 
     // 계산 기록 전체 불러오기
@@ -40,7 +47,7 @@ public class CalculatorApiController {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         UserEntity userEntity = userService.findByEmail(customUserDetails.getUsername());
 
-        return ResponseEntity.ok().body(calculatorService.getCalcResultsPage(userEntity,pageRequest));
+        return ResponseEntity.ok().body(calculatorService.getCalcResultsPage(userEntity, pageRequest));
     }
 
     // 계산 결과 자세히 보기
@@ -53,7 +60,7 @@ public class CalculatorApiController {
     @DeleteMapping("calculator/result/{uuid}")
     public ResponseEntity<StatusResponseDto> deleteResult(@PathVariable("uuid") UUID uuid) {
         calculatorService.deleteResult(uuid);
-        return ResponseEntity.ok().body( new StatusResponseDto(true));
+        return ResponseEntity.ok().body(new StatusResponseDto(true));
         // todo: StatusResponseDto 활용해 리턴 수정 필요
     }
 }

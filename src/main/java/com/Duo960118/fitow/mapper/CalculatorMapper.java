@@ -4,6 +4,9 @@ import com.Duo960118.fitow.entity.CalculatorDto;
 import com.Duo960118.fitow.entity.CalculateInfoEntity;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 public class CalculatorMapper {
 
     // 계산 결과 Entity 를 Dto 형식으로 변환
@@ -14,7 +17,15 @@ public class CalculatorMapper {
                 calculatorEntity.getGender(), calculatorEntity.getHeight(), calculatorEntity.getWeight(),
                 calculatorEntity.getBmr(), calculatorEntity.getActivityLevel(), calculatorEntity.getDietGoal(),
                 calculatorEntity.getCarb(), calculatorEntity.getProtein(), calculatorEntity.getFat(),
-                calculatorEntity.getCalcDate()
+                calculatorEntity.getCalcDate(), calculatorEntity.getCalcCategory()
+        );
+    }
+
+    public static CalculatorDto.AdvancedCalcListDto entityToAdvancedCalcListDto(CalculateInfoEntity calculateEntity) {
+        return new CalculatorDto.AdvancedCalcListDto(
+                calculateEntity.getUuidEntity().getUuid(), calculateEntity.getCarb(),
+                calculateEntity.getProtein(), calculateEntity.getFat(),
+                calculateEntity.getBmr(), calculateEntity.getCalcDate()
         );
     }
 }

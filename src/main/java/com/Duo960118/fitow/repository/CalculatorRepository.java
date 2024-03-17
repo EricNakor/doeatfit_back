@@ -2,6 +2,7 @@ package com.Duo960118.fitow.repository;
 
 import com.Duo960118.fitow.entity.CalculateInfoEntity;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,6 +16,9 @@ public interface CalculatorRepository extends JpaRepository<CalculateInfoEntity,
 
     // 기록 불러오기
     List<CalculateInfoEntity> findByUserEntityUserIdOrderByCalcIdDesc(Long userId);
+
+    // 카테고리 값이 0인 것만 불러오기
+    Page<CalculateInfoEntity> findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(Long userId, CalculateInfoEntity.calcCategoryEnum calcCategoryEnum, Pageable pageable);
 
     // 기록 삭제
     void deleteByUuidEntityUuid(UUID uuid);

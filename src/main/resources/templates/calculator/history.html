@@ -12,6 +12,7 @@
     <thead>
     <tr>
         <th>계산일자</th>
+        <th>카테고리</th>
         <th>기초대사량</th>
         <th>신장</th>
         <th>체중</th>
@@ -28,6 +29,7 @@
     <tbody th:each="result : ${results}">
     <tr>
         <td th:text="${#temporals.format(result.calcDate, 'yyyy-MM-dd')}"></td>
+        <td th:text="${result.calcCategory}"></td>
         <td><a th:href="@{'/calculator/result/' + ${result.uuid}}" th:text="${result.bmr}"></a></td>
         <td th:text="${result.height}"></td>
         <td th:text="${result.weight}"></td>

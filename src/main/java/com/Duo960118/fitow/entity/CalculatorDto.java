@@ -1,9 +1,6 @@
 package com.Duo960118.fitow.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -22,6 +19,7 @@ public class CalculatorDto {
         private int bmr;
         private CalculateInfoEntity.activityLevelEnum activityLevel;
         private CalculateInfoEntity.dietGoalEnum dietGoal;
+        private CalculateInfoEntity.calcCategoryEnum calcCategory;
     }
 
     // 계산 결과
@@ -50,5 +48,27 @@ public class CalculatorDto {
         private final double protein;
         private final double fat;
         private final LocalDate calcDate;
+        private final CalculateInfoEntity.calcCategoryEnum calcCategory;
+    }
+
+    // 로딩, 벤딩 계산값 입력 리스트
+    @Getter
+    @RequiredArgsConstructor
+    public static class AdvancedCalcListDto {
+        private final UUID uuid;
+        private final double carb;
+        private final double protein;
+        private final double fat;
+        private final int bmr;
+        private final LocalDate calcDate;
+    }
+
+    // 고급 계산 DTO
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class AdvancedCalcRequestDto {
+        private final UUID uuid;
+        private CalculateInfoEntity.calcCategoryEnum calcCategory;
     }
 }
