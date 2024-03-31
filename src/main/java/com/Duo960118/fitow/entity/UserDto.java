@@ -104,7 +104,7 @@ public class UserDto {
     // 탈퇴 DTO
     @Getter
     @Setter
-    public static class WithdrawRequestDto {
+    public static class EmailPasswdDto {
         private String email;
         private String passwd;
     }
@@ -115,4 +115,5 @@ public class UserDto {
         private String email;
         private UserEntity.UserRoleEnum newUserRole;
     }
+
 }

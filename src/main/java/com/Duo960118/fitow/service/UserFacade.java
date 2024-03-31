@@ -1,6 +1,5 @@
 package com.Duo960118.fitow.service;
 
-import com.Duo960118.fitow.entity.ReportDto;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.config.UploadConfig;
@@ -8,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
@@ -173,7 +170,7 @@ public class UserFacade {
     }
 
     // 회원탈퇴
-    public boolean withdraw(UserDto.WithdrawRequestDto withdrawRequest) {
+    public boolean withdraw(UserDto.EmailPasswdDto withdrawRequest) {
 
         UserEntity user = userService.findByEmail(withdrawRequest.getEmail());
         // 프로필 이미지 삭제

@@ -40,7 +40,6 @@ public class UserController {
     }
 
     // 로그인
-    // spring security가 다해줌
     @GetMapping("login")
     public String login() {
         return "user/login";

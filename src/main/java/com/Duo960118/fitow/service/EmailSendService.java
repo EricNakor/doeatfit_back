@@ -16,7 +16,7 @@ import java.util.Random;
 public class EmailSendService {
     private final EmailConfig emailConfig;
     private final JavaMailSender mailSender;
-    private final RedisService redisService;
+    private final RedisUtil redisUtil;
     // final를 사용하여 필드 선언 시 생성자에서 초기화 필수
     // 최종값이므로 생성자에서 초기화가 없으면 null 값으로
     // 초기화하지 않으면 컴파일 에러 발생
@@ -65,7 +65,7 @@ public class EmailSendService {
                             "인증번호는 " + authNum + " 입니다.\n" +
                             "인증번호를 제대로 입력해주세요";
             sendEmail(from, to, subject, text);
-            redisService.setDataExp(to, authNum, Duration.ofSeconds(60 * 4L)); //인증번호 4분 후 만료
+            redisUtil.setDataExp(to, authNum, Duration.ofSeconds(60 * 4L)); //인증번호 4분 후 만료
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,7 +87,7 @@ public class EmailSendService {
     // 인증번호 인증
     public boolean verifyEmail(EmailDto.VerifyEmailRequestDto verifyEmailRequest) {
         try {
-            return verifyEmailRequest.getAuthNum().equals(redisService.getData(verifyEmailRequest.getEmail()));
+            return verifyEmailRequest.getAuthNum().equals(redisUtil.getData(verifyEmailRequest.getEmail()));
         } catch (Exception e) {
             e.printStackTrace();
             return false;

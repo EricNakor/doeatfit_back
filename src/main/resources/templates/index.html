@@ -5,6 +5,7 @@
     <title>Fitow</title>
 </head>
 <body>
+
 <header>
     <h1>메뉴 로고 프로필</h1>
     <div>
@@ -13,13 +14,13 @@
         <a href="/join">회원가입</a>
         <a href="/login">로그인</a>
         <a href="/my-page">마이페이지</a>
-        <a href="/reports/all">신고 전체 조회</a><br>
+        <a href="/def-cms/reports/all">신고 전체 조회</a><br>
         <a href="/notices">공지 전체 조회</a>
         <a href="/notices/post">공지 작성</a>
         <a href="/calculator/normal">계산기</a>
         <a href="/calculator/history">계산 기록</a><br>
         <a href="/workouts">운동 추천</a>
-        <a href="/workouts/post">운동 작성</a>
+        <a href="/def-cms/workouts/post">운동 작성</a>
     </div><br>
     <div>
         <h3>api</h3>
@@ -35,6 +36,7 @@
     <!--    <th:include page="${contentPage }"></th:include>-->
     <!--얘랑 얘랑 뭐가 다른거지???-->
     <th:block th:replace="${contentPage}"></th:block>
+<button onclick="printToken()">토큰 확인</button>
 <footer>
     <p>Copyright &copy; 2023.960118Duo</p>
 </footer>

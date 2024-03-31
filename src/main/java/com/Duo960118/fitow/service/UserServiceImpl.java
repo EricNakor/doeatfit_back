@@ -6,6 +6,7 @@ import com.Duo960118.fitow.mapper.UserMapper;
 import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,6 @@ public class UserServiceImpl implements UserService {
     암호화 방식을 변경하면 BCryptPasswordEncoder를 사용한 모든 프로그램을
     일일이 찾아다니며 수정해야 하기 때문. SecurityConfig.java에 Bean 설정*/
 
-    private final PasswordEncoder passwordEncoder;
-
     // 회원가입
     @Override
     @Transactional
@@ -36,7 +35,7 @@ public class UserServiceImpl implements UserService {
         try {
             UserEntity userEntity = UserEntity.builder()
                     .email(joinRequest.getEmail())
-                    .passwd(passwordEncoder.encode(joinRequest.getPasswd()))
+                    .passwd(new BCryptPasswordEncoder().encode(joinRequest.getPasswd()))
                     .name(joinRequest.getName())
                     .nickName(joinRequest.getNickName())
                     .gender(joinRequest.getGender())
@@ -56,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public boolean withdraw(String email, String passwd) {
         UserEntity userEntity = this.findByEmail(email);
-        if (!passwordEncoder.matches(passwd, userEntity.getPasswd())) {
+        if (!new BCryptPasswordEncoder().matches(passwd, userEntity.getPasswd())) {
             return false;
         }
         userRepository.delete(userEntity);
@@ -90,6 +89,7 @@ public class UserServiceImpl implements UserService {
     // 연산이 독립적으로 이루어지고, 연산 중 다른 연산이 끼어들 수 없다. one by one.
     public boolean editPasswd(String email, UserDto.EditPasswdRequestDto editPasswdRequest) {
         try {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             // 이메일 존재하는지 확인
             UserEntity user = this.findByEmail(email);
 
