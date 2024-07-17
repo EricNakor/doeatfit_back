@@ -30,7 +30,10 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
                 .where(containsEmail(email))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(reportEntity.reportId.desc())
                 .fetch();
+        // TODO : apiController 에서 sort direction desc 로 했으나 적용되지 않아 QueryDSL orderBy 추가로 해결했는데,
+        //  apiController 의 PageableDefault 는 왜 작동하지 않는지 알아보자
 
         JPAQuery<Long> countQuery = getCount(reportStatus, reportCategory, email);
 

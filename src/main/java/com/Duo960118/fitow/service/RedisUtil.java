@@ -1,7 +1,6 @@
 package com.Duo960118.fitow.service;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.ILoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 

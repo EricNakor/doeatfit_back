@@ -68,7 +68,7 @@ public class TokenUtil {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-    
+
     // 만료된 access token에서 유저 정보를 가져올 때 사용
     //Headers: {"alg":"HS256","typ":"JWT","exp":"1300819380"}  [0]
     //Payload: {"email":"John Doe","role":"user","admin":true}   [1]
@@ -86,7 +86,7 @@ public class TokenUtil {
                 new String(Base64.getDecoder().decode(expiredToken.split("\\.")[1]), StandardCharsets.UTF_8),
                 Map.class).get("email").toString();
     }
-    
+
     public String getUsername(String token) {
         logger.debug(getAllClaims(token).get("email", String.class));
         return getAllClaims(token).get("email", String.class);
@@ -123,10 +123,10 @@ public class TokenUtil {
     }
 
     // 입력 받은 email을 key 값으로 갖는 TokensEntity가 access token 값으로 입력 받은 access token과 같은 refresh token이 있는 확인 
-    public boolean hasRefreshToken(String email,String accessToken) {
-        TokensEntity tokensEntity= null; //hasKey(REFRESH_TOKEN_PREFIX + accessToken);
+    public boolean hasRefreshToken(String email, String accessToken) {
+        TokensEntity tokensEntity; //hasKey(REFRESH_TOKEN_PREFIX + accessToken);
         try {
-            tokensEntity = tokensRepository.findById(email).orElseThrow(()->new RuntimeException("리프레시 토큰 없음"));
+            tokensEntity = tokensRepository.findById(email).orElseThrow(() -> new RuntimeException("리프레시 토큰 없음"));
         } catch (RuntimeException e) {
             return false;
         }
@@ -144,7 +144,7 @@ public class TokenUtil {
                 .ttl(ACCESS_TOKEN_TIME).build();
         accessTokenBlackListRepository.save(blackListedToken); //setDataExp(BLACKLIST_PREFIX + accessToken, "", Duration.ofSeconds(ACCESS_TOKEN_TIME));
     }
-    
+
     // 입력 받은 email을 key값으로 하는 TokensEntity에서 access token을 반환
     public String findAccessToken(String email) {
         TokensEntity tokensEntity = tokensRepository.findById(email).orElseThrow(() -> new UsernameNotFoundException("비로그인 이메일"));

@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ReportRepositoryCustom {
-    public Page<ReportEntity> findBySearchReportRequest(ReportEntity.ReportStatusEnum reportStatus, ReportEntity.ReportCategoryEnum reportCategory, String email, Pageable pageable);
+    Page<ReportEntity> findBySearchReportRequest(ReportEntity.ReportStatusEnum reportStatus, ReportEntity.ReportCategoryEnum reportCategory, String email, Pageable pageable);
 }

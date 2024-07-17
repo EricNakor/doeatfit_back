@@ -37,8 +37,11 @@ public class SecurityConfig {
     public static final String[] JS = {"/js/**"};
     public static final String[] ERROR = {"/error"};
 
-    public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**"};
-    public static final String[] NO_AUTH_API_PATHS = {"api/user/find/**", "/api/user/send-temp-passwd", "/api/user/join", "/api/email/send/auth", "/api/email/verify", "/api/user/check/**", "/api/workouts/**", "/api/notices/**"};
+    public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**", "/test"};
+    public static final String[] NO_AUTH_API_PATHS = {"api/users/find/**", "/api/users/send-temp-passwd", "/api/users/join",
+            "/api/email/send/auth", "/api/email/verify", "/api/users/check/**",
+            "/api/workouts/**", "/api/notices/**", "/api/users/gender-enum",
+            "/api/home-contents"};
 
     // admin 권한이 필요한 url
     public static final String[] ADMIN_AUTH_REQUIRED_PATHS = {"/def-cms/**"};
@@ -49,6 +52,7 @@ public class SecurityConfig {
 
         return configuration.getAuthenticationManager();
     }
+
     // css,js 같은 resource들은 필터 무시하게 함
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -58,6 +62,7 @@ public class SecurityConfig {
                 .requestMatchers(CSS)
                 .requestMatchers(FAVICON);
     }
+
     @Bean
     // 스프링 시큐리티의 세부 설정
     // 스프링에 의해 생성 또는 관리되는 객체를 의미하는 어노테이션. (컨트롤러/서비스/리포지토리 등 모두 빈에 해당)
@@ -67,6 +72,9 @@ public class SecurityConfig {
         // csrf 비활성화
         http
                 .csrf(AbstractHttpConfigurer::disable)
+
+                // cors 설정
+//                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
 
                 // jwt를 사용하므로 생략
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -112,5 +120,25 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
+    // CORS 설정을 위한 Bean
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration corsConfiguration = new CorsConfiguration();
+//        // 아래 설정을 '*'로 변경하여 모든 호스트에서의 연결을 허용할 수 있음
+//        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
+//        // 허용할 출처 설정
+//        corsConfiguration.setAllowedMethods(List.of( "GET"));
+//        // 허용할 HTTP 메서드 설정
+//        corsConfiguration.setAllowCredentials(true);
+//        // 자격 증명을 허용할지 여부 설정
+//        corsConfiguration.setAllowedHeaders(List.of("*"));
+//        // 허용할 헤더 설정
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", corsConfiguration);
+//        // 모든 경로에 대해 CORS 설정 등록
+//        return source;
+//    }
 
 }

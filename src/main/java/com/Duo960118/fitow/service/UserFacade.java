@@ -1,10 +1,13 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.config.UploadConfig;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,11 +24,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class UserFacade {
+    private static final Logger log = LoggerFactory.getLogger(UserFacade.class);
     private final UploadConfig uploadConfig;
     private final SecurityService securityService;
     private final EmailSendService emailSendService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final TokenUtil tokenUtil;
+    private final ReportService reportService;
+    private final NoticeService noticeService;
+    private final CalculatorService calculatorService;
 
     public static String tempPasswdGenerator(int spSize, int allSize, int numSize) {
         final char[] passwdCollectionSpCha = new char[]{'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
@@ -64,7 +72,7 @@ public class UserFacade {
             // 요청에서 받은 이메일로 임시 비밀번호 발송
             emailSendService.sendTempPasswd(email, passwd);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -80,7 +88,7 @@ public class UserFacade {
             // 토큰 리프레시
             securityService.syncAuthenticationUser();
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -109,7 +117,11 @@ public class UserFacade {
             } else {
                 // 이전 이미지 삭제
                 File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
-                file.delete();
+                if (file.delete()) {
+                    log.info("Profile image deleted");
+                } else {
+                    log.warn("Profile image not deleted");
+                }
 
                 // 프로필사진이 !null이면 원래 uuid로 파일명 덮어씌우기
                 String uuid = user.getProfileImg().substring(0, user.getProfileImg().lastIndexOf("."));
@@ -117,7 +129,11 @@ public class UserFacade {
             }
 
             // 프로필 이미지 이름 업데이트
-            userService.editProfileImgName(email, profileImgName);
+            if (userService.editProfileImgName(email, profileImgName)) {
+                log.info("Profile image updated");
+            } else {
+                log.warn("Profile image not updated");
+            }
 
             // 지정된 경로에 저장
             File file = new File(uploadConfig.getProfileImgDir() + "\\" + profileImgName);
@@ -126,7 +142,7 @@ public class UserFacade {
             // contextHolder.authentication 주입
             securityService.syncAuthenticationUser();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -143,7 +159,7 @@ public class UserFacade {
             // contextHolder.authentication 주입
             securityService.syncAuthenticationUser();
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -170,14 +186,37 @@ public class UserFacade {
     }
 
     // 회원탈퇴
-    public boolean withdraw(UserDto.EmailPasswdDto withdrawRequest) {
+    public boolean withdraw(UserDto.WithDrawDto withdrawRequest) {
 
         UserEntity user = userService.findByEmail(withdrawRequest.getEmail());
+
         // 프로필 이미지 삭제
-        if (!user.getProfileImg().isEmpty()) {
+        if (user.getProfileImg() != null) {
             File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
-            file.delete();
+            if (file.delete()) {
+                log.info("Profile image deleted");
+            } else {
+                log.warn("Profile image not deleted");
+            }
         }
+
+        // 토큰 블랙리스트 추가 or
+        // 쿠키에서 토큰 삭제는 해도 되고 안해도 되고
+        // 탈퇴한 회원 accessToken 추출
+        String accessToken = tokenUtil.resolveToken(withdrawRequest.getHttpServletRequest(), TokenUtil.ACCESS_TOKEN_KEY);
+        String email = withdrawRequest.getEmail();
+
+        // refresh token 제거
+        tokenUtil.deleteRefreshToken(email);
+
+        // access token blacklist 추가
+        tokenUtil.blacklistAccessToken(accessToken);
+
+        // 외부키 끊어주기
+        reportService.updateForeinKeysNull(user.getUserId());
+        noticeService.updateForeinKeysNull(user.getUserId());
+        calculatorService.updateForeinKeysNull(user.getUserId());
+
         // DB 삭제
         return userService.withdraw(withdrawRequest.getEmail(), withdrawRequest.getPasswd());
     }

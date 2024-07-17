@@ -4,9 +4,6 @@ import com.Duo960118.fitow.entity.CalculatorDto;
 import com.Duo960118.fitow.entity.CalculateInfoEntity;
 import org.springframework.context.annotation.Bean;
 
-import java.time.LocalDate;
-import java.util.UUID;
-
 public class CalculatorMapper {
 
     // 계산 결과 Entity 를 Dto 형식으로 변환

@@ -5,6 +5,8 @@ import com.Duo960118.fitow.entity.NoticeEntity;
 import com.Duo960118.fitow.mapper.NoticeMapper;
 import com.Duo960118.fitow.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class NoticeServiceImpl implements NoticeService {
+    private static final Logger log = LoggerFactory.getLogger(NoticeServiceImpl.class);
     private final NoticeRepository noticeRepository;
     private final UserService userService;
 
@@ -45,7 +48,7 @@ public class NoticeServiceImpl implements NoticeService {
 
             noticeEntity.updateNotice(editNoticeRequest);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -78,5 +81,14 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public List<NoticeDto.NoticeInfoDto> getNoticePage(PageRequest pageRequest) {
         return noticeRepository.findAll(pageRequest).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateForeinKeysNull(Long userId) {
+        List<NoticeEntity> noticeEntities = noticeRepository.findByUserEntityUserId(userId);
+        // 외래 키를 null로 설정
+        for (NoticeEntity noticeEntity : noticeEntities) {
+            noticeEntity.updateUserEntity(null);
+        }
     }
 }

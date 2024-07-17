@@ -13,4 +13,6 @@ public interface HomeContentRepository extends JpaRepository<HomeContentEntity,L
     void deleteByUuidEntityUuid(UUID uuid);
 
     List<HomeContentEntity> findByCategory(HomeContentEntity.HomeContentCategoryEnum category);
+
+    List<HomeContentEntity> findByIsBeingUsedTrue();
 }

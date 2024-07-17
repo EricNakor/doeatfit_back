@@ -37,4 +37,8 @@ public interface NoticeService {
     // PageRequest에 맞게 Notice들을 반환
     @Transactional
     List<NoticeDto.NoticeInfoDto> getNoticePage(PageRequest pageRequest);
+
+    // 회원 탈퇴 시 외부키 null로 변경
+    @Transactional
+    void updateForeinKeysNull(Long userId);
 }

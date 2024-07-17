@@ -32,12 +32,13 @@ public class HomeContentEntity extends TimeStampEntity {
     }
 
     public void updateHomeContent(HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
-        this.content=editHomeContentRequest.getContent();
-        this.isBeingUsed =editHomeContentRequest.getIsBeingUsed();
+        this.category = editHomeContentRequest.getCategory();
+        this.content = editHomeContentRequest.getContent();
+        this.isBeingUsed = editHomeContentRequest.getIsBeingUsed();
     }
 
-    public void updateIsBeingUsed(Boolean isBeingUsed){
-        this.isBeingUsed =isBeingUsed;
+    public void updateIsBeingUsed(Boolean isBeingUsed) {
+        this.isBeingUsed = isBeingUsed;
     }
 
     public enum HomeContentCategoryEnum {

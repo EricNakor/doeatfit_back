@@ -1,11 +1,16 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.config.UploadConfig;
 import com.Duo960118.fitow.entity.ReportDto;
 import com.Duo960118.fitow.entity.ReportEntity;
 import com.Duo960118.fitow.mapper.ReportMapper;
 import com.Duo960118.fitow.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +26,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class ReportServiceImpl implements ReportService {
+    private static final Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
     private final UserService userService;
     private final ReportRepository reportRepository;
+    private final UploadConfig uploadConfig;
 
     @Value("${spring.report_file_dir}")
     private String reportFileDir;
@@ -30,28 +37,47 @@ public class ReportServiceImpl implements ReportService {
     @Value("${spring.reply_file_dir}")
     private String replyFileDir;
 
+    // 파일명 추출 및 저장
+    private List<String> extractFileNameList(List<MultipartFile> files, String savePath) {
+        List<String> filenameList = new ArrayList<>();
+        for (MultipartFile multipartFile : files) {
+            String fileName = multipartFile.getOriginalFilename();
+            String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
+            String fileRename = UUID.randomUUID() + fileExt;
+            filenameList.add(fileRename);
+
+            File file = new File(savePath + "\\" + fileRename);
+            try {
+                multipartFile.transferTo(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return filenameList;
+    }
+
     // report 작성
     @Override
     public UUID postReport(List<MultipartFile> multipartFileList, ReportDto.PostReportRequestDto postReportRequest) {
 
-        List<String> reportFileNameList = new ArrayList<>();
-
         if (multipartFileList != null) {
-            for (MultipartFile multipartFile : multipartFileList) {
-
-                String fileName = multipartFile.getOriginalFilename();
-                String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
-                String fileRename = UUID.randomUUID() + fileExt;
-                reportFileNameList.add(fileRename);
-
-                File file = new File(reportFileDir + "\\" + fileRename);
-                try {
-                    multipartFile.transferTo(file);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            List<String> reportFileNameList = extractFileNameList(multipartFileList, reportFileDir);
             postReportRequest.setReportFiles(reportFileNameList);
+//            for (MultipartFile multipartFile : multipartFileList) {
+//
+//                String fileName = multipartFile.getOriginalFilename();
+//                String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
+//                String fileRename = UUID.randomUUID() + fileExt;
+//                reportFileNameList.add(fileRename);
+//
+//                File file = new File(reportFileDir + "\\" + fileRename);
+//                try {
+//                    multipartFile.transferTo(file);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+
         }
 
         ReportEntity reportEntity = ReportEntity.builder()
@@ -78,8 +104,6 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ReportDto.ReportDetailDto getReportDetail(UUID uuid) {
         ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 문의"));
-
-        String email = reportEntity.getUserEntity().getEmail();
 
         // 생성자는 파라미터 순서가 일치해야 함 > 순서수정
         return new ReportDto.ReportDetailDto(
@@ -139,30 +163,29 @@ public class ReportServiceImpl implements ReportService {
     // Report 답변
     @Override
     public boolean replyReport(UUID uuid, ReportDto.ReplyReportDto replyReport, List<MultipartFile> multipartFileList) {
-        List<String> replyFileNameList = new ArrayList<>();
         try {
             ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 문의"));
-
             if (multipartFileList != null) {
-                for (MultipartFile multipartFile : multipartFileList) {
-
-                    String fileName = multipartFile.getOriginalFilename();
-                    String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
-                    String fileRename = UUID.randomUUID() + fileExt;
-                    replyFileNameList.add(fileRename);
-
-                    File file = new File(replyFileDir + "\\" + fileRename);
-                    try {
-                        multipartFile.transferTo(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                List<String> replyFileNameList = extractFileNameList(multipartFileList, replyFileDir);
                 replyReport.setReplyFiles(replyFileNameList);
+//                for (MultipartFile multipartFile : multipartFileList) {
+//
+//                    String fileName = multipartFile.getOriginalFilename();
+//                    String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
+//                    String fileRename = UUID.randomUUID() + fileExt;
+//                    replyFileNameList.add(fileRename);
+//
+//                    File file = new File(replyFileDir + "\\" + fileRename);
+//                    try {
+//                        multipartFile.transferTo(file);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
             }
             reportEntity.replyReport(replyReport);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -182,4 +205,27 @@ public class ReportServiceImpl implements ReportService {
         return new PageImpl<>(searchResults);
     }
 
+    // 신고 및 문의 첨부파일
+    @Override
+    public Resource loadReportAttachmentImg(String filename) {
+        return new FileSystemResource(uploadConfig.getReportAttachmentImgDir() + filename);
+    }
+
+    // 답변 첨부파일
+    @Override
+    public Resource loadReplyAttachmentImg(String filename) {
+        return new FileSystemResource(uploadConfig.getReplyAttachmentImgDir() + filename);
+    }
+
+    @Override
+    public void updateForeinKeysNull(Long userId) {
+        Pageable pageable = Pageable.unpaged();
+        List<ReportEntity> reportEntities = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, pageable);
+
+        // 외래 키를 null로 설정
+        for (ReportEntity reportEntity : reportEntities) {
+            reportEntity.updateUserEntity(null);
+        }
+
+    }
 }

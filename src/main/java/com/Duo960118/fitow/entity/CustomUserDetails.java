@@ -20,11 +20,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     // UserDetails에 필수적인 것
     private final String email;
     private String passwd;
-    private boolean accountNonLocked = true;
-    private boolean accountNonExpired = true;
-    private boolean credentialsNonExpired = true;
-    private boolean enabled = true;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
     private final String nickName;
     private final String name;
     private final GenderEnum gender;
@@ -32,6 +28,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private final LocalDate joinDate;
     private final LocalDate passwdEditDate;
     private final String profileImg;
+    private final UserEntity.UserRoleEnum role;
 
     public CustomUserDetails(UserEntity userEntity) {
         this.email = userEntity.getEmail();
@@ -43,6 +40,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.joinDate = userEntity.getJoinDate();
         this.passwdEditDate = userEntity.getPasswdEditDate();
         this.profileImg = userEntity.getProfileImg();
+        this.role = userEntity.getRole();
 
         // User Role 기반으로 권한 생성
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -61,6 +59,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         userInfo.setJoinDate(this.joinDate);
         userInfo.setPasswdEditDate(this.passwdEditDate);
         userInfo.setProfileImg(this.profileImg);
+        userInfo.setRole(this.role);
         return userInfo;
     }
 
@@ -81,22 +80,22 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     @Override
     public boolean isAccountNonExpired() {
-        return this.accountNonExpired;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.accountNonLocked;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.credentialsNonExpired;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.enabled;
+        return true;
     }
 
     @Override

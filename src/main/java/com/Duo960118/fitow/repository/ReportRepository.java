@@ -1,8 +1,6 @@
 package com.Duo960118.fitow.repository;
 
 import com.Duo960118.fitow.entity.ReportEntity;
-import com.Duo960118.fitow.entity.UserEntity;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -2,7 +2,7 @@ package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.ReportDto;
 import com.Duo960118.fitow.entity.ReportEntity;
-import com.Duo960118.fitow.entity.UserEntity;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,4 +42,16 @@ public interface ReportService {
     // email 검색 (String)
     @Transactional
     Page<ReportDto.ReportInfoDto> searchReport(ReportEntity.ReportStatusEnum reportStatusEnum, ReportEntity.ReportCategoryEnum reportCategoryEnum, String email, Pageable pageable);
+
+    // 신고 및 문의 첨부파일
+    @Transactional
+    Resource loadReportAttachmentImg(String filename);
+    
+    // 답변 첨부파일
+    @Transactional
+    Resource loadReplyAttachmentImg(String filename);
+
+    // 회원 탈퇴 시 외부키 null로 변경
+    @Transactional
+    void updateForeinKeysNull(Long userId);
 }

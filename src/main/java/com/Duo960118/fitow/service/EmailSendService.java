@@ -3,17 +3,21 @@ package com.Duo960118.fitow.service;
 import com.Duo960118.fitow.entity.EmailDto;
 import com.Duo960118.fitow.config.EmailConfig;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Random;
 
 @RequiredArgsConstructor
 // final이 붙어있거나 @nonnull인 경우 생성자에 필요 arguments 지정
 @Service
 public class EmailSendService {
+    private static final Logger log = LoggerFactory.getLogger(EmailSendService.class);
     private final EmailConfig emailConfig;
     private final JavaMailSender mailSender;
     private final RedisUtil redisUtil;
@@ -47,7 +51,7 @@ public class EmailSendService {
             message.setText(text);
             mailSender.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -68,7 +72,7 @@ public class EmailSendService {
             redisUtil.setDataExp(to, authNum, Duration.ofSeconds(60 * 4L)); //인증번호 4분 후 만료
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -87,9 +91,12 @@ public class EmailSendService {
     // 인증번호 인증
     public boolean verifyEmail(EmailDto.VerifyEmailRequestDto verifyEmailRequest) {
         try {
-            return verifyEmailRequest.getAuthNum().equals(redisUtil.getData(verifyEmailRequest.getEmail()));
+            String storedAuthNum = redisUtil.getData(verifyEmailRequest.getEmail()).orElseThrow();
+            return Objects.equals(verifyEmailRequest.getAuthNum(), storedAuthNum);
+            // null 예외발생을 방지하기 위해 equals > object.equals로 변경
+            // null을 포함하여 비교할 수 있다.
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
     }

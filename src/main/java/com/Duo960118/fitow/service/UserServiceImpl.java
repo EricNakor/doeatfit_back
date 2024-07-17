@@ -1,23 +1,30 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.entity.NoticeEntity;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.mapper.UserMapper;
+import com.Duo960118.fitow.repository.NoticeRepository;
 import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
+    private final NoticeRepository noticeRepository;
         /*BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     user.setPasswd(passwordEncoder.encode(passwd));*/
     /*BCryptPasswordEncoder 객체를 직접 new로 생성하는 방식보다
@@ -44,7 +51,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             this.userRepository.save(userEntity);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -58,6 +65,7 @@ public class UserServiceImpl implements UserService {
         if (!new BCryptPasswordEncoder().matches(passwd, userEntity.getPasswd())) {
             return false;
         }
+
         userRepository.delete(userEntity);
         return true;
     }
@@ -101,7 +109,7 @@ public class UserServiceImpl implements UserService {
             user.updatePasswd(passwordEncoder.encode(editPasswdRequest.getNewPasswd()));
 
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -117,8 +125,13 @@ public class UserServiceImpl implements UserService {
 
             // 닉네임 수정
             user.updateNickName(editNickNameRequest.getNewNickName());
+
+            List<NoticeEntity> notices = noticeRepository.findByUserEntityUserId(user.getUserId());
+            for (NoticeEntity notice : notices) {
+                notice.updateUserEntity(user);  // ensure the notice has the updated user reference
+            }
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -132,7 +145,7 @@ public class UserServiceImpl implements UserService {
             UserEntity user = this.findByEmail(email);
             user.updateProfileImg(profileImg);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
@@ -150,10 +163,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public UserDto.UserInfoDto getUserInfo(String email) {
-        return  UserMapper.entityToUserInfoDto(userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("존재하지 않는 회원")));
+        return UserMapper.entityToUserInfoDto(userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원")));
     }
 
     // 이메일  찾기
@@ -171,4 +183,10 @@ public class UserServiceImpl implements UserService {
     }
 
     // todo: querydsl 이용해서 어드민 페이지에서 역할 과 이름, 이메일로 검색하는 기능 구현
+    // 만나이 계산
+    @Override
+    public int calculateAge(LocalDate birth) {
+        return Period.between(birth, LocalDate.now()).getYears();
+    }
+
 }

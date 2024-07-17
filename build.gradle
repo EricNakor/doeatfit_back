@@ -52,9 +52,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+//tasks.named('test') {
+//    useJUnitPlatform()
+//}
 
 // queryDSL 추가 : QueryDSL 빌드 옵션
 def querydslDir = "src/main/generated/querydsl"

@@ -2,7 +2,6 @@ package com.Duo960118.fitow.entity;
 
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,14 +13,14 @@ public class WorkoutDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WorkoutDetailDto {
-        private  UUID uuid;
-        private  String workoutName;
-        private  WorkoutEntity.DifficultyEnum workoutDifficulty;
-        private  Set<WorkoutEntity.MuscleEnum> agonistMuscles;
-        private  Set<WorkoutEntity.MuscleEnum> antagonistMuscles;
-        private  Set<WorkoutEntity.MuscleEnum> synergistMuscles;
-        private  List<String> descriptions;
-        private  String mediaFileName;
+        private UUID uuid;
+        private String workoutName;
+        private WorkoutEntity.DifficultyEnum workoutDifficulty;
+        private Set<WorkoutEntity.MuscleEnum> agonistMuscles;
+        private Set<WorkoutEntity.MuscleEnum> antagonistMuscles;
+        private Set<WorkoutEntity.MuscleEnum> synergistMuscles;
+        private List<String> descriptions;
+        private String mediaFileName;
 
     }
 
@@ -31,6 +30,7 @@ public class WorkoutDto {
     @Setter
     public static class PostWorkoutRequestDto {
         private String workoutName;
+
         private WorkoutEntity.DifficultyEnum workoutDifficulty;
 
         private List<WorkoutEntity.MuscleEnum> agonistMuscles;
@@ -40,6 +40,7 @@ public class WorkoutDto {
         private List<WorkoutEntity.MuscleEnum> synergistMuscles;
 
         private List<String> descriptions;
+
         private String mediaFileName;
 
         @Builder

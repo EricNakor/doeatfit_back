@@ -25,7 +25,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     public Page<WorkoutEntity> findBySearchWorkoutRequest(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable) {
 
         List<WorkoutEntity> fetch = queryFactory
-                .select( workoutEntity)
+                .select(workoutEntity)
                 .from(workoutEntity)
                 .where(containsWorkoutName(searchWorkoutRequest.getWorkoutName()))
                 .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties()))
@@ -49,7 +49,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     }
 
     // 개수 세는 용도? 왜쓰는지 모름. 페이징할 때 필요하다는 것만 암
-    private  JPAQuery<Long> getCount(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest){
+    private JPAQuery<Long> getCount(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest) {
 
         return queryFactory
                 .select(workoutEntity.count())
@@ -59,6 +59,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscleEnums()))
                 .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscleEnums()))
                 .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscleEnums()));
+//                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyPartEnums(), searchWorkoutRequest.getAgonistMuscleEnums()));
     }
 
     // BooleanExpression은 null 반환 시 자동으로 조건절에서 제거 된다.
@@ -74,16 +75,16 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
 
     // 운동 난이도 검색 
     private BooleanExpression inWorkoutDifficulty(List<WorkoutEntity.DifficultyEnum> workoutDifficultyEnums) {
-        if(ObjectUtils.isEmpty(workoutDifficultyEnums)){
+        if (ObjectUtils.isEmpty(workoutDifficultyEnums)) {
             return null;
         }
         return workoutEntity.workoutDifficulty.in(workoutDifficultyEnums);
     }
-    
+
     // 주동근 검색
     // 검색 조건으로 사용된 주동근들 중 하나라도 포함하면, 그 운동을 반환 하도록 하는 조건(BooleanExpression)
-    private BooleanExpression containsAgonistMuscleEnums(List<WorkoutEntity.MuscleEnum> agonistMuscleEnums){
-        if(ObjectUtils.isEmpty(agonistMuscleEnums)){
+    private BooleanExpression containsAgonistMuscleEnums(List<WorkoutEntity.MuscleEnum> agonistMuscleEnums) {
+        if (ObjectUtils.isEmpty(agonistMuscleEnums)) {
             return null;
         }
 
@@ -100,8 +101,8 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     }
 
     // 길항근 검색
-    private BooleanExpression containsAntagonistMuscleEnums(List<WorkoutEntity.MuscleEnum> antagonistMuscleEnums){
-        if(ObjectUtils.isEmpty(antagonistMuscleEnums)){
+    private BooleanExpression containsAntagonistMuscleEnums(List<WorkoutEntity.MuscleEnum> antagonistMuscleEnums) {
+        if (ObjectUtils.isEmpty(antagonistMuscleEnums)) {
             return null;
         }
 
@@ -116,10 +117,10 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
         }
         return expression;
     }
-    
+
     // 협응근 검색
-    private BooleanExpression containsSynergistMuscleEnums(List<WorkoutEntity.MuscleEnum> synergistMuscleEnums){
-        if(ObjectUtils.isEmpty(synergistMuscleEnums)){
+    private BooleanExpression containsSynergistMuscleEnums(List<WorkoutEntity.MuscleEnum> synergistMuscleEnums) {
+        if (ObjectUtils.isEmpty(synergistMuscleEnums)) {
             return null;
         }
 
@@ -134,5 +135,26 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
         }
         return expression;
     }
+
+    // 신체 부위로 검색
+//    private BooleanExpression containsBodyPartEnums(List<WorkoutEntity.BodyPartEnum> bodyPartEnums, List<WorkoutEntity.MuscleEnum> agonistMuscleEnums) {
+//        if (ObjectUtils.isEmpty(bodyPartEnums)) {
+//            return null;
+//        }
+//        BooleanExpression expression = null;
+//
+//        for (WorkoutEntity.MuscleEnum muscle : agonistMuscleEnums) {
+//            for (WorkoutEntity.BodyPartEnum bodyPart : bodyPartEnums) {
+//                if (muscle.getBodyPart() == bodyPart) {
+//                    if (expression == null) {
+//                        expression = workoutEntity.agonistMuscleEnums.contains(muscle);
+//                    } else {
+//                        expression = expression.or(workoutEntity.agonistMuscleEnums.contains(muscle));
+//                    }
+//                }
+//            }
+//        }
+//        return expression;
+//    }
 }
 

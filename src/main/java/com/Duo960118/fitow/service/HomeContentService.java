@@ -5,22 +5,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface HomeContentService {
     @Transactional
-    public Page<HomeContentDto.HomeContentInfoDto> getAllHomeContent(Pageable pageable);
+    Page<HomeContentDto.HomeContentInfoDto> getAllHomeContent(Pageable pageable);
 
     @Transactional
-    public HomeContentDto.HomeContentInfoDto getHomeContentInfo(UUID uuid);
+    HomeContentDto.HomeContentInfoDto getHomeContentInfo(UUID uuid);
 
     @Transactional
-    public HomeContentDto.HomeContentInfoDto postHomeContent(HomeContentDto.PostHomeContentRequestDto postHomeContentRequest);
+    HomeContentDto.HomeContentInfoDto postHomeContent(HomeContentDto.PostHomeContentRequestDto postHomeContentRequest);
 
     @Transactional
-    public HomeContentDto.HomeContentInfoDto editHomeContent(UUID uuid, HomeContentDto.EditHomeContentRequestDto editHomeContentRequest);
+    HomeContentDto.HomeContentInfoDto editHomeContent(UUID uuid, HomeContentDto.EditHomeContentRequestDto editHomeContentRequest);
 
     @Transactional
-    public void deleteHomeContent(UUID uuid);
+    void deleteHomeContent(UUID uuid);
 
+    @Transactional
+    List<HomeContentDto.HomeContentInfoDto> getActiveHomeContent();
 }

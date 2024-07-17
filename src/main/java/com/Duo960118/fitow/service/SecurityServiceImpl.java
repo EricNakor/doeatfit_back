@@ -19,7 +19,6 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = userService.findByEmail(email);
-
         return new CustomUserDetails(userEntity);
     }
 

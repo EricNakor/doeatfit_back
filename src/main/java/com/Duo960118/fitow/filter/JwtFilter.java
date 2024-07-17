@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,11 +19,11 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
     private final TokenUtil tokenUtil;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         logger.info(request.getRequestURL().toString());
 
         // 쿠키(혹은 헤더)에서 access token,refresh token을 받아옵니다.
-        String accessToken = tokenUtil.resolveToken((HttpServletRequest) request, TokenUtil.ACCESS_TOKEN_KEY);
+        String accessToken = tokenUtil.resolveToken(request, TokenUtil.ACCESS_TOKEN_KEY);
         String email = "";
         if (!accessToken.isBlank()) {
             email = tokenUtil.getEmailFromAccessToken(accessToken);

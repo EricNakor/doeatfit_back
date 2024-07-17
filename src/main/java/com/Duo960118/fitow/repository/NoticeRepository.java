@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.repository;
 
 import com.Duo960118.fitow.entity.NoticeEntity;
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,11 +17,14 @@ public interface NoticeRepository extends JpaRepository<NoticeEntity,Long> {
 
     // Pageable을 이용한 findAll
     @Override
-    Page<NoticeEntity> findAll(Pageable pageable);
+    @NonNull
+    // null safety
+    Page<NoticeEntity> findAll(@NonNull Pageable pageable);
 
     // Sort를 이용한 findAll
     @Override
-    List<NoticeEntity> findAll(Sort sort);
+    @NonNull
+    List<NoticeEntity> findAll(@NonNull Sort sort);
 
     // 일치하는 uuid를 가진 notice entity를 찾아 삭제
     void deleteByUuidEntityUuid(UUID uuid);
@@ -31,5 +35,8 @@ public interface NoticeRepository extends JpaRepository<NoticeEntity,Long> {
     List<NoticeEntity> findByNoticeCategoryAndTitleContaining(@Param("category") NoticeEntity.NoticeCategoryEnum category,@Param("searchString") String searchString);
 
     boolean existsByUuidEntityUuid(UUID uuid);
+
+    // 조회 회원의 공지 찾기
+    List<NoticeEntity> findByUserEntityUserId(Long useId);
 
 }

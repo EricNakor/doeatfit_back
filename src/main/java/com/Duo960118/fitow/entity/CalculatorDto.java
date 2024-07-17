@@ -23,14 +23,20 @@ public class CalculatorDto {
     }
 
     // 계산 결과
-    @Getter
-    @RequiredArgsConstructor
-    public static class CalcResponseDto {
-        private final UUID uuid;
-        private final double carb;
-        private final double protein;
-        private final double fat;
-    }
+    public record CalcResponseDto(UUID uuid, double carb, double protein, double fat){}
+//    @Getter
+//    @RequiredArgsConstructor
+//    public static class CalcResponseDto {
+//        private final UUID uuid;
+//        private final double carb;
+//        private final double protein;
+//        private final double fat;
+//    }
+    // record 는 불변 객체로 abstract 로 선언할 수 없으며 암시적으로 final 로 선언된다.
+    // 한 번 값이 정해지면 setter 를 통해 값을 변경할 수 없으며 상속을 할 수 없다.
+    // 필드 별 getter가 자동으로 생성된다.
+    // 모든 멤버 변수를 인자로 하는 public 생성자를 자동으로 생성한다.
+    // java 16부터 정식지원
 
     // 계산 결과 리스트
     @Getter
