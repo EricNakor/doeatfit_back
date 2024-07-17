@@ -32,6 +32,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private final LocalDate joinDate;
     private final LocalDate passwdEditDate;
     private final String profileImg;
+    private final UserEntity.UserRoleEnum role;
 
     public CustomUserDetails(UserEntity userEntity) {
         this.email = userEntity.getEmail();
@@ -43,6 +44,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.joinDate = userEntity.getJoinDate();
         this.passwdEditDate = userEntity.getPasswdEditDate();
         this.profileImg = userEntity.getProfileImg();
+        this.role = userEntity.getRole();
 
         // User Role 기반으로 권한 생성
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -61,6 +63,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         userInfo.setJoinDate(this.joinDate);
         userInfo.setPasswdEditDate(this.passwdEditDate);
         userInfo.setProfileImg(this.profileImg);
+        userInfo.setRole(this.role);
         return userInfo;
     }
 

@@ -9,8 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,11 +17,6 @@ import java.util.stream.Collectors;
 @Service
 public class CalculatorServiceImpl implements CalculatorService {
     private final CalculatorRepository calculatorRepository;
-
-    @Override
-    public int calculateAge(LocalDate birth) {
-        return Period.between(birth, LocalDate.now()).getYears();
-    }
 
     // BMR 이 없을 경우 BMR 추정치 계산
     public int calculateGenderBmr(int age, GenderEnum gender, float weight, float height) {
@@ -63,21 +56,11 @@ public class CalculatorServiceImpl implements CalculatorService {
         double calcStandDiet = calcStandardDiet(calcRequest);
         double result = 0.0;
         switch (calcRequest.getDietGoal()) {
-            case HIGH_LOSS -> {
-                result = calcStandDiet * 0.8;
-            }
-            case LOSS -> {
-                result = calcStandDiet * 0.9;
-            }
-            case KEEP -> {
-                result = calcStandDiet;
-            }
-            case GAIN -> {
-                result = calcStandDiet * 1.1;
-            }
-            case HIGH_GAIN -> {
-                result = calcStandDiet * 1.2;
-            }
+            case HIGH_LOSS -> result = calcStandDiet * 0.8;
+            case LOSS -> result = calcStandDiet * 0.9;
+            case KEEP -> result = calcStandDiet;
+            case GAIN -> result = calcStandDiet * 1.1;
+            case HIGH_GAIN -> result = calcStandDiet * 1.2;
         }
         return result;
     }
@@ -201,5 +184,17 @@ public class CalculatorServiceImpl implements CalculatorService {
         return calculatorRepository.findAllByUserEntityUserId(userEntity.getUserId(), pageRequest)
                 .stream().map(CalculatorMapper::entityToCalcResultDto).collect(Collectors.toList());
 
+    }
+
+    // 회원 탈퇴 시 외부키 null로 변경
+    @Override
+    @Transactional
+    public void updateForeinKeysNull(Long userId){
+        List<CalculateInfoEntity> calculateInfoEntities = calculatorRepository.findAllByUserEntityUserId(userId);
+
+        // 외래 키를 null로 설정
+        for (CalculateInfoEntity calculateInfoEntity : calculateInfoEntities) {
+            calculateInfoEntity.updateUserEntity(null);
+        }
     }
 }

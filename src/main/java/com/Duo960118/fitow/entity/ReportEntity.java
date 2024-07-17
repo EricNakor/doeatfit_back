@@ -25,11 +25,7 @@ public class ReportEntity {
     private ReportCategoryEnum reportCategory;
     // 신고자 유저 ID, 이메일
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "userId", referencedColumnName = "userId"),
-            @JoinColumn(name = "email", referencedColumnName = "email")
-            //todo: Long userId가 나을지 String email이 나을지
-    })
+    @JoinColumn(name = "userId", referencedColumnName = "userId")
     private UserEntity userEntity;
     // 신고 제목
     private String title;
@@ -69,6 +65,10 @@ public class ReportEntity {
         this.reply = reply;
         this.replyDate = replyDate;
         this.replyFiles = replyFiles;
+    }
+
+    public void updateUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 
     @Getter

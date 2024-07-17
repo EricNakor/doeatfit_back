@@ -57,6 +57,10 @@ public class CalculateInfoEntity {
         this.calcCategory = calcCategory;
     }
 
+    public void updateUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
+    }
+
     // 활동량
     @Getter
     public enum activityLevelEnum {

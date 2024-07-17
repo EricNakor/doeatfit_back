@@ -1,8 +1,10 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.config.UploadConfig;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.core.io.FileSystemResource;
@@ -26,6 +28,10 @@ public class UserFacade {
     private final EmailSendService emailSendService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final TokenUtil tokenUtil;
+    private final ReportService reportService;
+    private final NoticeService noticeService;
+    private final CalculatorService calculatorService;
 
     public static String tempPasswdGenerator(int spSize, int allSize, int numSize) {
         final char[] passwdCollectionSpCha = new char[]{'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
@@ -170,14 +176,33 @@ public class UserFacade {
     }
 
     // 회원탈퇴
-    public boolean withdraw(UserDto.EmailPasswdDto withdrawRequest) {
+    public boolean withdraw(UserDto.WithDrawDto withdrawRequest) {
 
         UserEntity user = userService.findByEmail(withdrawRequest.getEmail());
+
         // 프로필 이미지 삭제
-        if (!user.getProfileImg().isEmpty()) {
+        if (user.getProfileImg() != null) {
             File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
             file.delete();
         }
+
+        // 토큰 블랙리스트 추가 or
+        // 쿠키에서 토큰 삭제는 해도 되고 안해도 되고
+        // 탈퇴한 회원 accessToken 추출
+        String accessToken = tokenUtil.resolveToken(withdrawRequest.getHttpServletRequest(), TokenUtil.ACCESS_TOKEN_KEY);
+        String email = withdrawRequest.getEmail();
+
+        // refresh token 제거
+        tokenUtil.deleteRefreshToken(email);
+
+        // access token blacklist 추가
+        tokenUtil.blacklistAccessToken(accessToken);
+
+        // 외부키 끊어주기
+        reportService.updateForeinKeysNull(user.getUserId());
+        noticeService.updateForeinKeysNull(user.getUserId());
+        calculatorService.updateForeinKeysNull(user.getUserId());
+
         // DB 삭제
         return userService.withdraw(withdrawRequest.getEmail(), withdrawRequest.getPasswd());
     }

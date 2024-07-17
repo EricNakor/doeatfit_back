@@ -79,4 +79,13 @@ public class NoticeServiceImpl implements NoticeService {
     public List<NoticeDto.NoticeInfoDto> getNoticePage(PageRequest pageRequest) {
         return noticeRepository.findAll(pageRequest).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
     }
+
+    @Override
+    public void updateForeinKeysNull(Long userId) {
+        List<NoticeEntity> noticeEntities = noticeRepository.findByUserEntityUserId(userId);
+        // 외래 키를 null로 설정
+        for (NoticeEntity noticeEntity : noticeEntities) {
+            noticeEntity.updateUserEntity(null);
+        }
+    }
 }

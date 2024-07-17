@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.entity;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,16 +105,30 @@ public class UserDto {
     // 탈퇴 DTO
     @Getter
     @Setter
-    public static class EmailPasswdDto {
+    public static class WithDrawDto {
         private String email;
         private String passwd;
+        private HttpServletRequest httpServletRequest;
     }
 
+    // 회원 권한 DTO
     @Getter
     @Setter
-    public static class EditUserRoleRequestDto{
+    public static class EditUserRoleRequestDto {
         private String email;
         private UserEntity.UserRoleEnum newUserRole;
     }
 
+    // 계산 나이, 성별 정보 DTO
+    @Getter
+    @Setter
+    public static class AgeGenderResponseDto {
+        private GenderEnum gender;
+        private int age;
+
+        public AgeGenderResponseDto(GenderEnum gender, int age) {
+            this.gender = gender;
+            this.age = age;
+        }
+    }
 }

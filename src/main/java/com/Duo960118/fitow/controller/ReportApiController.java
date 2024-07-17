@@ -7,6 +7,7 @@ import com.Duo960118.fitow.entity.StatusResponseDto;
 import com.Duo960118.fitow.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,11 +28,12 @@ import java.util.UUID;
 public class ReportApiController {
     private final ReportService reportService;
 
-    // 신고 및 문의 리스트 개인용
+    // 신고 및 문의 리스트 - 유저
     @GetMapping("reports/my-reports")
     public ResponseEntity<List<ReportDto.ReportInfoDto>> getReports(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Sort sort = Sort.by("reportId").descending();
         String email = customUserDetails.getUsername();
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize).withSort(sort);
 
         return ResponseEntity.ok().body(reportService.getReports(email, pageRequest));
     }
@@ -40,6 +42,18 @@ public class ReportApiController {
     @GetMapping("reports/{uuid}")
     public ReportDto.ReportDetailDto getReportDetail(@PathVariable("uuid") UUID uuid) {
         return reportService.getReportDetail(uuid);
+    }
+
+    // 신고 및 문의 이미지 가져오기
+    @GetMapping("reports/report-img/{filename}")
+    public Resource getReportAttachmentImg(@PathVariable("filename") String filename) {
+        return reportService.loadReportAttachmentImg(filename);
+    }
+
+    // 답변 이미지 가져오기
+    @GetMapping("reports/reply-img/{filename}")
+    public Resource getReplyAttachmentImg(@PathVariable("filename") String filename) {
+        return reportService.loadReplyAttachmentImg(filename);
     }
 
     // 신고 및 문의 작성
@@ -70,10 +84,11 @@ public class ReportApiController {
         return ResponseEntity.ok().body(new StatusResponseDto(reportService.replyReport(uuid, replyReport, multipartFile)));
     }
 
-    // 신고 전체 문의 리스트
+    // 신고 문의 리스트 - 어드민
     @GetMapping("def-cms/reports")
     public ResponseEntity<List<ReportDto.ReportInfoDto>> reports(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        Sort sort = Sort.by("reportId").descending();
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize).withSort(sort);
         List<ReportDto.ReportInfoDto> result = reportService.getAllReport(pageRequest);
 
         return ResponseEntity.ok().body(result);
@@ -85,10 +100,28 @@ public class ReportApiController {
             @RequestParam(value = "status", required = false) ReportEntity.ReportStatusEnum status,
             @RequestParam(value = "category", required = false) ReportEntity.ReportCategoryEnum category,
             @RequestParam(value = "email", required = false) String email,
-            @PageableDefault(size = 10, sort = "reportDate", direction = Sort.Direction.DESC) Pageable pageable) {
+//            @PageableDefault(page = 0, size = 10, sort = "reportId", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10, sort = "reportId") Pageable pageable) {
 
         Page<ReportDto.ReportInfoDto> result = reportService.searchReport(status, category, email, pageable);
 
-        return ResponseEntity.ok().body(reportService.searchReport(status, category, email, pageable));
+//        for (ReportDto.ReportInfoDto reportInfoDto : result) {
+//            log.info(reportInfoDto.getTitle());
+//        }
+
+        return ResponseEntity.ok().body(result);
     }
+
+    // 신고 및 문의 카테고리 Enum 반환
+    @GetMapping("reports/category-enum")
+    public ResponseEntity<ReportEntity.ReportCategoryEnum[]> getReportCategoryEnum() {
+        return ResponseEntity.ok().body(ReportEntity.ReportCategoryEnum.values());
+    }
+
+    // 신고 및 문의 상태 Enum 반환
+    @GetMapping("reports/status-enum")
+    public ResponseEntity<ReportEntity.ReportStatusEnum[]> getReportStatusEnum() {
+        return ResponseEntity.ok().body(ReportEntity.ReportStatusEnum.values());
+    }
+
 }

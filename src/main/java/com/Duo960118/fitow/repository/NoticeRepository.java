@@ -32,4 +32,7 @@ public interface NoticeRepository extends JpaRepository<NoticeEntity,Long> {
 
     boolean existsByUuidEntityUuid(UUID uuid);
 
+    // 조회 회원의 공지 찾기
+    List<NoticeEntity> findByUserEntityUserId(Long useId);
+
 }

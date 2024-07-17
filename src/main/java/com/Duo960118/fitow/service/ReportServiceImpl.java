@@ -1,11 +1,14 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.config.UploadConfig;
 import com.Duo960118.fitow.entity.ReportDto;
 import com.Duo960118.fitow.entity.ReportEntity;
 import com.Duo960118.fitow.mapper.ReportMapper;
 import com.Duo960118.fitow.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl implements ReportService {
     private final UserService userService;
     private final ReportRepository reportRepository;
+    private final UploadConfig uploadConfig;
 
     @Value("${spring.report_file_dir}")
     private String reportFileDir;
@@ -78,8 +82,6 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ReportDto.ReportDetailDto getReportDetail(UUID uuid) {
         ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 문의"));
-
-        String email = reportEntity.getUserEntity().getEmail();
 
         // 생성자는 파라미터 순서가 일치해야 함 > 순서수정
         return new ReportDto.ReportDetailDto(
@@ -182,4 +184,27 @@ public class ReportServiceImpl implements ReportService {
         return new PageImpl<>(searchResults);
     }
 
+    // 신고 및 문의 첨부파일
+    @Override
+    public Resource loadReportAttachmentImg(String filename) {
+        return new FileSystemResource(uploadConfig.getReportAttachmentImgDir() + filename);
+    }
+
+    // 답변 첨부파일
+    @Override
+    public Resource loadReplyAttachmentImg(String filename) {
+        return new FileSystemResource(uploadConfig.getReplyAttachmentImgDir() + filename);
+    }
+
+    @Override
+    public void updateForeinKeysNull(Long userId) {
+        Pageable pageable = Pageable.unpaged();
+        List<ReportEntity> reportEntities = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, pageable);
+
+        // 외래 키를 null로 설정
+        for (ReportEntity reportEntity : reportEntities) {
+            reportEntity.updateUserEntity(null);
+        }
+
+    }
 }

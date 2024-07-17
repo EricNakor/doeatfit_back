@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -87,7 +88,10 @@ public class EmailSendService {
     // 인증번호 인증
     public boolean verifyEmail(EmailDto.VerifyEmailRequestDto verifyEmailRequest) {
         try {
-            return verifyEmailRequest.getAuthNum().equals(redisUtil.getData(verifyEmailRequest.getEmail()));
+            String storedAuthNum = redisUtil.getData(verifyEmailRequest.getEmail()).orElseThrow();
+            return Objects.equals(verifyEmailRequest.getAuthNum(), storedAuthNum);
+            // null 예외발생을 방지하기 위해 equals > object.equals로 변경
+            // null을 포함하여 비교할 수 있다.
         } catch (Exception e) {
             e.printStackTrace();
             return false;

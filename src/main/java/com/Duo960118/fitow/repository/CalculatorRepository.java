@@ -2,7 +2,6 @@ package com.Duo960118.fitow.repository;
 
 import com.Duo960118.fitow.entity.CalculateInfoEntity;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -25,4 +24,6 @@ public interface CalculatorRepository extends JpaRepository<CalculateInfoEntity,
 
     // 페이징 처리
     Page<CalculateInfoEntity> findAllByUserEntityUserId(Long userId, Pageable pageable);
+
+    List<CalculateInfoEntity> findAllByUserEntityUserId(Long userId);
 }

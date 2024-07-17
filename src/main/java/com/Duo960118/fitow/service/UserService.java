@@ -2,9 +2,9 @@ package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
-import org.apache.catalina.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 // 확장된 구현체를 만들어야 할 경우가 발생할 것 같을때
@@ -61,4 +61,7 @@ public interface UserService {
     // 이메일로 유저 하나 디테일 조회
     @Transactional
     UserDto.UserInfoDto getUserInfo(String email);
+
+    // 만나이 계산
+    int calculateAge(LocalDate birth);
 }

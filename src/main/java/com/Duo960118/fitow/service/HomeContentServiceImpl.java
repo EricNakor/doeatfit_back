@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -24,16 +25,16 @@ public class HomeContentServiceImpl implements HomeContentService {
 
     @Override
     public HomeContentDto.HomeContentInfoDto getHomeContentInfo(UUID uuid) {
-        return HomeContentMapper.entityToHomeContentInfoDto(homeContentRepository.findByUuidEntityUuid(uuid).orElseThrow(()-> new RuntimeException("존재하지 않는 home content")));
+        return HomeContentMapper.entityToHomeContentInfoDto(homeContentRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 home content")));
     }
 
     @Override
     public HomeContentDto.HomeContentInfoDto postHomeContent(HomeContentDto.PostHomeContentRequestDto postHomeContentRequest) {
         List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(postHomeContentRequest.getCategory());
 
-        if(postHomeContentRequest.getIsBeingUsed()){
+        if (postHomeContentRequest.getIsBeingUsed()) {
             // category 같은 모든 엔티티`isBeingUsed` 값을 `false`로
-            for(HomeContentEntity h : homeContentEntities){
+            for (HomeContentEntity h : homeContentEntities) {
                 h.updateIsBeingUsed(false);
             }
         }
@@ -50,16 +51,16 @@ public class HomeContentServiceImpl implements HomeContentService {
 
     @Override
     public HomeContentDto.HomeContentInfoDto editHomeContent(UUID uuid, HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
-        if(editHomeContentRequest.getIsBeingUsed()){
+        if (editHomeContentRequest.getIsBeingUsed()) {
             List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(editHomeContentRequest.getCategory());
 
             // 모든 엔티티`isBeingUsed` 값을 `false`로
-            for(HomeContentEntity h : homeContentEntities){
+            for (HomeContentEntity h : homeContentEntities) {
                 h.updateIsBeingUsed(false);
             }
         }
 
-        HomeContentEntity homeContentEntity = homeContentRepository.findByUuidEntityUuid(uuid).orElseThrow(()-> new RuntimeException("존재하지 않는 home content"));
+        HomeContentEntity homeContentEntity = homeContentRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 home content"));
         homeContentEntity.updateHomeContent(editHomeContentRequest);
 
         return HomeContentMapper.entityToHomeContentInfoDto(homeContentEntity);
@@ -68,6 +69,26 @@ public class HomeContentServiceImpl implements HomeContentService {
     @Override
     public void deleteHomeContent(UUID uuid) {
         homeContentRepository.deleteByUuidEntityUuid(uuid);
+    }
+
+    @Override
+    public List<HomeContentDto.HomeContentInfoDto> getActiveHomeContent() {
+        List<HomeContentEntity> activeHomeContents = homeContentRepository.findByIsBeingUsedTrue();
+
+        return activeHomeContents.stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
+
+    private HomeContentDto.HomeContentInfoDto convertEntityToDto(HomeContentEntity entity) {
+        return HomeContentDto.HomeContentInfoDto.builder()
+                .uuid(entity.getUuidEntity().getUuid())
+                .category(entity.getCategory())
+                .isBeingUsed(entity.getIsBeingUsed())
+                .content(entity.getContent())
+                .createdAt(entity.getCreatedAt())
+                .editedAt(entity.getEditedAt())
+                .build();
     }
 
 }
