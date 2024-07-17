@@ -4,6 +4,7 @@ import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.config.UploadConfig;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
