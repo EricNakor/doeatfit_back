@@ -4,6 +4,7 @@ import com.Duo960118.fitow.entity.CalculatorDto;
 import com.Duo960118.fitow.entity.GenderEnum;
 import com.Duo960118.fitow.entity.UserEntity;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,16 +26,13 @@ public interface CalculatorService {
     CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest, UserEntity userEntity);
 
     // 로딩, 벤딩할 값 가져오기
-    List<CalculatorDto.AdvancedCalcListDto> getAdvancedCalcList(UserEntity userEntity, PageRequest pageRequest);
+    List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(UserEntity userEntity, Pageable pageable);
 
     // 로딩, 벤딩 계산
     CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest, UserEntity userEntity);
 
     // 계산 결과 한 개
     CalculatorDto.CalcResultDto getCalcResult(UUID uuid);
-
-    // 계산 결과 히스토리
-    List<CalculatorDto.CalcResultDto> getCalcResults(UserEntity userEntity);
 
     // 계산 결과 삭제
     @Transactional
