@@ -155,7 +155,7 @@
 //        LEG("다리"),
 //        CHEST("가슴"),
 //        SHOULDER("어깨"),
-//        HEAP("엉덩이");
+//        HIP("엉덩이");
 //
 //        private final String desc;
 //
@@ -310,14 +310,106 @@ public class WorkoutEntity extends TimeStampEntity {
     @Getter
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum MuscleEnum {
-        LATISSIMUS_DORSI_MUSCLE("LATISSIMUS_DORSI_MUSCLE", "광배근", BodyPartEnum.BACK),
+        // 등
         TRAPEZIUS("TRAPEZIUS", "승모근", BodyPartEnum.BACK),
+        UPPER_TRAPEZIUS("UPPER_TRAPEZIUS", "상부 승모근", BodyPartEnum.BACK),
+        MIDDLE_TRAPEZIUS("MIDDLE_TRAPEZIUS", "중부 승모근", BodyPartEnum.BACK),
+        LOWER_TRAPEZIUS("LOWER_TRAPEZIUS", "하부 승모근", BodyPartEnum.BACK),
+
+        LATISSIMUS_DORSI("LATISSIMUS_DORSI", "광배근", BodyPartEnum.BACK),
+        UPPER_LATISSIMUS_DORSI("UPPER_LATISSIMUS_DORSI", "상부 광배근", BodyPartEnum.BACK),
+        LOWER_LATISSIMUS_DORSI("LOWER_LATISSIMUS_DORSI", "하부 광배근", BodyPartEnum.BACK),
+
+        TERES_MAJOR("TERES_MAJOR", "대원근", BodyPartEnum.BACK),
+        TERES_MINOR("TERES_MINOR", "소원근", BodyPartEnum.BACK),
+        LEVATOR_SCAPULA("LEVATOR_SCAPULA", "견갑거근", BodyPartEnum.BACK),
+
+        RHOMBOIDS("RHOMBOIDS", "능형근", BodyPartEnum.BACK),
+        MAJOR_RHOMBOIDS("MAJOR_RHOMBOIDS", "대능형근", BodyPartEnum.BACK),
+        MINOR_RHOMBOIDS("MINOR_RHOMBOIDS", "소능형근", BodyPartEnum.BACK),
+
         ERECTOR_MUSCLE("ERECTOR_MUSCLE", "기립근", BodyPartEnum.BACK),
-        QUADRICEPS_FEMORIS_MUSCLE("QUADRICEPS_FEMORIS_MUSCLE", "대퇴 사두근", BodyPartEnum.LEG),
-        HAMSTRING("HAMSTRING", "햄스트링", BodyPartEnum.LEG),
-        GLUTEUS_MAXIMUS_MUSCLE("GLUTEUS_MAXIMUS_MUSCLE", "대둔근", BodyPartEnum.LEG),
-        BICEPS_MUSCLE("BICEPS_MUSCLE", "이두근", BodyPartEnum.ARM),
-        TRICEPS_MUSCLE("TRICEPS_MUSCLE", "삼두근", BodyPartEnum.ARM);
+
+        // 어깨
+        DELTOID("DELTOID", "삼각근", BodyPartEnum.SHOULDER),
+        ANTERIOR_DELTOID("ANTERIOR_DELTOID", "전면 삼각근", BodyPartEnum.SHOULDER),
+        LATERAL_DELTOID("LATERAL_DELTOID", "측면 삼각근", BodyPartEnum.SHOULDER),
+        POSTERIOR_DELTOID("POSTERIOR_DELTOID", "후면 삼각근", BodyPartEnum.SHOULDER),
+        CORACOBRACHIALIS("CORACOBRACHIALIS", "오훼완근", BodyPartEnum.SHOULDER),
+
+        SUPRASPINATUS("SUPRASPINATUS", "극상근", BodyPartEnum.SHOULDER),
+        INFRASPINATUS("INFRASPINATUS", "극하근", BodyPartEnum.SHOULDER),
+
+        SUBSCAPULARIS("SUBSCAPULARIS", "견갑하근", BodyPartEnum.SHOULDER),
+
+        // 가슴
+        PECTORALIS_MAJOR("PECTORALIS_MAJOR","대흉근", BodyPartEnum.CHEST),
+        UPPER_PECTORALIS_MAJOR("UPPER_PECTORALIS_MAJOR","상부 대흉근", BodyPartEnum.CHEST),
+        MIDDLE_PECTORALIS_MAJOR("MIDDLE_PECTORALIS_MAJOR","중부 대흉근", BodyPartEnum.CHEST),
+        LOWER_PECTORALIS_MAJOR("LOWER_PECTORALIS_MAJOR","하부 대흉근", BodyPartEnum.CHEST),
+
+        PECTORALIS_MINOR("PECTORALIS_MINOR","소흉근", BodyPartEnum.CHEST),
+
+        SUBCLAVIUS("SUBCLAVIUS","쇄골하근", BodyPartEnum.CHEST),
+
+        SERRATUS_ANTERIOR("SERRATUS_ANTERIOR","전거근", BodyPartEnum.CHEST),
+
+        // 팔
+        BICEPS("BICEPS", "이두근", BodyPartEnum.ARM),
+        BICEPS_LONG_HEAD("BICEPS_LONG_HEAD","상완 이두 장두", BodyPartEnum.ARM),
+        BICEPS_SHORT_HEAD("BICEPS_SHORT_HEAD","상완 이두 단두", BodyPartEnum.ARM),
+        BRACHIALIS("BRACHIALIS","상완근", BodyPartEnum.ARM),
+
+        TRICEPS("TRICEPS", "삼두근", BodyPartEnum.ARM),
+        TRICEPS_LONG_HEAD("TRICEPS_LONG_HEAD","상완 삼두 장두", BodyPartEnum.ARM),
+        TRICEPS_LATERAL("TRICEPS_LATERAL","상완 삼두 외측", BodyPartEnum.ARM),
+        TRICEPS_MEDIAL_HEAD("TRICEPS_MEDIAL_HEAD","상완 삼두 내측", BodyPartEnum.ARM),
+
+        ANTEBRACHIAL("ANTEBRACHIAL","전완근", BodyPartEnum.ARM),
+        WRIST_EXTENSORS("WRIST_EXTENSORS","전완 신근", BodyPartEnum.ARM),
+        WRIST_FLEXORS("WRIST_FLEXORS","전완 굴근", BodyPartEnum.ARM),
+
+        // 복근
+        RECTUS_ABDOMINIS("RECTUS_ABDOMINIS","복직근", BodyPartEnum.ABDOMEN),
+        EXTERNAL_OBLIQUE("EXTERNAL_OBLIQUE","외복사근", BodyPartEnum.ABDOMEN),
+        INTERNAL_OBLIQUE("INTERNAL_OBLIQUE","내복사근", BodyPartEnum.ABDOMEN),
+        TRANSVERSE_OBLIQUE("TRANSVERSE_OBLIQUE","복횡근", BodyPartEnum.ABDOMEN),
+        QUADRATUS_LUMBORUM("QUADRATUS_LUMBORUM","요방형근", BodyPartEnum.ABDOMEN),
+
+        // 둔근
+        GLUTEUS("GLUTEUS", "둔근", BodyPartEnum.HIP),
+        GLUTEUS_MAXIMUS("GLUTEUS_MAXIMUS", "대둔근", BodyPartEnum.HIP),
+        GLUTEUS_MEDIUS("GLUTEUS_MEDIUS", "중둔근", BodyPartEnum.HIP),
+        GLUTEUS_MINIMUS("GLUTEUS_MINIMUS", "소둔근", BodyPartEnum.HIP),
+        LATERAL_ROTATORS_HIP_JOINT("LATERAL_ROTATORS_HIP_JOINT", "고관절 외회전근", BodyPartEnum.HIP),
+        PSOAS_MAJOR("PSOAS_MAJOR", "대요근", BodyPartEnum.HIP),
+        ILIACUS("ILIACUS", "장골근", BodyPartEnum.HIP),
+        PECTINEUS("PECTINEUS", "치골근", BodyPartEnum.HIP),
+
+        // 하체
+        QUADRICEPS_FEMORIS("QUADRICEPS_FEMORIS", "대퇴 사두근", BodyPartEnum.LEG),
+        RECTUS_FEMORIS("RECTUS_FEMORIS", "대퇴직근", BodyPartEnum.LEG),
+        VASTUS_MEDIALIS("VASTUS_MEDIALIS", "내측광근", BodyPartEnum.LEG),
+        VASTUS_LATERALIS("VASTUS_LATERALIS", "외측광근", BodyPartEnum.LEG),
+        TENSOR_FASCIAE_LATAE("TENSOR_FASCIAE_LATAE", "대퇴근막장근", BodyPartEnum.LEG),
+
+        ADDUCTOR("ADDUCTOR", "내전근", BodyPartEnum.LEG),
+        ADDUCTOR_MAGNUS("ADDUCTOR_MAGNUS", "대내전근", BodyPartEnum.LEG),
+        ADDUCTOR_LONGUS("ADDUCTOR_LONGUS", "장내전근", BodyPartEnum.LEG),
+        ADDUCTOR_BREVIS("ADDUCTOR_BREVIS", "단내전근", BodyPartEnum.LEG),
+        GRACILIS("GRACILIS", "박근", BodyPartEnum.LEG),
+
+        HAMSTRING("HAMSTRING", "슬건근", BodyPartEnum.LEG),
+        BICEPS_FEMORIS("BICEPS_FEMORIS", "대퇴 이두근", BodyPartEnum.LEG),
+        SEMITENDINOSUS("SEMITENDINOSUS", "반건양근", BodyPartEnum.LEG),
+        SEMIMEMBRANOSUS("SEMIMEMBRANOSUS", "반막양근", BodyPartEnum.LEG),
+
+        CALF("CALF", "종아리", BodyPartEnum.LEG),
+        GASTROCNEMIUS("GASTROCNEMIUS", "비복근", BodyPartEnum.LEG),
+        SOLEUS("SOLEUS", "가자미근", BodyPartEnum.LEG),
+        TIBIALIS_ANTERIOR("TIBIALIS_ANTERIOR", "전경근", BodyPartEnum.LEG);
+
+
 
         private final String name;
         private final String desc;
@@ -361,7 +453,7 @@ public class WorkoutEntity extends TimeStampEntity {
         LEG("LEG", "다리"),
         CHEST("CHEST", "가슴"),
         SHOULDER("SHOULDER", "어깨"),
-        HEAP("HEAP", "엉덩이");
+        HIP("HIP", "엉덩이");
 
         private final String name;
         private final String desc;
@@ -421,3 +513,6 @@ public class WorkoutEntity extends TimeStampEntity {
         }
     }
 }
+
+// bodyPart 컬럼 추가
+// api에도 수정

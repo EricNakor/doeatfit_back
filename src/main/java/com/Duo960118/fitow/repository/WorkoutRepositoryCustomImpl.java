@@ -8,18 +8,21 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-
+    protected final Log logger = LogFactory.getLog(this.getClass());
     //
     @Override
     public Page<WorkoutEntity> findBySearchWorkoutRequest(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable) {
@@ -32,6 +35,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscleEnums()))
                 .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscleEnums()))
                 .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscleEnums()))
+                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyPartEnums()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -58,8 +62,8 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties()))
                 .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscleEnums()))
                 .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscleEnums()))
-                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscleEnums()));
-//                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyPartEnums(), searchWorkoutRequest.getAgonistMuscleEnums()));
+                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscleEnums()))
+                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyPartEnums()));
     }
 
     // BooleanExpression은 null 반환 시 자동으로 조건절에서 제거 된다.
@@ -73,7 +77,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
         return workoutEntity.workoutName.contains(workoutName);
     }
 
-    // 운동 난이도 검색 
+    // 운동 난이도 검색
     private BooleanExpression inWorkoutDifficulty(List<WorkoutEntity.DifficultyEnum> workoutDifficultyEnums) {
         if (ObjectUtils.isEmpty(workoutDifficultyEnums)) {
             return null;
@@ -137,24 +141,33 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     }
 
     // 신체 부위로 검색
-//    private BooleanExpression containsBodyPartEnums(List<WorkoutEntity.BodyPartEnum> bodyPartEnums, List<WorkoutEntity.MuscleEnum> agonistMuscleEnums) {
-//        if (ObjectUtils.isEmpty(bodyPartEnums)) {
-//            return null;
-//        }
-//        BooleanExpression expression = null;
-//
-//        for (WorkoutEntity.MuscleEnum muscle : agonistMuscleEnums) {
-//            for (WorkoutEntity.BodyPartEnum bodyPart : bodyPartEnums) {
-//                if (muscle.getBodyPart() == bodyPart) {
-//                    if (expression == null) {
-//                        expression = workoutEntity.agonistMuscleEnums.contains(muscle);
-//                    } else {
-//                        expression = expression.or(workoutEntity.agonistMuscleEnums.contains(muscle));
-//                    }
-//                }
-//            }
-//        }
-//        return expression;
-//    }
-}
+    private BooleanExpression containsBodyPartEnums(List<WorkoutEntity.BodyPartEnum> bodyPartEnums) {
+        if (ObjectUtils.isEmpty(bodyPartEnums)) {
+            return null;
+        }
+        BooleanExpression expression = null;
 
+        for (WorkoutEntity.BodyPartEnum bodyPart : bodyPartEnums) {
+
+            // 이 bodyPartEnum을 갖는 enum만 골라 리스트에 담기
+            List<WorkoutEntity.MuscleEnum> muscleEnums = new ArrayList<>();
+            for (WorkoutEntity.MuscleEnum muscle : WorkoutEntity.MuscleEnum.values()) {
+                if (muscle.getBodyPart() == bodyPart) {
+                    muscleEnums.add(muscle);
+                }
+            }
+
+            for (WorkoutEntity.MuscleEnum muscle : muscleEnums) {
+                if (expression == null) {
+                    // muscle를 포함하고 있다면 ok
+                    expression = workoutEntity.agonistMuscleEnums.contains(muscle);
+                } else {
+                    expression = expression.or(workoutEntity.agonistMuscleEnums.contains(muscle));
+                }
+                logger.info(expression.toString());
+            }
+        }
+
+        return expression;
+    }
+}
