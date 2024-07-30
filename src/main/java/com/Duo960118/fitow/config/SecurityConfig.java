@@ -37,7 +37,7 @@ public class SecurityConfig {
     public static final String[] JS = {"/js/**"};
     public static final String[] ERROR = {"/error"};
 
-    public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**", "/test"};
+    public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**"};
     public static final String[] NO_AUTH_API_PATHS = {"api/users/find/**", "/api/users/send-temp-passwd", "/api/users/join",
             "/api/email/send/auth", "/api/email/verify", "/api/users/check/**",
             "/api/workouts/**", "/api/notices/**", "/api/users/gender-enum",
