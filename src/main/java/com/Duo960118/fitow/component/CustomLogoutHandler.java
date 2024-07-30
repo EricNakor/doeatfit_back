@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.component;
 
+import com.Duo960118.fitow.entity.JwtProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public class CustomLogoutHandler implements LogoutHandler, LogoutSuccessHandler 
     // 로그아웃 시에는 리프레시 토큰을 제거하고, 액세스 토큰을 액세스 토큰의 유효기간 만큼 ttl을 걸어서 블랙리스트에 추가
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        String accessToken = tokenUtil.resolveToken(request, TokenUtil.ACCESS_TOKEN_KEY);
+        String accessToken = tokenUtil.resolveToken(request, JwtProperties.ACCESS_TOKEN_KEY);
         String email;
         try {
             email = tokenUtil.getEmailFromAccessToken(accessToken);

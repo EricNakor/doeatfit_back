@@ -1,19 +1,18 @@
 package com.Duo960118.fitow.component;
 
 import com.Duo960118.fitow.entity.BlackListedToken;
+import com.Duo960118.fitow.entity.JwtProperties;
 import com.Duo960118.fitow.entity.TokensEntity;
 import com.Duo960118.fitow.repository.TokenBlackListRepository;
 import com.Duo960118.fitow.repository.TokensRepository;
 import com.Duo960118.fitow.service.SecurityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,37 +20,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.*;
 
 @Component
 public class TokenUtil {
-    // Header KEY 값
-    //public static final String AUTHORIZATION_HEADER = "Authorization";
-    // cookie token key
-    public static final String ACCESS_TOKEN_KEY = "access_token";
-    // Token 식별자
-    private static final String BEARER_PREFIX = "Bearer "; // jwt 타입 명시
-
-    private static final long ACCESS_TOKEN_TIME = Duration.ofMinutes(30).toMillis();// 30분
-
-    private static final long REFRESH_TOKEN_TIME = Duration.ofDays(7).toSeconds();// 7일
-
     private final SecurityService securityService;
     private final TokensRepository tokensRepository;
     private final TokenBlackListRepository accessTokenBlackListRepository;
-    private final SecretKey secretKey;
-
     private final Logger logger = LoggerFactory.getLogger(TokenUtil.class);
 
-    public TokenUtil(@Value("${spring.jwt.secret}") String secret, SecurityService securityService, TokensRepository tokensRepository, TokenBlackListRepository tokenBlackListRepository) {
+    public TokenUtil(SecurityService securityService, TokensRepository tokensRepository, TokenBlackListRepository tokenBlackListRepository) {
         this.securityService = securityService;
-        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.tokensRepository = tokensRepository;
         this.accessTokenBlackListRepository = tokenBlackListRepository;
     }
@@ -63,7 +45,7 @@ public class TokenUtil {
         token = token.split(" ")[1].trim();
         return Jwts
                 .parser()
-                .verifyWith(secretKey)
+                .verifyWith(JwtProperties.secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -91,30 +73,17 @@ public class TokenUtil {
         logger.debug(getAllClaims(token).get("email", String.class));
         return getAllClaims(token).get("email", String.class);
     }
-//
-//    public Boolean isExpired(String token) {
-//        return getAllClaims(token).getExpiration().before(new Date());
-//    }
 
-//    public String createToken(String username, String role, Long expiredMs) {
-//        return BEARER_PREFIX + Jwts.builder()
-//                .claim("email", username)
-//                .claim("role", role)
-//                .issuedAt(new Date(System.currentTimeMillis()))
-//                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-//                .signWith(secretKey)
-//                .compact();
-//    }
 
     // email을 key, access token과 refresh token을 value로 하여 redis에 저장
     // refresh 토큰에는 사용자 정보를 담을 필요가 없다.
-    public void saveRefreshToken(String accessToken) {
+    public void issueRefreshToken(String accessToken) {
         String refreshToken = UUID.randomUUID().toString();
         TokensEntity tokensEntity = TokensEntity.builder()
                 .refreshToken(refreshToken)
                 .accessToken(accessToken)
                 .email(this.getUsername(accessToken))
-                .ttl(REFRESH_TOKEN_TIME)
+                .ttl(JwtProperties.REFRESH_TOKEN_TIME)
                 .build();
 
         // email 필요
@@ -141,7 +110,7 @@ public class TokenUtil {
     public void blacklistAccessToken(String accessToken) {
         BlackListedToken blackListedToken = BlackListedToken.builder()
                 .accessToken(accessToken)
-                .ttl(ACCESS_TOKEN_TIME).build();
+                .ttl(JwtProperties.ACCESS_TOKEN_TIME).build();
         accessTokenBlackListRepository.save(blackListedToken); //setDataExp(BLACKLIST_PREFIX + accessToken, "", Duration.ofSeconds(ACCESS_TOKEN_TIME));
     }
 
@@ -153,12 +122,12 @@ public class TokenUtil {
 
     // jwt access token 생성
     public String createAccessToken(UserDetails userDetails) {
-        return BEARER_PREFIX + Jwts.builder()
+        return JwtProperties.TOKEN_PREFIX + Jwts.builder()
                 .claim("email", userDetails.getUsername())
                 .claim("role", userDetails.getAuthorities().toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME))
-                .signWith(secretKey)
+                .expiration(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_TOKEN_TIME))
+                .signWith(JwtProperties.secretKey)
                 .compact();
     }
 
@@ -171,55 +140,61 @@ public class TokenUtil {
     // Request의 Cookie에서 token 값을 가져옴. "refresh_token" : "TOKEN값"
     public String resolveToken(HttpServletRequest request, String tokenKey) {
         Cookie[] cookies = request.getCookies(); // 모든 쿠키 가져오기
-        if (cookies != null) {
-            String token = Arrays.stream(cookies).filter((c) -> c.getName().equals(tokenKey)).findFirst().orElse(new Cookie(tokenKey, "")).getValue();
-            return URLDecoder.decode(token, StandardCharsets.UTF_8);
+        if (cookies == null) {
+            throw new IllegalArgumentException("쿠키 없음");
         }
-        logger.info("no token");
-        return "";
+
+        String token = Arrays.stream(cookies).filter((c) -> c.getName().equals(tokenKey)).findFirst().orElse(new Cookie(tokenKey, "")).getValue();
+        if(token.isEmpty()){
+            throw new NoSuchElementException();
+        }
+
+        return URLDecoder.decode(token, StandardCharsets.UTF_8);
     }
+
 
     // bearer 확인 + 만료일자 확인 + 로그아웃 블랙리스트에 있는지 확인
-    public boolean validateAccessToken(String token) {
-        try {
-            // 텍스트 있는지 확인
-            if (!StringUtils.hasText(token)) {
-                logger.info("access token 비어있음");
-                return false;
-            }
-
-            // Bearer 검증
-            if (!token.startsWith(BEARER_PREFIX)) {
-                logger.info("Jwt token 유효성 검증 실패: {}", token);
-                return false;
-            }
-
-            // 블랙 리스트 확인
-            if (accessTokenBlackListRepository.existsById(token)) {
-                logger.info("access token이 블랙리스트에 있음");
-                return false;
-            }
-
-            // 토큰 추출
-            token = token.substring(BEARER_PREFIX.length());
-
-            // 토큰에서 claim 추출
-            Claims claims = Jwts.parser().setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            // 만료되었을 시 false
-            return !claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            logger.error(e.toString());
-            return false;
+    public boolean validateAccessToken(String bearerToken) {
+        // 텍스트 있는지 확인
+        if (!StringUtils.hasText(bearerToken)) {
+            throw new JwtException("access token이 없습니다");
         }
+
+        // Bearer 검증
+        if (!bearerToken.startsWith(JwtProperties.TOKEN_PREFIX)) {
+            throw new JwtException("유효하지 않은 bearer token"); // message :"Jwt token 유효성 검증 실패: {}",
+        }
+
+        // 블랙 리스트 확인
+        if (accessTokenBlackListRepository.existsById(bearerToken)) {
+            throw new JwtException("bearer token이 블랙리스트에 있음"); // message : "access token이 블랙리스트에 있음"
+        }
+
+        // 액세스 토큰 추출
+        String token = bearerToken.substring(JwtProperties.TOKEN_PREFIX.length());
+
+        // 토큰에서 claim 추출
+        Claims claims = Jwts.parser()
+                .setSigningKey(JwtProperties.secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        // 유효기간 확인
+        Date expiration = claims.getExpiration();
+        logger.info("expired at: {}",expiration);
+
+        if(expiration.before(new Date())){
+            // 쿠키를 사용해서 임시로 빈 헤더 넘겨줌
+            throw new ExpiredJwtException(Jwts.header().build(), claims, expiration.toString());
+        }
+
+        return true;
     }
 
-    // access token을 cookie에 저장
-    public Cookie saveAccessTokenAsCookie(String token) {
-        Cookie cookie = new Cookie(ACCESS_TOKEN_KEY, URLEncoder.encode(token, StandardCharsets.UTF_8));
+    // access token을 cookie로 변환
+    public Cookie convertAccessTokenAsCookie(String accessToken) {
+        Cookie cookie = new Cookie(JwtProperties.ACCESS_TOKEN_KEY, URLEncoder.encode(accessToken, StandardCharsets.UTF_8));
         cookie.setPath("/");
         cookie.setDomain("localhost");
         cookie.setHttpOnly(true);

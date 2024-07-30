@@ -1,10 +1,10 @@
 package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.component.TokenUtil;
+import com.Duo960118.fitow.entity.JwtProperties;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.config.UploadConfig;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -204,7 +204,7 @@ public class UserFacade {
         // 토큰 블랙리스트 추가 or
         // 쿠키에서 토큰 삭제는 해도 되고 안해도 되고
         // 탈퇴한 회원 accessToken 추출
-        String accessToken = tokenUtil.resolveToken(withdrawRequest.getHttpServletRequest(), TokenUtil.ACCESS_TOKEN_KEY);
+        String accessToken = tokenUtil.resolveToken(withdrawRequest.getHttpServletRequest(), JwtProperties.ACCESS_TOKEN_KEY);
         String email = withdrawRequest.getEmail();
 
         // refresh token 제거

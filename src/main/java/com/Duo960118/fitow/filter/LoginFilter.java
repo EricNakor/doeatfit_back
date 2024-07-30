@@ -44,23 +44,23 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         // 중복 로그인 체크
         String email = customUserDetails.getUsername();
+
         if (tokenUtil.isLogin(email)) {
             // 지우기 전에 기 로그인된 액세스 토큰 블랙리스트 추가
             tokenUtil.blacklistAccessToken(tokenUtil.findAccessToken(email));
             tokenUtil.deleteRefreshToken(email);
         }
+
         // cookie에 access token 저장
         String accessToken = tokenUtil.createAccessToken(customUserDetails);
-        logger.debug(accessToken);
 
-        Cookie accessCookie = tokenUtil.saveAccessTokenAsCookie(accessToken);
-
-        response.addCookie(accessCookie);
+        Cookie cookie = tokenUtil.convertAccessTokenAsCookie(accessToken);
+        response.addCookie(cookie);
 
         // redis에 refresh token 저장
-        tokenUtil.saveRefreshToken(accessToken);
+        tokenUtil.issueRefreshToken(accessToken);
 
-        // ok
+        // set status ok
         response.setStatus(200);
     }
 

@@ -1,6 +1,8 @@
 package com.Duo960118.fitow.config;
 
+import com.Duo960118.fitow.component.CustomAuthenticationEntryPoint;
 import com.Duo960118.fitow.component.CustomLogoutHandler;
+import com.Duo960118.fitow.component.CustomAccessDeniedHandler;
 import com.Duo960118.fitow.filter.JwtFilter;
 import com.Duo960118.fitow.filter.LoginFilter;
 import com.Duo960118.fitow.component.TokenUtil;
@@ -31,12 +33,14 @@ public class SecurityConfig {
     private final CustomLogoutHandler customLogoutHandler;
     private final TokenUtil tokenUtil;
 
-    // 인증이 필요없는 url
+    // 필터를 거치치 않아도 되는 url
     public static final String[] CSS = {"/css/**"};
     public static final String FAVICON = "/favicon.ico";
     public static final String[] JS = {"/js/**"};
     public static final String[] ERROR = {"/error"};
+    public static final String[] API = {"/api/home-contents"};
 
+    // 인증이 필요없는 url
     public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**", "/test"};
     public static final String[] NO_AUTH_API_PATHS = {"api/users/find/**", "/api/users/send-temp-passwd", "/api/users/join",
             "/api/email/send/auth", "/api/email/verify", "/api/users/check/**",
@@ -60,13 +64,14 @@ public class SecurityConfig {
                 .requestMatchers(ERROR)
                 .requestMatchers(JS)
                 .requestMatchers(CSS)
-                .requestMatchers(FAVICON);
+                .requestMatchers(FAVICON)
+                .requestMatchers(API);
     }
 
     @Bean
     // 스프링 시큐리티의 세부 설정
     // 스프링에 의해 생성 또는 관리되는 객체를 의미하는 어노테이션. (컨트롤러/서비스/리포지토리 등 모두 빈에 해당)
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         // 내부적으로 SecurityFilterChain 클래스가 동작하여 모든 요청 URL에 이 클래스가 필터로 적용되어
         // URL별로 특별한 설정을 할 수 있게 된다.
         // csrf 비활성화
@@ -109,7 +114,12 @@ public class SecurityConfig {
                         // admin 권한 확인 (ex. notice 작성,수정,삭제 시)
                         .requestMatchers(ADMIN_AUTH_REQUIRED_PATHS).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
                         .requestMatchers(ADMIN_AUTH_REQUIRED_API_PATHS).hasAuthority(UserEntity.UserRoleEnum.ADMIN.getValue())
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+
+                // 인가 예외 핸들링
+                .exceptionHandling((exceptionConfig) -> exceptionConfig.accessDeniedHandler(customAccessDeniedHandler)
+                // jwt 인증 관련 예외처리
+                .authenticationEntryPoint(customAuthenticationEntryPoint));
 
         return http.build();
     }
