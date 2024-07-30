@@ -5,7 +5,9 @@ import com.Duo960118.fitow.service.CalculatorService;
 import com.Duo960118.fitow.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +49,16 @@ public class CalculatorApiController {
         UserEntity userEntity = userService.findByEmail(customUserDetails.getUsername());
 
         return ResponseEntity.ok().body(calculatorService.getCalcResultsPage(userEntity, pageRequest));
+    }
+
+    // 로딩, 밴팅 할 값 불러오기
+    @GetMapping("history/category_normal")
+    public ResponseEntity<List<CalculatorDto.CalcResultDto>> getNormalResultHistory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                                    @PageableDefault(page = 0, size = 10, sort = "calcId")Pageable pageable) {
+        UserEntity userEntity = userService.findByEmail(customUserDetails.getUsername());
+        List<CalculatorDto.CalcResultDto> result = calculatorService.getAdvancedCalcPage(userEntity, pageable);
+
+        return ResponseEntity.ok().body(result);
     }
 
     // 계산 결과 자세히 보기

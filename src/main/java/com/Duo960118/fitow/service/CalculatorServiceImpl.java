@@ -6,6 +6,7 @@ import com.Duo960118.fitow.repository.CalculatorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,23 +101,6 @@ public class CalculatorServiceImpl implements CalculatorService {
         return CalculatorMapper.entityToCalcResultDto(calculatorEntity);
     }
 
-    // 계산 결과 히스토리
-    @Override
-    public List<CalculatorDto.CalcResultDto> getCalcResults(UserEntity userEntity) {
-        List<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdOrderByCalcIdDesc(userEntity.getUserId());
-
-        // 매퍼
-        return calculateInfoEntity.stream().map(CalculatorMapper::entityToCalcResultDto).collect(Collectors.toList());
-    }
-
-    @Override
-    // 로딩, 벤딩할 값 리스트
-    public List<CalculatorDto.AdvancedCalcListDto> getAdvancedCalcList(UserEntity userEntity, PageRequest pageRequest) {
-        Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, pageRequest);
-
-        return calculateInfoEntity.stream().map(CalculatorMapper::entityToAdvancedCalcListDto).collect(Collectors.toList());
-    }
-
     @Override
     @Transactional
     // 로딩, 벤딩 계산하기
@@ -172,8 +156,20 @@ public class CalculatorServiceImpl implements CalculatorService {
     @Override
     public List<CalculatorDto.CalcResultDto> getCalcResultsPage(UserEntity userEntity, PageRequest pageRequest) {
         return calculatorRepository.findAllByUserEntityUserId(userEntity.getUserId(), pageRequest)
-                .stream().map(CalculatorMapper::entityToCalcResultDto).collect(Collectors.toList());
+                .stream()
+                .map(CalculatorMapper::entityToCalcResultDto)
+                .collect(Collectors.toList());
 
+    }
+
+    @Override
+    // 로딩, 밴딩할 값 리스트
+    public List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(UserEntity userEntity, Pageable pageable) {
+        Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, pageable);
+        return calculateInfoEntity
+                .stream()
+                .map(CalculatorMapper::entityToCalcResultDto)
+                .collect(Collectors.toList());
     }
 
     // 회원 탈퇴 시 외부키 null로 변경
