@@ -23,12 +23,12 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final TokenUtil tokenUtil;
+    private String token="", email="";
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         logger.info(request.getRequestURL().toString());
 
         // 쿠키에서 access token을 받아옵니다.
-        String token, email;
         try {
             // request에서 token을 가져옵니다
             token = tokenUtil.resolveToken(request, JwtProperties.ACCESS_TOKEN_KEY);
@@ -48,8 +48,10 @@ public class JwtFilter extends OncePerRequestFilter {
                     tokenUtil.issueRefreshToken(token);
                 }
             }
+        } catch (ExpiredJwtException e) {
+            //토큰의 유효기간 만료
             // redis에서 access token을 key로 갖는 refresh token이 있는지 확인합니다
-            else if (tokenUtil.hasRefreshToken(email,token)) {
+            if (tokenUtil.hasRefreshToken(email,token)) {
                 logger.info("refresh token 존재. access token 재발급");
 
                 // 리프레시 토큰이 유효하면 액세스 토큰으로부터 유저 정보를 받아옵니다.
@@ -67,10 +69,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 // SecurityContext 에 Authentication 객체를 저장합니다.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            }else{
+                request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.EXPIRED_TOKEN);
             }
-        } catch (ExpiredJwtException e) {
-            //토큰의 유효기간 만료
-            request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.EXPIRED_TOKEN);
         } catch (JwtException e) {
             //유효하지 않은 토큰
             request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.INVALID_TOKEN);
