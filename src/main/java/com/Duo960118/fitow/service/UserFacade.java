@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -171,21 +170,6 @@ public class UserFacade {
         return new FileSystemResource(uploadConfig.getProfileImgDir() + filename);
     }
 
-    // 회원가입
-    public boolean join(UserDto.JoinRequestDto joinRequest) {
-        return userService.join(joinRequest);
-    }
-
-    // 닉네임 중복 확인
-    public boolean checkNickName(String nickName) {
-        return userService.checkNickName(nickName);
-    }
-
-    // 이메일 중복 확인
-    public boolean checkEmail(String email) {
-        return userService.checkEmail(email);
-    }
-
     // 회원탈퇴
     public boolean withdraw(UserDto.WithDrawDto withdrawRequest) {
 
@@ -220,16 +204,6 @@ public class UserFacade {
 
         // DB 삭제
         return userService.withdraw(withdrawRequest.getEmail(), withdrawRequest.getPasswd());
-    }
-
-    // 비밀번호 변경을 위한 이메일 찾기
-    public List<String> findEmail(UserDto.FindEmailRequestDto findEmailRequest) {
-        return userService.findEmail(findEmailRequest);
-    }
-
-    // 이메일 찾기를 위한 가입정보 대조
-    public boolean findUserInfo(UserDto.FindUserInfoRequestDto userInfoRequest) {
-        return userService.findUserInfo(userInfoRequest);
     }
 
     // 유저 롤 수정

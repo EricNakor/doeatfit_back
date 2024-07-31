@@ -1,10 +1,8 @@
 package com.Duo960118.fitow.service;
 
-import com.Duo960118.fitow.entity.NoticeEntity;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.mapper.UserMapper;
-import com.Duo960118.fitow.repository.NoticeRepository;
 import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,7 +22,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private final NoticeRepository noticeRepository;
+
         /*BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     user.setPasswd(passwordEncoder.encode(passwd));*/
     /*BCryptPasswordEncoder 객체를 직접 new로 생성하는 방식보다
@@ -36,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean join(UserDto.JoinRequestDto joinRequest) {
-        // User user = new User(email, passwordEncoder.encode(passwd), name, nickName, gender, birth, profileImgDir);
+        // User user = new User(email, passwordE    private final NoticeRepository noticeRepository;ncoder.encode(passwd), name, nickName, gender, birth, profileImgDir);
         // 아래와 같이 생성자를 여러개 할 필요없이 Entity에 @Builder 설정해두고
         // 빌더 패턴 활용해서 각 기능별로 필요한 변수만 불러와서 작업에 용이 및 가독성 증가
         try {
@@ -126,10 +124,6 @@ public class UserServiceImpl implements UserService {
             // 닉네임 수정
             user.updateNickName(editNickNameRequest.getNewNickName());
 
-            List<NoticeEntity> notices = noticeRepository.findByUserEntityUserId(user.getUserId());
-            for (NoticeEntity notice : notices) {
-                notice.updateUserEntity(user);  // ensure the notice has the updated user reference
-            }
         } catch (RuntimeException e) {
             log.error(e.getMessage());
             return false;

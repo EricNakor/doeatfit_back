@@ -26,20 +26,20 @@ public class UserApiController {
     // 회원가입
     @PostMapping("users/join")
     public StatusResponseDto join(@RequestBody UserDto.JoinRequestDto joinRequest) {
-        return new StatusResponseDto(userFacade.join(joinRequest));
+        return new StatusResponseDto(userService.join(joinRequest));
     }
 
     // 이메일 중복확인
     // todo: 중복 체크 인증 여부는 front에서 체크하고, api 우회 접근 방어 로직은 back에서 >> front 작업 시 진행
     @GetMapping("users/check/duplicate/email")
     public StatusResponseDto checkEmailDuplication(@RequestParam("email") String email) {
-        return new StatusResponseDto(userFacade.checkEmail(email));
+        return new StatusResponseDto(userService.checkEmail(email));
     }
 
     // 닉네임 중복확인
     @GetMapping("users/check/duplicate/nickname")
     public StatusResponseDto checkNickNameDuplication(@RequestParam("nickName") String nickName) {
-        return new StatusResponseDto(userFacade.checkNickName(nickName));
+        return new StatusResponseDto(userService.checkNickName(nickName));
     }
 
     // 회원탈퇴
@@ -75,13 +75,13 @@ public class UserApiController {
     // 이메일 찾기
     @PostMapping("users/find/email")
     public UserDto.EmailDto findEmail(@RequestBody UserDto.FindEmailRequestDto findEmailRequest) {
-        return new UserDto.EmailDto(userFacade.findEmail(findEmailRequest));
+        return new UserDto.EmailDto(userService.findEmail(findEmailRequest));
     }
 
     // 가입 정보 찾기
     @PostMapping("users/find/info")
     public StatusResponseDto findUserInfo(@RequestBody UserDto.FindUserInfoRequestDto userInfoRequest) {
-        return new StatusResponseDto(userFacade.findUserInfo(userInfoRequest));
+        return new StatusResponseDto(userService.findUserInfo(userInfoRequest));
     }
 
     // 임시비밀번호 발송
