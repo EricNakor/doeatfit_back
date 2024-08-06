@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -57,111 +58,95 @@ public class UserFacade {
     // 임시 비밀번호 저장하기
     @Transactional
     public boolean sendTempPasswd(String email) {
-        try {
-            // 이메일 존재하는지 확인
-            UserEntity userEntity = userService.findByEmail(email);
+        // 이메일 존재하는지 확인
+        UserEntity userEntity = userService.findByEmail(email);
 
-            // 임시 비밀번호로 수정
-            // 임시 비밀번호 생성기
-            int tempPasswdSpLength = 1;
-            int tempPasswdNumLength = 2;
-            int tempPasswdAllLength = 9;
-            String passwd = tempPasswdGenerator(tempPasswdSpLength, tempPasswdAllLength, tempPasswdNumLength);
-            userEntity.updatePasswd(passwordEncoder.encode(passwd));
+        // 임시 비밀번호로 수정
+        // 임시 비밀번호 생성기
+        int tempPasswdSpLength = 1;
+        int tempPasswdNumLength = 2;
+        int tempPasswdAllLength = 9;
+        String passwd = tempPasswdGenerator(tempPasswdSpLength, tempPasswdAllLength, tempPasswdNumLength);
+        userEntity.updatePasswd(passwordEncoder.encode(passwd));
 
-            // 요청에서 받은 이메일로 임시 비밀번호 발송
-            emailSendService.sendTempPasswd(email, passwd);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
-        return true;
+        // 요청에서 받은 이메일로 임시 비밀번호 발송
+        emailSendService.sendTempPasswd(email, passwd);
+//        try {
+//
+//        } catch (RuntimeException e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
+//        return true;
     }
 
     // 닉네임 수정
     @Transactional
-    public boolean editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest) {
-        try {
-            if (!userService.editNickName(email, editNickNameRequest)) {
-                return false;
-            }
-            // 토큰 리프레시
-            securityService.syncAuthenticationUser();
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
-        return true;
+    public void editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest) {
+        userService.editNickName(email, editNickNameRequest);
+        // 토큰 리프레시
+        securityService.syncAuthenticationUser();
     }
 
     // 프로필 이미지 저장
     @Transactional
-    public boolean saveProfileImg(String email, UserDto.SaveProfileImgRequestDto editProfileImgRequest) {
-        try {
-            // 파일명 추출
-            String fileName = editProfileImgRequest.getProfileImgFile().getOriginalFilename();
-            // 파일 확장자 추출
-            String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
-            String profileImgName;
+    public boolean saveProfileImg(String email, UserDto.SaveProfileImgRequestDto editProfileImgRequest) throws IOException {
+        // 파일명 추출
+        String fileName = editProfileImgRequest.getProfileImgFile().getOriginalFilename();
+        // 파일 확장자 추출
+        String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
+        String profileImgName;
 
-            // 이메일 존재 여부 확인
-            UserEntity user = userService.findByEmail(email);
+        // 이메일 존재 여부 확인
+        UserEntity user = userService.findByEmail(email);
 
-            // 있으면 프로필 사진이 null 값인지 확인해
-            if (user.getProfileImg() == null) {
-                // 프로필사진이 null이면 uuid를 발생하고 파일명으로 쓰기
-                UUID uuid = UUID.randomUUID();
+        // 있으면 프로필 사진이 null 값인지 확인해
+        if (user.getProfileImg() == null) {
+            // 프로필사진이 null이면 uuid를 발생하고 파일명으로 쓰기
+            UUID uuid = UUID.randomUUID();
 
-                // uuid로 이미지 이름 설정 및 파일 확장자 붙이기
-                profileImgName = uuid + fileExt;
-            } else {
-                // 이전 이미지 삭제
-                File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
-                if (file.delete()) {
-                    log.info("Profile image deleted");
-                } else {
-                    log.warn("Profile image not deleted");
-                }
+            // uuid로 이미지 이름 설정 및 파일 확장자 붙이기
+            profileImgName = uuid + fileExt;
+        } else {
+            // 이전 이미지 삭제
+            File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
 
-                // 프로필사진이 !null이면 원래 uuid로 파일명 덮어씌우기
-                String uuid = user.getProfileImg().substring(0, user.getProfileImg().lastIndexOf("."));
-                profileImgName = uuid + fileExt;
+            if (!file.delete()) {
+                // 예외: 프로필 이미지 삭제 실패
+                throw new
             }
 
-            // 프로필 이미지 이름 업데이트
-            if (userService.editProfileImgName(email, profileImgName)) {
-                log.info("Profile image updated");
-            } else {
-                log.warn("Profile image not updated");
-            }
-
-            // 지정된 경로에 저장
-            File file = new File(uploadConfig.getProfileImgDir() + "\\" + profileImgName);
-            editProfileImgRequest.getProfileImgFile().transferTo(file);
-
-            // contextHolder.authentication 주입
-            securityService.syncAuthenticationUser();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return false;
+            // 프로필사진이 !null이면 원래 uuid로 파일명 덮어씌우기
+            String uuid = user.getProfileImg().substring(0, user.getProfileImg().lastIndexOf("."));
+            profileImgName = uuid + fileExt;
         }
-        return true;
+
+        // 프로필 이미지 이름 업데이트
+        userService.editProfileImgName(email, profileImgName);
+
+        // 지정된 경로에 저장
+        File file = new File(uploadConfig.getProfileImgDir() + "\\" + profileImgName);
+        editProfileImgRequest.getProfileImgFile().transferTo(file);
+
+        // contextHolder.authentication 주입
+        securityService.syncAuthenticationUser();
+//        try {
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
+//        return true;
     }
 
     // 비밀번호 수정
     public boolean editPasswd(String email, UserDto.EditPasswdRequestDto editPasswdRequest) {
-        try {
-            // 수정
-            if (!userService.editPasswd(email, editPasswdRequest)) {
-                return false;
-            }
+        // 수정
+        userService.editPasswd(email, editPasswdRequest);
 
-            // contextHolder.authentication 주입
-            securityService.syncAuthenticationUser();
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
+        // contextHolder.authentication 주입
+        securityService.syncAuthenticationUser();
+
         return true;
     }
 
@@ -171,8 +156,7 @@ public class UserFacade {
     }
 
     // 회원탈퇴
-    public boolean withdraw(UserDto.WithDrawDto withdrawRequest) {
-
+    public void withdraw(UserDto.WithDrawDto withdrawRequest) {
         UserEntity user = userService.findByEmail(withdrawRequest.getEmail());
 
         // 프로필 이미지 삭제
@@ -198,12 +182,12 @@ public class UserFacade {
         tokenUtil.blacklistAccessToken(accessToken);
 
         // 외부키 끊어주기
-        reportService.updateForeinKeysNull(user.getUserId());
-        noticeService.updateForeinKeysNull(user.getUserId());
-        calculatorService.updateForeinKeysNull(user.getUserId());
+        reportService.updateForeignKeysNull(user.getUserId());
+        noticeService.updateForeignKeysNull(user.getUserId());
+        calculatorService.updateForeignKeysNull(user.getUserId());
 
         // DB 삭제
-        return userService.withdraw(withdrawRequest.getEmail(), withdrawRequest.getPasswd());
+        userService.withdraw(withdrawRequest.getEmail(), withdrawRequest.getPasswd());
     }
 
     // 유저 롤 수정

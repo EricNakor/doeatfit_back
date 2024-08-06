@@ -1,6 +1,6 @@
 package com.Duo960118.fitow.component;
 
-import com.Duo960118.fitow.entity.JwtErrorCode;
+import com.Duo960118.fitow.entity.ErrorCodeEnum;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.warn(JwtErrorCode.FORBIDDEN_REQUEST.getMessage());
-        response.sendError(JwtErrorCode.FORBIDDEN_REQUEST.getHttpStatus(), JwtErrorCode.FORBIDDEN_REQUEST.getMessage());
+        log.warn(ErrorCodeEnum.FORBIDDEN_REQUEST.getMessage());
+        response.sendError(ErrorCodeEnum.FORBIDDEN_REQUEST.getHttpStatus(), ErrorCodeEnum.FORBIDDEN_REQUEST.getMessage());
     }
 }

@@ -40,7 +40,10 @@ public class NoticeApiController {
     // 공지 검색
     @GetMapping("notices/search")
     public ResponseEntity<List<NoticeDto.NoticeInfoDto>> searchNotice(@RequestParam("noticeCategory") NoticeEntity.NoticeCategoryEnum noticeCategory, @RequestParam("searchString") String searchString) {
-        return ResponseEntity.ok().body(noticeService.searchNotice(noticeCategory, searchString));
+        NoticeDto.SearchNoticeDto searchNoticeDto = NoticeDto.SearchNoticeDto.builder()
+                .searchString(searchString)
+                .category(noticeCategory).build();
+        return ResponseEntity.ok().body(noticeService.searchNotice(searchNoticeDto));
     }
 
     // 공지 작성
@@ -63,8 +66,9 @@ public class NoticeApiController {
     // todo: security config에 admin 권한 확인 필요
     @PutMapping("def-cms/notices/{uuid}")
     public ResponseEntity<StatusResponseDto> editNotice(@PathVariable("uuid") UUID uuid, @RequestBody NoticeDto.PostNoticeRequestDto editNoticeRequest) {
+        editNoticeRequest.setUuid(uuid);
         return ResponseEntity.ok()
-                .body(new StatusResponseDto(noticeService.editNotice(uuid, editNoticeRequest)));
+                .body(new StatusResponseDto(noticeService.editNotice(editNoticeRequest)));
     }
 
     // 공지 자세히 보기

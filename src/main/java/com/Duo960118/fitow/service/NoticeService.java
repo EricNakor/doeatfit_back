@@ -12,15 +12,15 @@ import java.util.UUID;
 public interface NoticeService {
     // Notice 추가
     @Transactional
-    UUID postNotice(NoticeDto.PostNoticeRequestDto postNotice );
+    UUID postNotice(NoticeDto.PostNoticeRequestDto postNotice);
 
     // Notice 삭제
     @Transactional
-    boolean deleteNotice(UUID uuid);
+    void deleteNotice(UUID uuid);
     
     // Notice 수정
     @Transactional
-    boolean editNotice(UUID uuid,NoticeDto.PostNoticeRequestDto editNoticeRequest );
+    void editNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest );
 
     // notice 세부 사항
     @Transactional
@@ -28,7 +28,7 @@ public interface NoticeService {
 
     // 조건에 맞는 Notice 검색
     @Transactional
-    List<NoticeDto.NoticeInfoDto> searchNotice(NoticeEntity.NoticeCategoryEnum category, String searchString);
+    List<NoticeDto.NoticeInfoDto> searchNotice(NoticeDto.SearchNoticeDto searchNoticeDto);
 
     // 모든 Notice를 정렬된 상태로 반환
     @Transactional
@@ -40,5 +40,5 @@ public interface NoticeService {
 
     // 회원 탈퇴 시 외부키 null로 변경
     @Transactional
-    void updateForeinKeysNull(Long userId);
+    void updateForeignKeysNull(Long userId);
 }

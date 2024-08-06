@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.entity;
 
 import lombok.*;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,6 +14,7 @@ public class NoticeDto {
     @Setter
     @NoArgsConstructor
     public static class PostNoticeRequestDto {
+        private UUID uuid;
         private String nickName;
         private String title;
         private String content;
@@ -49,5 +51,13 @@ public class NoticeDto {
         private final NoticeEntity.NoticeCategoryEnum category;
         private final String author;
         private final LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class SearchNoticeDto {
+        private NoticeEntity.NoticeCategoryEnum category;
+        private String searchString;
     }
 }

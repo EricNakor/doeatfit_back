@@ -54,6 +54,7 @@ public class HomeContentServiceImpl implements HomeContentService {
         if (editHomeContentRequest.getIsBeingUsed()) {
             List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(editHomeContentRequest.getCategory());
 
+            // 만약 빈 리스트라면 아무것도 안함
             // 모든 엔티티`isBeingUsed` 값을 `false`로
             for (HomeContentEntity h : homeContentEntities) {
                 h.updateIsBeingUsed(false);
@@ -76,19 +77,19 @@ public class HomeContentServiceImpl implements HomeContentService {
         List<HomeContentEntity> activeHomeContents = homeContentRepository.findByIsBeingUsedTrue();
 
         return activeHomeContents.stream()
-                .map(this::convertEntityToDto)
+                .map(HomeContentMapper::entityToHomeContentInfoDto)
                 .collect(Collectors.toList());
     }
 
-    private HomeContentDto.HomeContentInfoDto convertEntityToDto(HomeContentEntity entity) {
-        return HomeContentDto.HomeContentInfoDto.builder()
-                .uuid(entity.getUuidEntity().getUuid())
-                .category(entity.getCategory())
-                .isBeingUsed(entity.getIsBeingUsed())
-                .content(entity.getContent())
-                .createdAt(entity.getCreatedAt())
-                .editedAt(entity.getEditedAt())
-                .build();
-    }
+//    private HomeContentDto.HomeContentInfoDto convertEntityToDto(HomeContentEntity entity) {
+//        return HomeContentDto.HomeContentInfoDto.builder()
+//                .uuid(entity.getUuidEntity().getUuid())
+//                .category(entity.getCategory())
+//                .isBeingUsed(entity.getIsBeingUsed())
+//                .content(entity.getContent())
+//                .createdAt(entity.getCreatedAt())
+//                .editedAt(entity.getEditedAt())
+//                .build();
+//    }
 
 }

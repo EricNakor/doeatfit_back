@@ -30,7 +30,7 @@ public interface WorkoutService {
     
     // 운동 삭제
     @Transactional
-    boolean deleteWorkout(UUID uuid);
+    void deleteWorkout(UUID uuid);
 
     // 운동 영상 불러오기
     Resource loadWorkoutMedia(String filename);

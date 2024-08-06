@@ -2,6 +2,7 @@ package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.EmailDto;
 import com.Duo960118.fitow.config.EmailConfig;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,37 +45,40 @@ public class EmailSendService {
         // MimeMessage message = new MimeMessage();
         // message.set
         SimpleMailMessage message = new SimpleMailMessage();//JavaMailSender 객체를 사용하여 MimeMessage 객체를 생성
-        try {
-            message.setFrom(from);
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(text);
-            mailSender.send(message);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        message.setFrom(from);
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        // 예외: MailException
+        mailSender.send(message);
+
+//        try {
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//        }
     }
 
     // mail 수발신 및 인증번호 html form
     public boolean sendAuthEmail(EmailDto.SendAuthEmailRequestDto sendAuthEmailRequest) {
-        try {
-            String authNum = authNumberGenerator();
+        String authNum = authNumberGenerator();
+        String from = emailConfig.getServiceEmail();
+        String to = sendAuthEmailRequest.getEmail();
+        String subject = "회원 가입 인증 이메일 입니다.";
+        String text =
+                "FITOW를 방문해주셔서 감사합니다.\n" +
+                        "인증번호는 " + authNum + " 입니다.\n" +
+                        "인증번호를 제대로 입력해주세요";
+        sendEmail(from, to, subject, text);
+        redisUtil.setDataExp(to, authNum, Duration.ofSeconds(60 * 4L)); //인증번호 4분 후 만료
 
-            String from = emailConfig.getServiceEmail();
-            String to = sendAuthEmailRequest.getEmail();
-            String subject = "회원 가입 인증 이메일 입니다.";
-
-            String text =
-                    "FITOW를 방문해주셔서 감사합니다.\n" +
-                            "인증번호는 " + authNum + " 입니다.\n" +
-                            "인증번호를 제대로 입력해주세요";
-            sendEmail(from, to, subject, text);
-            redisUtil.setDataExp(to, authNum, Duration.ofSeconds(60 * 4L)); //인증번호 4분 후 만료
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return false;
-        }
+//        try {
+//
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
         return true;
     }
 
@@ -90,14 +94,16 @@ public class EmailSendService {
 
     // 인증번호 인증
     public boolean verifyEmail(EmailDto.VerifyEmailRequestDto verifyEmailRequest) {
-        try {
-            String storedAuthNum = redisUtil.getData(verifyEmailRequest.getEmail()).orElseThrow();
-            return Objects.equals(verifyEmailRequest.getAuthNum(), storedAuthNum);
-            // null 예외발생을 방지하기 위해 equals > object.equals로 변경
-            // null을 포함하여 비교할 수 있다.
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return false;
-        }
+        // null 예외발생을 방지하기 위해 equals > object.equals로 변경
+        // null을 포함하여 비교할 수 있다.
+        String storedAuthNum = redisUtil.getData(verifyEmailRequest.getEmail()).orElseThrow();
+        return Objects.equals(verifyEmailRequest.getAuthNum(), storedAuthNum);
+
+//        try {
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
     }
 }

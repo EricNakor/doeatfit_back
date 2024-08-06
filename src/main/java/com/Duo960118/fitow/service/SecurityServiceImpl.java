@@ -24,7 +24,6 @@ public class SecurityServiceImpl implements SecurityService {
         return new CustomUserDetails(userEntity);
     }
 
-
     // 인증서 새로 발급
     @Override
     public Authentication createNewAuthentication(Authentication currentAuth, String email) {
@@ -35,11 +34,6 @@ public class SecurityServiceImpl implements SecurityService {
         newAuthToken.setDetails(currentAuth.getDetails());
         return newAuthToken;
     }
-
-
-
-
-
 
     // 수정된 UserEntity로 AuthToken 생성 후 SecurityContext에 삽입
     @Override

@@ -2,7 +2,7 @@ package com.Duo960118.fitow.filter;
 
 import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.CustomUserDetails;
-import com.Duo960118.fitow.entity.JwtErrorCode;
+import com.Duo960118.fitow.entity.ErrorCodeEnum;
 import com.Duo960118.fitow.entity.JwtProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -70,15 +70,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 // SecurityContext 에 Authentication 객체를 저장합니다.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }else{
-                request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.EXPIRED_TOKEN);
+                request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.EXPIRED_TOKEN);
             }
         } catch (JwtException e) {
             //유효하지 않은 토큰
-            request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.INVALID_TOKEN);
+            request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.INVALID_TOKEN);
         } catch (IllegalArgumentException e) {
-            request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.COOKIE_NOT_EXIST);
+            request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.COOKIE_NOT_EXIST);
         } catch (NoSuchElementException e){
-            request.setAttribute(JwtProperties.EXCEPTION_STRING, JwtErrorCode.TOKEN_NOT_EXIST);
+            request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.TOKEN_NOT_EXIST);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

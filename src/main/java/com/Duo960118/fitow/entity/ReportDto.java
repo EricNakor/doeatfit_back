@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 
 public class ReportDto {
     // 신고 작성
@@ -62,11 +63,21 @@ public class ReportDto {
     // 신고 답변
     @Getter
     @Setter
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     public static class ReplyReportDto {
-        private final UUID uuid;
+        private UUID uuid;
         private ReportEntity.ReportStatusEnum reportStatus;
         private String reply;
         private List<String> replyFiles;
+    }
+
+    @Getter
+    @Setter
+    @RequiredArgsConstructor
+    public static class SearchReportDto {
+        private final ReportEntity.ReportStatusEnum reportStatus;
+        private final ReportEntity.ReportCategoryEnum reportCategory;
+        private final String email;
+        private final Pageable pageable;
     }
 }

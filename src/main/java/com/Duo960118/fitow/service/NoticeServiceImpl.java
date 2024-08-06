@@ -42,20 +42,22 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public boolean editNotice(UUID uuid,NoticeDto.PostNoticeRequestDto editNoticeRequest) {
-        try {
-            NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물"));
-
-            noticeEntity.updateNotice(editNoticeRequest);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
+    public boolean editNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest) {
+        // 예외: 존재하지 않는 게시물
+        NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(editNoticeRequest.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물"));
+        noticeEntity.updateNotice(editNoticeRequest);
+//        try {
+//
+//        } catch (RuntimeException e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
         return true;
     }
 
     @Override
     public NoticeDto.NoticeDetailDto getNoticeDetail(UUID uuid) {
+        // 예외: 존재하지 않는 게시물
         NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물"));
 
         String nickName = noticeEntity.getUserEntity().getNickName();
@@ -69,8 +71,8 @@ public class NoticeServiceImpl implements NoticeService {
     // 기존의 for문과 Iterator를 사용하면 코드가 길어져서 가독성과 재사용성이 떨어지며 데이터 타입마다 다른 방식으로 다뤄야 하는 불편함이 있다.
     // 스트림은 데이터 소스를 추상화하고, 데이터를 다루는데 자주 사용되는 메소드를 정의해 놓아서 데이터 소스에 상관없이 모두 같은 방식으로 다룰 수 있으므로 코드의 재사용성이 높아진다.
     @Override
-    public List<NoticeDto.NoticeInfoDto>searchNotice(NoticeEntity.NoticeCategoryEnum category, String searchString) {
-        return noticeRepository.findByNoticeCategoryAndTitleContaining(category,searchString).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+    public List<NoticeDto.NoticeInfoDto>searchNotice(NoticeDto.SearchNoticeDto searchNoticeDto) {
+        return noticeRepository.findByNoticeCategoryAndTitleContaining(searchNoticeDto.getCategory(),searchNoticeDto.getSearchString()).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
     }
 
     @Override
@@ -84,7 +86,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public void updateForeinKeysNull(Long userId) {
+    public void updateForeignKeysNull(Long userId) {
         List<NoticeEntity> noticeEntities = noticeRepository.findByUserEntityUserId(userId);
         // 외래 키를 null로 설정
         for (NoticeEntity noticeEntity : noticeEntities) {

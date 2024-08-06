@@ -26,7 +26,6 @@ public class CalculatorServiceImpl implements CalculatorService {
         } else {
             return (int) (66 + 13.7 * weight + 5 * height - 6.8 * age);
         }
-
     }
 
     // 유지 칼로리
@@ -93,19 +92,12 @@ public class CalculatorServiceImpl implements CalculatorService {
         return new CalculatorDto.CalcResponseDto(normalCalcEntity.getUuidEntity().getUuid(), carb, protein, fat);
     }
 
-    @Override
-    // 계산 결과 한 개
-    public CalculatorDto.CalcResultDto getCalcResult(UUID uuid) {
-        CalculateInfoEntity calculatorEntity = calculatorRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("계산 결과가 없습니다"));
-
-        return CalculatorMapper.entityToCalcResultDto(calculatorEntity);
-    }
-
+    // 로딩, 벤딩 계산하기
     @Override
     @Transactional
-    // 로딩, 벤딩 계산하기
     public CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest, UserEntity userEntity) {
 
+        // 예외: 존재하지 않는 계산 결과
         CalculateInfoEntity calculateEntity = calculatorRepository.findByUuidEntityUuid(calcRequest.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 결과"));
 
         double advancedCarb, advancedProtein, advancedFat;
@@ -121,6 +113,7 @@ public class CalculatorServiceImpl implements CalculatorService {
                 advancedFat = calculateEntity.getFat();
                 break;
             default:
+                // 예외: 고급 계산기 알 수 없는 카테고리
                 throw new IllegalArgumentException("알 수 없는 카테고리: " + calcRequest.getCalcCategory());
         }
         // 저장할 데이터 빌드
@@ -144,6 +137,15 @@ public class CalculatorServiceImpl implements CalculatorService {
         return new CalculatorDto.CalcResponseDto(advancedCalcEntity.getUuidEntity().getUuid(), advancedCarb, advancedProtein, advancedFat);
     }
 
+    // 계산 결과 한 개
+    @Override
+    public CalculatorDto.CalcResultDto getCalcResult(UUID uuid) {
+        // 예외: 계산 결과가 없습니다
+        CalculateInfoEntity calculatorEntity = calculatorRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("계산 결과가 없습니다"));
+
+        return CalculatorMapper.entityToCalcResultDto(calculatorEntity);
+    }
+
     // 계산 결과 삭제
     @Override
     @Transactional
@@ -159,11 +161,9 @@ public class CalculatorServiceImpl implements CalculatorService {
                 .stream()
                 .map(CalculatorMapper::entityToCalcResultDto)
                 .collect(Collectors.toList());
-
     }
-
-    @Override
     // 로딩, 밴딩할 값 리스트
+    @Override
     public List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(UserEntity userEntity, Pageable pageable) {
         Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, pageable);
         return calculateInfoEntity
@@ -175,7 +175,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     // 회원 탈퇴 시 외부키 null로 변경
     @Override
     @Transactional
-    public void updateForeinKeysNull(Long userId){
+    public void updateForeignKeysNull(Long userId){
         List<CalculateInfoEntity> calculateInfoEntities = calculatorRepository.findAllByUserEntityUserId(userId);
 
         // 외래 키를 null로 설정

@@ -1,9 +1,6 @@
 package com.Duo960118.fitow.controller;
 
-import com.Duo960118.fitow.entity.CustomUserDetails;
-import com.Duo960118.fitow.entity.ReportDto;
-import com.Duo960118.fitow.entity.ReportEntity;
-import com.Duo960118.fitow.entity.StatusResponseDto;
+import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,21 +44,21 @@ public class ReportApiController {
 
     // 신고 및 문의 이미지 가져오기
     @GetMapping("reports/report-img/{filename}")
-    public Resource getReportAttachmentImg(@PathVariable("filename") String filename) {
-        return reportService.loadReportAttachmentImg(filename);
+    public Resource getReportAttachmentImg(@PathVariable("filename") CommonDto.FileNameDto fileNameDto) {
+        return reportService.loadReportAttachmentImg(fileNameDto);
     }
 
     // 답변 이미지 가져오기
     @GetMapping("reports/reply-img/{filename}")
-    public Resource getReplyAttachmentImg(@PathVariable("filename") String filename) {
-        return reportService.loadReplyAttachmentImg(filename);
+    public Resource getReplyAttachmentImg(@PathVariable("filename") CommonDto.FileNameDto fileNameDto) {
+        return reportService.loadReplyAttachmentImg(fileNameDto);
     }
 
     // 신고 및 문의 작성
     @PostMapping("reports")
     public ResponseEntity<ReportDto.PostReportResponseDto> postReport(@RequestPart(value = "reportFile", required = false) List<MultipartFile> multipartFile,
                                                                       @RequestPart(value = "postReportRequestDto") ReportDto.PostReportRequestDto postReportRequest,
-                                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
         postReportRequest.setEmail(customUserDetails.getUserInfo().getEmail());
         postReportRequest.setReportStatus(ReportEntity.ReportStatusEnum.TODO);
         postReportRequest.setReply("");
@@ -80,8 +78,9 @@ public class ReportApiController {
     @PutMapping("def-cms/reports/reply/{uuid}")
     public ResponseEntity<StatusResponseDto> replyReport(@PathVariable("uuid") UUID uuid,
                                                          @RequestPart(value = "replyReportDto") ReportDto.ReplyReportDto replyReport,
-                                                         @RequestPart(value = "replyFiles", required = false) List<MultipartFile> multipartFile) {
-        return ResponseEntity.ok().body(new StatusResponseDto(reportService.replyReport(uuid, replyReport, multipartFile)));
+                                                         @RequestPart(value = "replyFiles", required = false) List<MultipartFile> multipartFile) throws IOException {
+        replyReport.setUuid(uuid);
+        return ResponseEntity.ok().body(new StatusResponseDto(reportService.replyReport(replyReport, multipartFile)));
     }
 
     // 신고 문의 리스트 - 어드민
@@ -98,12 +97,13 @@ public class ReportApiController {
     @GetMapping("def-cms/reports/search")
     public ResponseEntity<Page<ReportDto.ReportInfoDto>> searchReports(
             @RequestParam(value = "status", required = false) ReportEntity.ReportStatusEnum status,
-            @RequestParam(value = "category", required = false) ReportEntity.ReportCategoryEnum category,
-            @RequestParam(value = "email", required = false) String email,
+                                                                       @RequestParam(value = "category", required = false) ReportEntity.ReportCategoryEnum category,
+                                                                       @RequestParam(value = "email", required = false) String email,
 //            @PageableDefault(page = 0, size = 10, sort = "reportId", direction = Sort.Direction.DESC) Pageable pageable) {
             @PageableDefault(page = 0, size = 10, sort = "reportId") Pageable pageable) {
 
-        Page<ReportDto.ReportInfoDto> result = reportService.searchReport(status, category, email, pageable);
+        ReportDto.SearchReportDto searchReportDto = new ReportDto.SearchReportDto(status,category,email,pageable);
+        Page<ReportDto.ReportInfoDto> result = reportService.searchReport(searchReportDto);
 
 //        for (ReportDto.ReportInfoDto reportInfoDto : result) {
 //            log.info(reportInfoDto.getTitle());

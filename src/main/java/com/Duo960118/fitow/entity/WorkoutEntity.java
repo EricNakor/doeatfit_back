@@ -269,7 +269,7 @@ public class WorkoutEntity extends TimeStampEntity {
     // 길항근
     @ElementCollection
     @CollectionTable(name = "ANTAGONIST_MUSCLE_ENUMS", joinColumns = @JoinColumn(name = "WORKOUT_ID"))
-    @Enumerated(EnumType.STRING)
+        @Enumerated(EnumType.STRING)
     private Set<MuscleEnum> antagonistMuscleEnums;
 
     // 협응근

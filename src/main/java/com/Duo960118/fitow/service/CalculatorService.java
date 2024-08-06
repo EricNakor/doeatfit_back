@@ -42,5 +42,5 @@ public interface CalculatorService {
     List<CalculatorDto.CalcResultDto> getCalcResultsPage(UserEntity userEntity, PageRequest pageRequest);
 
     // 회원 탈퇴 시 외부키 null로 변경
-    void updateForeinKeysNull(Long userId);
+    void updateForeignKeysNull(Long userId);
 }

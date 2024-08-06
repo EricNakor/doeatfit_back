@@ -33,46 +33,42 @@ public class UserServiceImpl implements UserService {
     // 회원가입
     @Override
     @Transactional
-    public boolean join(UserDto.JoinRequestDto joinRequest) {
+    public void join(UserDto.JoinRequestDto joinRequest) {
         // User user = new User(email, passwordE    private final NoticeRepository noticeRepository;ncoder.encode(passwd), name, nickName, gender, birth, profileImgDir);
         // 아래와 같이 생성자를 여러개 할 필요없이 Entity에 @Builder 설정해두고
         // 빌더 패턴 활용해서 각 기능별로 필요한 변수만 불러와서 작업에 용이 및 가독성 증가
-        try {
-            UserEntity userEntity = UserEntity.builder()
-                    .email(joinRequest.getEmail())
-                    .passwd(new BCryptPasswordEncoder().encode(joinRequest.getPasswd()))
-                    .name(joinRequest.getName())
-                    .nickName(joinRequest.getNickName())
-                    .gender(joinRequest.getGender())
-                    .birth(joinRequest.getBirth())
-                    .role(UserEntity.UserRoleEnum.NORMAL)
-                    .build();
-            this.userRepository.save(userEntity);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
-        return true;
+        UserEntity userEntity = UserEntity.builder()
+                .email(joinRequest.getEmail())
+                .passwd(new BCryptPasswordEncoder().encode(joinRequest.getPasswd()))
+                .name(joinRequest.getName())
+                .nickName(joinRequest.getNickName())
+                .gender(joinRequest.getGender())
+                .birth(joinRequest.getBirth())
+                .role(UserEntity.UserRoleEnum.NORMAL)
+                .build();
+        this.userRepository.save(userEntity);
     }
 
     // 회원 탈퇴
     @Override
     @Transactional
-    public boolean withdraw(String email, String passwd) {
+    public void withdraw(String email, String passwd) {
         UserEntity userEntity = this.findByEmail(email);
         if (!new BCryptPasswordEncoder().matches(passwd, userEntity.getPasswd())) {
-            return false;
+            // 예외: 비밀번호 일치 하지 않음
+            throw new
         }
 
         userRepository.delete(userEntity);
-        return true;
     }
 
     // 주어진 이메일이 DB에 존재하는지 확인
     @Override
     @Transactional
     public UserEntity findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("존재하지 않는 회원"));
+        // 예외: 존재하지 않는 회원
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
+        //throw new UserNotFoundException("User with email " + email + " not found")
     }
 
     // 이메일 중복확인
@@ -93,56 +89,40 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     // 연산이 독립적으로 이루어지고, 연산 중 다른 연산이 끼어들 수 없다. one by one.
-    public boolean editPasswd(String email, UserDto.EditPasswdRequestDto editPasswdRequest) {
-        try {
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            // 이메일 존재하는지 확인
-            UserEntity user = this.findByEmail(email);
+    public void editPasswd(String email, UserDto.EditPasswdRequestDto editPasswdRequest) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        // 이메일 존재하는지 확인
+        UserEntity user = this.findByEmail(email);
 
-            // 현재 비밀번호 맞는지 확인
-            if (!passwordEncoder.matches(editPasswdRequest.getCurrentPasswd(), user.getPasswd())) {
-                return false;
-            }
-            // 변경
-            user.updatePasswd(passwordEncoder.encode(editPasswdRequest.getNewPasswd()));
-
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
+        // 현재 비밀번호 맞는지 확인
+        // 예외: 비밀번호 일치하지 않음
+        if (!passwordEncoder.matches(editPasswdRequest.getCurrentPasswd(), user.getPasswd())) {
+            throw
         }
-        return true;
+        // 변경
+        user.updatePasswd(passwordEncoder.encode(editPasswdRequest.getNewPasswd()));
     }
 
     // 닉네임 수정
     @Override
     @Transactional
-    public boolean editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest) {
-        try {
-            // 이메일 존재하는지 확인
-            UserEntity user = this.findByEmail(email);
+    public void editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest) {
+        // 이메일 존재하는지 확인
+        UserEntity user = this.findByEmail(email);
 
-            // 닉네임 수정
-            user.updateNickName(editNickNameRequest.getNewNickName());
-
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
-        return true;
+        // 닉네임 수정
+        user.updateNickName(editNickNameRequest.getNewNickName());
     }
 
     // 프로필 사진 수정
     @Override
     @Transactional
-    public boolean editProfileImgName(String email, String profileImg) {
-        try {
-            UserEntity user = this.findByEmail(email);
-            user.updateProfileImg(profileImg);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
-        }
-        return true;
+    public void editProfileImgName(String email, String profileImg) {
+        // 이메일 존재하는지 확인
+        UserEntity user = this.findByEmail(email);
+
+        // 프로필 사진 수정
+        user.updateProfileImg(profileImg);
     }
 
     @Override
@@ -158,8 +138,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public UserDto.UserInfoDto getUserInfo(String email) {
-        return UserMapper.entityToUserInfoDto(userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원")));
+        return UserMapper.entityToUserInfoDto(this.findByEmail(email));
     }
 
     // 이메일  찾기

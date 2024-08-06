@@ -5,12 +5,15 @@ import com.Duo960118.fitow.service.UserFacade;
 import com.Duo960118.fitow.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import java.util.List;
 // RestController == ResponseBody + Controller
 // RestController는 JSON 형식(ResponseBody)으로 자동으로 반환
 public class UserApiController {
+    private static final Logger log = LoggerFactory.getLogger(UserApiController.class);
     private final UserFacade userFacade;
     private final UserService userService;
 
@@ -93,7 +97,7 @@ public class UserApiController {
     // todo: fileService 할래 말래?? notice 또는 이후 확장될 board등..
     // 프로필 이미지 저장하기
     @PostMapping("users/profile-img")
-    public StatusResponseDto saveProfileImg(@RequestPart("file") MultipartFile file, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public StatusResponseDto saveProfileImg(@RequestPart("file") MultipartFile file, @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
         return new StatusResponseDto(userFacade.saveProfileImg(customUserDetails.getUsername(), new UserDto.SaveProfileImgRequestDto(file)));
     }
 
@@ -166,5 +170,13 @@ public class UserApiController {
         return ResponseEntity
                 .ok()
                 .body(userFacade.editUserRole(editUserRoleRequest));
+    }
+
+    // 예외 처리 테스트
+    @GetMapping("test")
+    public String test(){
+        log.info("test");
+        int exception = 4/0;
+        return "test";
     }
 }

@@ -12,11 +12,11 @@ import java.util.List;
 public interface UserService {
     // 회원가입
     @Transactional
-    boolean join(UserDto.JoinRequestDto joinRequest);
+    void join(UserDto.JoinRequestDto joinRequest);
 
     // 회원탈퇴
     @Transactional
-    boolean withdraw(String email, String passwd);
+    void withdraw(String email, String passwd);
 
     // 해당 이메일을 db 에서 찾기
     @Transactional
@@ -40,15 +40,15 @@ public interface UserService {
 
     // 비밀번호 수정
     @Transactional
-    boolean editPasswd(String email, UserDto.EditPasswdRequestDto editPwRequest);
+    void editPasswd(String email, UserDto.EditPasswdRequestDto editPwRequest);
 
     // 닉네임 수정
     @Transactional
-    boolean editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest);
+    void editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest);
 
     // 프로필 이미지 이름 수정
     @Transactional
-    boolean editProfileImgName(String email, String profileImg);
+    void editProfileImgName(String email, String profileImg);
 
     // 닉네임으로 UserEntity 찾기
     @Transactional

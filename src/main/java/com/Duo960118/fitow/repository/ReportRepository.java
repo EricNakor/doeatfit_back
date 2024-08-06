@@ -25,5 +25,5 @@ public interface ReportRepository extends JpaRepository<ReportEntity, Long>, Rep
     // Status 검색 (filter)
     // Category 검색 (filter)
     // email 검색 (String)
-    List<ReportEntity> findAllByReportStatusAndReportCategoryAndUserEntityEmail(ReportEntity.ReportStatusEnum reportStatusEnum, ReportEntity.ReportCategoryEnum reportCategoryEnum, String email);
+//    List<ReportEntity> findAllByReportStatusAndReportCategoryAndUserEntityEmail(ReportEntity.ReportStatusEnum reportStatusEnum, ReportEntity.ReportCategoryEnum reportCategoryEnum, String email);
 }

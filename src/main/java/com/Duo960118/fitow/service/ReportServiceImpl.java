@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.config.UploadConfig;
+import com.Duo960118.fitow.entity.CommonDto;
 import com.Duo960118.fitow.entity.ReportDto;
 import com.Duo960118.fitow.entity.ReportEntity;
 import com.Duo960118.fitow.mapper.ReportMapper;
@@ -38,7 +39,7 @@ public class ReportServiceImpl implements ReportService {
     private String replyFileDir;
 
     // 파일명 추출 및 저장
-    private List<String> extractFileNameList(List<MultipartFile> files, String savePath) {
+    private List<String> extractFileNameList(List<MultipartFile> files, String savePath) throws IOException {
         List<String> filenameList = new ArrayList<>();
         for (MultipartFile multipartFile : files) {
             String fileName = multipartFile.getOriginalFilename();
@@ -47,18 +48,19 @@ public class ReportServiceImpl implements ReportService {
             filenameList.add(fileRename);
 
             File file = new File(savePath + "\\" + fileRename);
-            try {
-                multipartFile.transferTo(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            multipartFile.transferTo(file);
+//            try {
+//
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
         }
         return filenameList;
     }
 
     // report 작성
     @Override
-    public UUID postReport(List<MultipartFile> multipartFileList, ReportDto.PostReportRequestDto postReportRequest) {
+    public UUID postReport(List<MultipartFile> multipartFileList, ReportDto.PostReportRequestDto postReportRequest) throws IOException {
 
         if (multipartFileList != null) {
             List<String> reportFileNameList = extractFileNameList(multipartFileList, reportFileDir);
@@ -95,14 +97,15 @@ public class ReportServiceImpl implements ReportService {
 
     // report 삭제
     @Override
-    public boolean deleteReport(UUID uuid) {
+    public void deleteReport(UUID uuid) {
         reportRepository.deleteByUuidEntityUuid(uuid);
-        return !reportRepository.existsByUuidEntityUuid(uuid);
+//        return !reportRepository.existsByUuidEntityUuid(uuid);
     }
 
     // Report 상세내용
     @Override
     public ReportDto.ReportDetailDto getReportDetail(UUID uuid) {
+        // 예외: 존재하지 않는 문의
         ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 문의"));
 
         // 생성자는 파라미터 순서가 일치해야 함 > 순서수정
@@ -162,12 +165,12 @@ public class ReportServiceImpl implements ReportService {
 
     // Report 답변
     @Override
-    public boolean replyReport(UUID uuid, ReportDto.ReplyReportDto replyReport, List<MultipartFile> multipartFileList) {
-        try {
-            ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 문의"));
-            if (multipartFileList != null) {
-                List<String> replyFileNameList = extractFileNameList(multipartFileList, replyFileDir);
-                replyReport.setReplyFiles(replyFileNameList);
+    public void replyReport(ReportDto.ReplyReportDto replyReport, List<MultipartFile> multipartFileList) throws IOException {
+        // 예외: 존재하지 않는 문의
+        ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(replyReport.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 문의"));
+        if (multipartFileList != null) {
+            List<String> replyFileNameList = extractFileNameList(multipartFileList, replyFileDir);
+            replyReport.setReplyFiles(replyFileNameList);
 //                for (MultipartFile multipartFile : multipartFileList) {
 //
 //                    String fileName = multipartFile.getOriginalFilename();
@@ -182,22 +185,18 @@ public class ReportServiceImpl implements ReportService {
 //                        throw new RuntimeException(e);
 //                    }
 //                }
-            }
-            reportEntity.replyReport(replyReport);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return false;
         }
-        return true;
+        reportEntity.replyReport(replyReport);
+
     }
 
     // Status 검색 (filter)
     // Category 검색 (filter)
     // email 검색 (String)
     @Override
-    public Page<ReportDto.ReportInfoDto> searchReport(ReportEntity.ReportStatusEnum reportStatusEnum, ReportEntity.ReportCategoryEnum reportCategoryEnum, String email, Pageable pageable) {
+    public Page<ReportDto.ReportInfoDto> searchReport(ReportDto.SearchReportDto searchReport) {
 
-        List<ReportDto.ReportInfoDto> searchResults = reportRepository.findBySearchReportRequest(reportStatusEnum, reportCategoryEnum, email, pageable)
+        List<ReportDto.ReportInfoDto> searchResults = reportRepository.findBySearchReportRequest(searchReport)
                 .stream()
                 .map(ReportMapper::entityToReportInfoDto)
                 .toList();
@@ -207,18 +206,18 @@ public class ReportServiceImpl implements ReportService {
 
     // 신고 및 문의 첨부파일
     @Override
-    public Resource loadReportAttachmentImg(String filename) {
-        return new FileSystemResource(uploadConfig.getReportAttachmentImgDir() + filename);
+    public Resource loadReportAttachmentImg(CommonDto.FileNameDto fileNameDto) {
+        return new FileSystemResource(uploadConfig.getReportAttachmentImgDir() + fileNameDto.getFilename());
     }
 
     // 답변 첨부파일
     @Override
-    public Resource loadReplyAttachmentImg(String filename) {
-        return new FileSystemResource(uploadConfig.getReplyAttachmentImgDir() + filename);
+    public Resource loadReplyAttachmentImg(CommonDto.FileNameDto fileNameDto) {
+        return new FileSystemResource(uploadConfig.getReplyAttachmentImgDir() + fileNameDto.getFilename());
     }
 
     @Override
-    public void updateForeinKeysNull(Long userId) {
+    public void updateForeignKeysNull(Long userId) {
         Pageable pageable = Pageable.unpaged();
         List<ReportEntity> reportEntities = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, pageable);
 
@@ -226,6 +225,5 @@ public class ReportServiceImpl implements ReportService {
         for (ReportEntity reportEntity : reportEntities) {
             reportEntity.updateUserEntity(null);
         }
-
     }
 }
