@@ -17,8 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -33,12 +31,12 @@ public class SecurityConfig {
     private final CustomLogoutHandler customLogoutHandler;
     private final TokenUtil tokenUtil;
 
-    // 필터를 거치치 않아도 되는 url
+    // 필터(ex. jwt)를 거치치 않아도 되는 url
     public static final String[] CSS = {"/css/**"};
     public static final String FAVICON = "/favicon.ico";
     public static final String[] JS = {"/js/**"};
     public static final String[] ERROR = {"/error"};
-    public static final String[] API = {"/api/home-contents"};
+    public static final String[] API = {"/api/home-contents","/api/users/join","/api/def-cms/users"};
 
     // 인증이 필요없는 url
     public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**", "/test"};
@@ -124,12 +122,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 비밀번호 인코더
-    // Bean을 만드는 가장 쉬운 방법으로 @Configuration이 적용된 파일에 메서드를 새로 추가하는 것.
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
 
     // CORS 설정을 위한 Bean

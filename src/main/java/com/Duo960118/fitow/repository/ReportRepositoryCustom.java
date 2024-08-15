@@ -5,5 +5,5 @@ import com.Duo960118.fitow.entity.ReportEntity;
 import org.springframework.data.domain.Page;
 
 public interface ReportRepositoryCustom {
-    Page<ReportEntity> findBySearchReportRequest(ReportDto.SearchReportDto searchReportDto);
+    Page<ReportEntity> findBySearchReportRequest(ReportDto.SearchReportRequestDto searchReportRequestDto);
 }

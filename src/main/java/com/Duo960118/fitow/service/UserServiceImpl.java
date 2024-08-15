@@ -2,19 +2,20 @@ package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
+import com.Duo960118.fitow.exception.PasswordNotMatchesException;
 import com.Duo960118.fitow.mapper.UserMapper;
 import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -22,8 +23,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-        /*BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    /*BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     user.setPasswd(passwordEncoder.encode(passwd));*/
     /*BCryptPasswordEncoder 객체를 직접 new로 생성하는 방식보다
     PasswordEncoder 객체를 빈으로 등록해서 사용하는 것이 좋다.
@@ -32,14 +34,13 @@ public class UserServiceImpl implements UserService {
 
     // 회원가입
     @Override
-    @Transactional
-    public void join(UserDto.JoinRequestDto joinRequest) {
+    public UserDto.JoinResponseDto join(UserDto.JoinRequestDto joinRequest) {
         // User user = new User(email, passwordE    private final NoticeRepository noticeRepository;ncoder.encode(passwd), name, nickName, gender, birth, profileImgDir);
         // 아래와 같이 생성자를 여러개 할 필요없이 Entity에 @Builder 설정해두고
         // 빌더 패턴 활용해서 각 기능별로 필요한 변수만 불러와서 작업에 용이 및 가독성 증가
         UserEntity userEntity = UserEntity.builder()
                 .email(joinRequest.getEmail())
-                .passwd(new BCryptPasswordEncoder().encode(joinRequest.getPasswd()))
+                .passwd(passwordEncoder.encode(joinRequest.getPasswd()))
                 .name(joinRequest.getName())
                 .nickName(joinRequest.getNickName())
                 .gender(joinRequest.getGender())
@@ -47,16 +48,17 @@ public class UserServiceImpl implements UserService {
                 .role(UserEntity.UserRoleEnum.NORMAL)
                 .build();
         this.userRepository.save(userEntity);
+
+        return UserMapper.entityToJoinResponseDto(userEntity);
     }
 
     // 회원 탈퇴
     @Override
-    @Transactional
-    public void withdraw(String email, String passwd) {
-        UserEntity userEntity = this.findByEmail(email);
-        if (!new BCryptPasswordEncoder().matches(passwd, userEntity.getPasswd())) {
+    public void withdraw(UserDto.WithDrawRequestDto withdrawRequest) {
+        UserEntity userEntity = this.findByEmail( withdrawRequest.getEmail());
+        if (!passwordEncoder.matches(withdrawRequest.getPasswd(), userEntity.getPasswd())) {
             // 예외: 비밀번호 일치 하지 않음
-            throw new
+            throw new PasswordNotMatchesException();
         }
 
         userRepository.delete(userEntity);
@@ -64,59 +66,57 @@ public class UserServiceImpl implements UserService {
 
     // 주어진 이메일이 DB에 존재하는지 확인
     @Override
-    @Transactional
     public UserEntity findByEmail(String email) {
         // 예외: 존재하지 않는 회원
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
-        //throw new UserNotFoundException("User with email " + email + " not found")
+        return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원" + email ));
     }
 
     // 이메일 중복확인
     @Override
-    @Transactional
-    public boolean checkEmail(String email) {
-        return userRepository.existsByEmail(email);
+    public UserDto.CheckDuplicateDto checkEmail(UserDto.CheckEmailRequestDto checkEmailRequest) {
+        return userRepository.existsByEmail(checkEmailRequest.getEmail()) ?
+                new UserDto.CheckDuplicateDto(true) : new UserDto.CheckDuplicateDto(false);
     }
 
     // 닉네임 중복확인
     @Override
-    @Transactional
-    public boolean checkNickName(String nickName) {
-        return userRepository.existsByNickName(nickName);
+    public UserDto.CheckDuplicateDto checkNickName(UserDto.CheckNickNameRequestDto checkNickNameRequest) {
+        return userRepository.existsByNickName(checkNickNameRequest.getNickName()) ?
+                new UserDto.CheckDuplicateDto(true) : new UserDto.CheckDuplicateDto(false);
     }
 
     // 비밀번호 수정
     @Override
-    @Transactional
     // 연산이 독립적으로 이루어지고, 연산 중 다른 연산이 끼어들 수 없다. one by one.
-    public void editPasswd(String email, UserDto.EditPasswdRequestDto editPasswdRequest) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public UserDto.EditPasswdResponseDto editPasswd(UserDto.EditPasswdRequestDto editPasswdRequest) {
         // 이메일 존재하는지 확인
-        UserEntity user = this.findByEmail(email);
+        UserEntity user = this.findByEmail(editPasswdRequest.getEmail());
 
         // 현재 비밀번호 맞는지 확인
         // 예외: 비밀번호 일치하지 않음
         if (!passwordEncoder.matches(editPasswdRequest.getCurrentPasswd(), user.getPasswd())) {
-            throw
+            throw new PasswordNotMatchesException();
         }
         // 변경
         user.updatePasswd(passwordEncoder.encode(editPasswdRequest.getNewPasswd()));
+
+        return new UserDto.EditPasswdResponseDto(user.getPasswdEditDate());
     }
 
     // 닉네임 수정
     @Override
-    @Transactional
-    public void editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest) {
+    public UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameDto editNickNameRequest) {
         // 이메일 존재하는지 확인
-        UserEntity user = this.findByEmail(email);
+        UserEntity user = this.findByEmail(editNickNameRequest.getEmail());
 
         // 닉네임 수정
         user.updateNickName(editNickNameRequest.getNewNickName());
+
+        return new UserDto.EditNickNameResponseDto(editNickNameRequest.getNewNickName());
     }
 
     // 프로필 사진 수정
     @Override
-    @Transactional
     public void editProfileImgName(String email, String profileImg) {
         // 이메일 존재하는지 확인
         UserEntity user = this.findByEmail(email);
@@ -138,23 +138,21 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional
     public UserDto.UserInfoDto getUserInfo(String email) {
         return UserMapper.entityToUserInfoDto(this.findByEmail(email));
     }
 
     // 이메일  찾기
     @Override
-    @Transactional
-    public List<String> findEmail(UserDto.FindEmailRequestDto findEmailRequest) {
-        return userRepository.findByNameAndGenderAndBirth(findEmailRequest.getName(), findEmailRequest.getGender(), findEmailRequest.getBirth());
+    public UserDto.EmailListDto findEmail(UserDto.FindEmailRequestDto findEmailRequest) {
+        return new UserDto.EmailListDto(userRepository.findByNameAndGenderAndBirth(findEmailRequest.getName(), findEmailRequest.getGender(), findEmailRequest.getBirth()));
     }
 
     // 가입정보 찾기
     @Override
-    @Transactional
-    public boolean findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto) {
-        return userRepository.existsByEmailAndNameAndGenderAndBirth(userInfoDto.getEmail(), userInfoDto.getName(), userInfoDto.getGender(), userInfoDto.getBirth());
+    public UserDto.FindUserInfoResponseDto findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto) {
+        boolean isJoined = userRepository.existsByEmailAndNameAndGenderAndBirth(userInfoDto.getEmail(), userInfoDto.getName(), userInfoDto.getGender(), userInfoDto.getBirth());
+        return new UserDto.FindUserInfoResponseDto(isJoined);
     }
 
     // todo: querydsl 이용해서 어드민 페이지에서 역할 과 이름, 이메일로 검색하는 기능 구현
@@ -164,4 +162,12 @@ public class UserServiceImpl implements UserService {
         return Period.between(birth, LocalDate.now()).getYears();
     }
 
+    @Override
+    public UserDto.AgeGenderResponseDto getUserAgeGender(UserDto.AgeGenderRequestDto ageGenderRequest) {
+        UserEntity user = this.findByEmail(ageGenderRequest.getEmail());
+        return UserDto.AgeGenderResponseDto.builder()
+                .age(Period.between(user.getBirth(), LocalDate.now()).getYears())
+                .gender(user.getGender())
+                .build();
+    }
 }

@@ -7,11 +7,11 @@ import com.Duo960118.fitow.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,29 +36,22 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public boolean deleteNotice(UUID uuid) {
+    public void deleteNotice(UUID uuid) {
         noticeRepository.deleteByUuidEntityUuid(uuid);
-        return !noticeRepository.existsByUuidEntityUuid(uuid);
+//        return !noticeRepository.existsByUuidEntityUuid(uuid);
     }
 
     @Override
-    public boolean editNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest) {
+    public void editNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest) {
         // 예외: 존재하지 않는 게시물
-        NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(editNoticeRequest.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물"));
+        NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(editNoticeRequest.getUuid()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시물"+editNoticeRequest.getUuid()));
         noticeEntity.updateNotice(editNoticeRequest);
-//        try {
-//
-//        } catch (RuntimeException e) {
-//            log.error(e.getMessage());
-//            return false;
-//        }
-        return true;
     }
 
     @Override
     public NoticeDto.NoticeDetailDto getNoticeDetail(UUID uuid) {
         // 예외: 존재하지 않는 게시물
-        NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물"));
+        NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시물" + uuid));
 
         String nickName = noticeEntity.getUserEntity().getNickName();
 
@@ -71,18 +64,18 @@ public class NoticeServiceImpl implements NoticeService {
     // 기존의 for문과 Iterator를 사용하면 코드가 길어져서 가독성과 재사용성이 떨어지며 데이터 타입마다 다른 방식으로 다뤄야 하는 불편함이 있다.
     // 스트림은 데이터 소스를 추상화하고, 데이터를 다루는데 자주 사용되는 메소드를 정의해 놓아서 데이터 소스에 상관없이 모두 같은 방식으로 다룰 수 있으므로 코드의 재사용성이 높아진다.
     @Override
-    public List<NoticeDto.NoticeInfoDto>searchNotice(NoticeDto.SearchNoticeDto searchNoticeDto) {
-        return noticeRepository.findByNoticeCategoryAndTitleContaining(searchNoticeDto.getCategory(),searchNoticeDto.getSearchString()).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+    public List<NoticeDto.NoticeInfoDto>searchNotice(NoticeDto.SearchNoticeRequestDto searchNoticeRequest) {
+        return noticeRepository.findByNoticeCategoryAndTitleContaining(searchNoticeRequest.getCategory(), searchNoticeRequest.getSearchString()).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
     }
 
-    @Override
-    public List<NoticeDto.NoticeInfoDto> getNotices(Sort sort) {
-        return noticeRepository.findAll(sort).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<NoticeDto.NoticeInfoDto> getNotices(Sort sort) {
+//        return noticeRepository.findAll(sort).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+//    }
 
     @Override
-    public List<NoticeDto.NoticeInfoDto> getNoticePage(PageRequest pageRequest) {
-        return noticeRepository.findAll(pageRequest).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+    public List<NoticeDto.NoticeInfoDto> getNoticePage(Pageable pageable) {
+        return noticeRepository.findAll(pageable).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
     }
 
     @Override

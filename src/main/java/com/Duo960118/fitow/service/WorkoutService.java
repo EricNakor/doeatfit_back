@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface WorkoutService {
     // 운동 전체 조회
     @Transactional
-    List<WorkoutDto.WorkoutDetailDto> getAllWorkout(PageRequest pageRequest);
+    List<WorkoutDto.WorkoutDetailDto> getAllWorkout(Pageable pageable);
 
     // 운동 한개 세부사항 조회
     @Transactional
@@ -22,11 +22,11 @@ public interface WorkoutService {
 
     // 운동 수정
     @Transactional
-    UUID editWorkout(UUID uuid, MultipartFile multipartFile, WorkoutDto.PostWorkoutRequestDto postWorkoutRequest);
+    WorkoutDto.WorkoutDetailDto editWorkout(WorkoutDto.PostWorkoutRequestDto postWorkoutRequest);
     
     // 운동 추가
     @Transactional
-    UUID postWorkout(MultipartFile multipartFile, WorkoutDto.PostWorkoutRequestDto postWorkoutRequest);
+    WorkoutDto.WorkoutDetailDto postWorkout(WorkoutDto.PostWorkoutRequestDto postWorkoutRequest);
     
     // 운동 삭제
     @Transactional

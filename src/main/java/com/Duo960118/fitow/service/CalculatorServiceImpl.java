@@ -3,6 +3,7 @@ package com.Duo960118.fitow.service;
 import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.mapper.CalculatorMapper;
 import com.Duo960118.fitow.repository.CalculatorRepository;
+import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class CalculatorServiceImpl implements CalculatorService {
     private final CalculatorRepository calculatorRepository;
+    private final UserService userService;
 
     // BMR 이 없을 경우 BMR 추정치 계산
     public int calculateGenderBmr(int age, GenderEnum gender, float weight, float height) {
@@ -58,7 +61,8 @@ public class CalculatorServiceImpl implements CalculatorService {
     @Override
     @Transactional
     // 유지 칼로리, 다이어트 목표를 이용한 일일 권장 섭취량 계산
-    public CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest, UserEntity userEntity) {
+    public CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest) {
+        UserEntity userEntity = userService.findByEmail(calcRequest.getEmail());
         // bmr 값이 없을 때
         // todo: front에서 bmr값 안적으면 0 으로 넣어서 보내기
         if (calcRequest.getBmr() == 0) {
@@ -95,10 +99,10 @@ public class CalculatorServiceImpl implements CalculatorService {
     // 로딩, 벤딩 계산하기
     @Override
     @Transactional
-    public CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest, UserEntity userEntity) {
-
+    public CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest ) {
+        UserEntity userEntity = userService.findByEmail(calcRequest.getEmail());
         // 예외: 존재하지 않는 계산 결과
-        CalculateInfoEntity calculateEntity = calculatorRepository.findByUuidEntityUuid(calcRequest.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 결과"));
+        CalculateInfoEntity calculateEntity = calculatorRepository.findByUuidEntityUuid(calcRequest.getUuid()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 계산 결과" + calcRequest.getUuid()));
 
         double advancedCarb, advancedProtein, advancedFat;
         switch (calcRequest.getCalcCategory()) {
@@ -116,6 +120,7 @@ public class CalculatorServiceImpl implements CalculatorService {
                 // 예외: 고급 계산기 알 수 없는 카테고리
                 throw new IllegalArgumentException("알 수 없는 카테고리: " + calcRequest.getCalcCategory());
         }
+
         // 저장할 데이터 빌드
         CalculateInfoEntity advancedCalcEntity = CalculateInfoEntity.builder()
                 .userEntity(userEntity)
@@ -140,8 +145,8 @@ public class CalculatorServiceImpl implements CalculatorService {
     // 계산 결과 한 개
     @Override
     public CalculatorDto.CalcResultDto getCalcResult(UUID uuid) {
-        // 예외: 계산 결과가 없습니다
-        CalculateInfoEntity calculatorEntity = calculatorRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("계산 결과가 없습니다"));
+        // 예외: 존재하지 않는 계산결과
+        CalculateInfoEntity calculatorEntity = calculatorRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new NoSuchElementException("존재하지 않는 계산결과 " + uuid));
 
         return CalculatorMapper.entityToCalcResultDto(calculatorEntity);
     }
@@ -156,16 +161,20 @@ public class CalculatorServiceImpl implements CalculatorService {
     // 계산 결과 히스토리 페이징 처리
     // todo: 페이징처리 서비스와 히스토리 서비스 중 하나 택 1
     @Override
-    public List<CalculatorDto.CalcResultDto> getCalcResultsPage(UserEntity userEntity, PageRequest pageRequest) {
-        return calculatorRepository.findAllByUserEntityUserId(userEntity.getUserId(), pageRequest)
+    public List<CalculatorDto.CalcResultDto> getCalcResultsPage(CalculatorDto.ResultListPageDto resultListPageDto) {
+        UserEntity userEntity = userService.findByEmail(resultListPageDto.getEmail());
+
+        return calculatorRepository.findAllByUserEntityUserId(userEntity.getUserId(), resultListPageDto.getPageable())
                 .stream()
                 .map(CalculatorMapper::entityToCalcResultDto)
                 .collect(Collectors.toList());
     }
+
     // 로딩, 밴딩할 값 리스트
     @Override
-    public List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(UserEntity userEntity, Pageable pageable) {
-        Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, pageable);
+    public List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto) {
+        UserEntity userEntity = userService.findByEmail(resultListPageDto.getEmail());
+        Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, resultListPageDto.getPageable());
         return calculateInfoEntity
                 .stream()
                 .map(CalculatorMapper::entityToCalcResultDto)

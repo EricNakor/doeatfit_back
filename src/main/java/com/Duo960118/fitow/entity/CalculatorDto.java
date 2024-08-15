@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.entity;
 
 import lombok.*;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,6 +13,7 @@ public class CalculatorDto {
     @Setter
     @NoArgsConstructor
     public static class CalcRequestDto {
+        private String email;
         private int age;
         private GenderEnum gender;
         private float height;
@@ -74,7 +76,17 @@ public class CalculatorDto {
     @Setter
     @AllArgsConstructor
     public static class AdvancedCalcRequestDto {
+        private String email;
         private final UUID uuid;
         private CalculateInfoEntity.calcCategoryEnum calcCategory;
+    }
+
+    // 계산 결과 페이징 DTO
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ResultListPageDto {
+        private final String email;
+        private final Pageable pageable;
     }
 }

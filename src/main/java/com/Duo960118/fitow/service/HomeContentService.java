@@ -19,7 +19,7 @@ public interface HomeContentService {
     HomeContentDto.HomeContentInfoDto postHomeContent(HomeContentDto.PostHomeContentRequestDto postHomeContentRequest);
 
     @Transactional
-    HomeContentDto.HomeContentInfoDto editHomeContent(UUID uuid, HomeContentDto.EditHomeContentRequestDto editHomeContentRequest);
+    HomeContentDto.HomeContentInfoDto editHomeContent(HomeContentDto.EditHomeContentRequestDto editHomeContentRequest);
 
     @Transactional
     void deleteHomeContent(UUID uuid);

@@ -1,7 +1,6 @@
 package com.Duo960118.fitow.entity;
 
 import lombok.*;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -56,7 +55,7 @@ public class NoticeDto {
     @Getter
     @Setter
     @Builder
-    public static class SearchNoticeDto {
+    public static class SearchNoticeRequestDto {
         private NoticeEntity.NoticeCategoryEnum category;
         private String searchString;
     }

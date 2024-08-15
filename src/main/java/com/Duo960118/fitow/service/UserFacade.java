@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.Duo960118.fitow.config.PasswordConfig.generateTempPasswd;
 
 @RequiredArgsConstructor
 @Service
@@ -36,28 +37,10 @@ public class UserFacade {
     private final NoticeService noticeService;
     private final CalculatorService calculatorService;
 
-    public static String tempPasswdGenerator(int spSize, int allSize, int numSize) {
-        final char[] passwdCollectionSpCha = new char[]{'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
-        final char[] passwdCollectionNum = new char[]{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',};
-        final char[] passwdCollectionAll = new char[]{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-                '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
-        return getRandPasswd(spSize, passwdCollectionSpCha) + getRandPasswd(allSize, passwdCollectionAll) + getRandPasswd(numSize, passwdCollectionNum);
-    }
-
-    static String getRandPasswd(int size, char[] passwdCollection) {
-        StringBuilder randPasswd = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            int selectRandomPasswd = (int) (Math.random() * (passwdCollection.length));
-            randPasswd.append(passwdCollection[selectRandomPasswd]);
-        }
-        return randPasswd.toString();
-    }
 
     // 임시 비밀번호 저장하기
     @Transactional
-    public boolean sendTempPasswd(String email) {
+    public void sendTempPasswd(String email) {
         // 이메일 존재하는지 확인
         UserEntity userEntity = userService.findByEmail(email);
 
@@ -66,31 +49,26 @@ public class UserFacade {
         int tempPasswdSpLength = 1;
         int tempPasswdNumLength = 2;
         int tempPasswdAllLength = 9;
-        String passwd = tempPasswdGenerator(tempPasswdSpLength, tempPasswdAllLength, tempPasswdNumLength);
+        String passwd = generateTempPasswd(tempPasswdSpLength, tempPasswdAllLength, tempPasswdNumLength);
         userEntity.updatePasswd(passwordEncoder.encode(passwd));
 
         // 요청에서 받은 이메일로 임시 비밀번호 발송
         emailSendService.sendTempPasswd(email, passwd);
-//        try {
-//
-//        } catch (RuntimeException e) {
-//            log.error(e.getMessage());
-//            return false;
-//        }
-//        return true;
     }
 
     // 닉네임 수정
     @Transactional
-    public void editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest) {
-        userService.editNickName(email, editNickNameRequest);
+    public UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameDto editNickNameRequest) {
+        UserDto.EditNickNameResponseDto editNickNameResponse = userService.editNickName(editNickNameRequest);
         // 토큰 리프레시
         securityService.syncAuthenticationUser();
+
+        return editNickNameResponse;
     }
 
     // 프로필 이미지 저장
     @Transactional
-    public boolean saveProfileImg(String email, UserDto.SaveProfileImgRequestDto editProfileImgRequest) throws IOException {
+    public UserDto.SaveProfileImgResponseDto saveProfileImg(String email, UserDto.SaveProfileImgRequestDto editProfileImgRequest) throws IOException {
         // 파일명 추출
         String fileName = editProfileImgRequest.getProfileImgFile().getOriginalFilename();
         // 파일 확장자 추출
@@ -113,7 +91,7 @@ public class UserFacade {
 
             if (!file.delete()) {
                 // 예외: 프로필 이미지 삭제 실패
-                throw new
+                throw new IOException(user.getProfileImg()+" 해당 프로필 이미지를 삭제할 수 없습니다");
             }
 
             // 프로필사진이 !null이면 원래 uuid로 파일명 덮어씌우기
@@ -130,24 +108,19 @@ public class UserFacade {
 
         // contextHolder.authentication 주입
         securityService.syncAuthenticationUser();
-//        try {
-//
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//            return false;
-//        }
-//        return true;
+
+        return new UserDto.SaveProfileImgResponseDto(profileImgName);
     }
 
     // 비밀번호 수정
-    public boolean editPasswd(String email, UserDto.EditPasswdRequestDto editPasswdRequest) {
+    public UserDto.EditPasswdResponseDto editPasswd(UserDto.EditPasswdRequestDto editPasswdRequest) {
         // 수정
-        userService.editPasswd(email, editPasswdRequest);
+        UserDto.EditPasswdResponseDto editPasswdResponse = userService.editPasswd(editPasswdRequest);
 
         // contextHolder.authentication 주입
         securityService.syncAuthenticationUser();
 
-        return true;
+        return editPasswdResponse;
     }
 
     // 프로필 이미지 불러오기
@@ -156,7 +129,7 @@ public class UserFacade {
     }
 
     // 회원탈퇴
-    public void withdraw(UserDto.WithDrawDto withdrawRequest) {
+    public void withdraw(UserDto.WithDrawRequestDto withdrawRequest) {
         UserEntity user = userService.findByEmail(withdrawRequest.getEmail());
 
         // 프로필 이미지 삭제
@@ -187,26 +160,16 @@ public class UserFacade {
         calculatorService.updateForeignKeysNull(user.getUserId());
 
         // DB 삭제
-        userService.withdraw(withdrawRequest.getEmail(), withdrawRequest.getPasswd());
+        userService.withdraw(withdrawRequest);
     }
 
     // 유저 롤 수정
-    public UserDto.UserInfoDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest) {
+    public UserDto.EditUserRoleResponseDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest) {
         UserEntity userEntity = userService.findByEmail(editUserRoleRequest.getEmail());
         userEntity.updateUserRole(editUserRoleRequest.getNewUserRole());
 
         securityService.syncAuthenticationUser();
 
-        return new UserDto.UserInfoDto(
-                userEntity.getEmail(),
-                userEntity.getNickName(),
-                userEntity.getName(),
-                userEntity.getGender(),
-                userEntity.getBirth(),
-                userEntity.getJoinDate(),
-                userEntity.getPasswdEditDate(),
-                userEntity.getProfileImg(),
-                userEntity.getRole()
-        );
+        return new UserDto.EditUserRoleResponseDto(userEntity.getRole());
     }
 }

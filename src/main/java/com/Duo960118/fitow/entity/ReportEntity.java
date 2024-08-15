@@ -84,11 +84,11 @@ public class ReportEntity {
         RESOLVED
     }
 
-    public void replyReport(ReportDto.ReplyReportDto replyReport) {
+    public void replyReport(ReportDto.ReplyReportRequestDto replyReport) {
         if (!this.reply.equals(replyReport.getReply())) {
             this.replyDate = LocalDateTime.now();
             this.reply = replyReport.getReply();
-            this.replyFiles = replyReport.getReplyFiles();
+            this.replyFiles = replyReport.getReplyFileNames();
         }
         this.reportStatus = replyReport.getReportStatus();
     }

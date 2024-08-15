@@ -6,6 +6,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class EmailSendService {
 
     // todo: 메일 전송 속도 개선, smtp 대체 할 다른 걸 쓰거나, 답답함을 해소할 프로그레스바 같은것 프론트에 표시
     // 이메일 발송 정보
-    public void sendEmail(String from, String to, String subject, String text) {
+    public void sendEmail(String from, String to, String subject, String text) throws MailException{
         // todo: mime message 이용 html 이메일 발송 admin
         // MimeMessage message = new MimeMessage();
         // message.set
@@ -51,12 +52,6 @@ public class EmailSendService {
         message.setText(text);
         // 예외: MailException
         mailSender.send(message);
-
-//        try {
-//
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//        }
     }
 
     // mail 수발신 및 인증번호 html form

@@ -23,13 +23,13 @@ public interface CalculatorService {
 
     // 유지 칼로리, 다이어트 목표를 이용한 일일 권장 섭취량 계산
     @Transactional
-    CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest, UserEntity userEntity);
+    CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest);
 
     // 로딩, 벤딩할 값 가져오기
-    List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(UserEntity userEntity, Pageable pageable);
+    List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto);
 
     // 로딩, 벤딩 계산
-    CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest, UserEntity userEntity);
+    CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest);
 
     // 계산 결과 한 개
     CalculatorDto.CalcResultDto getCalcResult(UUID uuid);
@@ -39,7 +39,7 @@ public interface CalculatorService {
     void deleteResult(UUID uuid);
 
     // 계산 결과 페이징 처리
-    List<CalculatorDto.CalcResultDto> getCalcResultsPage(UserEntity userEntity, PageRequest pageRequest);
+    List<CalculatorDto.CalcResultDto> getCalcResultsPage(CalculatorDto.ResultListPageDto resultListPageDto);
 
     // 회원 탈퇴 시 외부키 null로 변경
     void updateForeignKeysNull(Long userId);

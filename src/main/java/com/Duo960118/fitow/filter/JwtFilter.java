@@ -4,6 +4,7 @@ import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.CustomUserDetails;
 import com.Duo960118.fitow.entity.ErrorCodeEnum;
 import com.Duo960118.fitow.entity.JwtProperties;
+import com.Duo960118.fitow.exception.NoCookieException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -75,7 +76,7 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (JwtException e) {
             //유효하지 않은 토큰
             request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.INVALID_TOKEN);
-        } catch (IllegalArgumentException e) {
+        } catch (NoCookieException e) {
             request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.COOKIE_NOT_EXIST);
         } catch (NoSuchElementException e){
             request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.TOKEN_NOT_EXIST);

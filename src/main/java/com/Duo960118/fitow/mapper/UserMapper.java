@@ -19,4 +19,18 @@ public class UserMapper {
                 userEntity.getRole()
         );
     }
+
+    @Bean
+    public static UserDto.JoinResponseDto entityToJoinResponseDto(UserEntity userEntity){
+        return UserDto.JoinResponseDto.builder()
+                .userId(userEntity.getUserId())
+                .birth(userEntity.getBirth())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .joinDate(userEntity.getJoinDate())
+                .gender(userEntity.getGender())
+                .nickName(userEntity.getNickName())
+                .passwdEditDate(userEntity.getPasswdEditDate())
+                .build();
+    }
 }

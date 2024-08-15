@@ -2,6 +2,7 @@ package com.Duo960118.fitow.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,7 +36,9 @@ public class HomeContentDto {
     }
 
     @Getter
+    @Setter
     public static class EditHomeContentRequestDto {
+        private UUID uuid;
         private HomeContentEntity.HomeContentCategoryEnum category;
         private Boolean isBeingUsed;
         private String content;

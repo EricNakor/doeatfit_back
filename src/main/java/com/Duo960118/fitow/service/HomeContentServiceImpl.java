@@ -50,7 +50,7 @@ public class HomeContentServiceImpl implements HomeContentService {
     }
 
     @Override
-    public HomeContentDto.HomeContentInfoDto editHomeContent(UUID uuid, HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
+    public HomeContentDto.HomeContentInfoDto editHomeContent( HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
         if (editHomeContentRequest.getIsBeingUsed()) {
             List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(editHomeContentRequest.getCategory());
 
@@ -61,12 +61,13 @@ public class HomeContentServiceImpl implements HomeContentService {
             }
         }
 
-        HomeContentEntity homeContentEntity = homeContentRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("존재하지 않는 home content"));
+        HomeContentEntity homeContentEntity = homeContentRepository.findByUuidEntityUuid(editHomeContentRequest.getUuid()).orElseThrow(() -> new RuntimeException("존재하지 않는 home content"));
         homeContentEntity.updateHomeContent(editHomeContentRequest);
 
         return HomeContentMapper.entityToHomeContentInfoDto(homeContentEntity);
     }
 
+    // todo: 활성화 된 홈 컨텐츠는 삭제 불가능하게 하는게 나을 지도
     @Override
     public void deleteHomeContent(UUID uuid) {
         homeContentRepository.deleteByUuidEntityUuid(uuid);

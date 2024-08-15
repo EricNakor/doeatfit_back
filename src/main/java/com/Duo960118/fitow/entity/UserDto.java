@@ -1,6 +1,8 @@
 package com.Duo960118.fitow.entity;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +15,12 @@ public class UserDto {
     @Getter
     @Setter
     public static class JoinRequestDto {
+        // @Valid 실패할 경우  MethodArgumentNotValidException 예외 발생
+        //출처: https://mangkyu.tistory.com/174 [MangKyu's Diary:티스토리]
+        @Email(message = "이메일 오류")
         private String email;
+
+        @Pattern(message = "비밀번호 오류", regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]+$")
         private String passwd;
         private String name;
         private String nickName;
@@ -34,15 +41,36 @@ public class UserDto {
     @Getter
     @Setter
     public static class EditPasswdRequestDto {
+        private String email;
         private String currentPasswd;
         private String newPasswd;
+    }
+    @Getter
+    @RequiredArgsConstructor
+    public static class EditPasswdResponseDto {
+        private final LocalDate passwdEditDate;
+    }
+
+    @Getter
+    @Builder
+    public static class EditUserInfoResponseDto {
+        private Long userId;
     }
 
     // 닉네임 수정 DTO
     @Getter
     @Setter
-    public static class EditNickNameRequestDto {
+    @Builder
+    public static class EditNickNameDto {
+        private String email;
         private String newNickName;
+    }
+
+    @Getter
+    @Setter
+    @RequiredArgsConstructor
+    public static class EditNickNameResponseDto {
+        private final String nickName;
     }
 
     // 프로필사진 수정 DTO
@@ -58,6 +86,7 @@ public class UserDto {
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserInfoDto {
         private String email;
         private String nickName;
@@ -68,18 +97,6 @@ public class UserDto {
         private LocalDate passwdEditDate;
         private String profileImg;
         private UserEntity.UserRoleEnum role;
-
-        public UserInfoDto(String email, String nickName, String name, GenderEnum gender, LocalDate birth, LocalDate joinDate, LocalDate passwdEditDate, String profileImg, UserEntity.UserRoleEnum role) {
-            this.email = email;
-            this.nickName = nickName;
-            this.name = name;
-            this.gender = gender;
-            this.birth = birth;
-            this.joinDate = joinDate;
-            this.passwdEditDate = passwdEditDate;
-            this.profileImg = profileImg;
-            this.role = role;
-        }
     }
 
 
@@ -98,17 +115,18 @@ public class UserDto {
     @Getter
     @Setter
     @RequiredArgsConstructor
-    public static class EmailDto {
+    public static class EmailListDto {
         private final List<String> emails;
     }
 
     // 탈퇴 DTO
     @Getter
     @Setter
-    public static class WithDrawDto {
-        private String email;
-        private String passwd;
-        private HttpServletRequest httpServletRequest;
+    @Builder
+    public static class WithDrawRequestDto {
+        private final String email;
+        private final String passwd;
+        private final HttpServletRequest httpServletRequest;
     }
 
     // 회원 권한 DTO
@@ -122,13 +140,68 @@ public class UserDto {
     // 계산 나이, 성별 정보 DTO
     @Getter
     @Setter
-    public static class AgeGenderResponseDto {
-        private GenderEnum gender;
-        private int age;
+    @RequiredArgsConstructor
+    public static class AgeGenderRequestDto {
+        private final String email;
+    }
 
-        public AgeGenderResponseDto(GenderEnum gender, int age) {
-            this.gender = gender;
-            this.age = age;
-        }
+    @Getter
+    @Setter
+    @Builder
+    public static class AgeGenderResponseDto {
+        private final GenderEnum gender;
+        private final int age;
+    }
+
+    @Getter
+    @Builder
+    public static class JoinResponseDto {
+        private Long userId;
+        private String email;
+        private String nickName;
+        private String name;
+        private GenderEnum gender;
+        private LocalDate birth;
+        private LocalDate joinDate;
+        private LocalDate passwdEditDate;
+//        private String profileImg;
+//        private UserEntity.UserRoleEnum role;
+    }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor
+    public static class EditUserRoleResponseDto{
+        private final UserEntity.UserRoleEnum role;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class SaveProfileImgResponseDto {
+        private final String profileImg;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class CheckDuplicateDto {
+        private final Boolean isDuplicated;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class CheckEmailRequestDto {
+        private final String email;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class CheckNickNameRequestDto {
+        private final String nickName;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class FindUserInfoResponseDto {
+        private final Boolean isJoined;
     }
 }

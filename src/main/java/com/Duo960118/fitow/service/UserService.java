@@ -12,39 +12,39 @@ import java.util.List;
 public interface UserService {
     // 회원가입
     @Transactional
-    void join(UserDto.JoinRequestDto joinRequest);
+    UserDto.JoinResponseDto join(UserDto.JoinRequestDto joinRequest);
 
     // 회원탈퇴
     @Transactional
-    void withdraw(String email, String passwd);
+    void withdraw(UserDto.WithDrawRequestDto withDrawRequest);
 
     // 해당 이메일을 db 에서 찾기
     @Transactional
     UserEntity findByEmail(String email);
 
-    // 이메일  찾기
+    // 이메일 찾기
     @Transactional
-    List<String> findEmail(UserDto.FindEmailRequestDto findEmailRequest);
+    UserDto.EmailListDto findEmail(UserDto.FindEmailRequestDto findEmailRequest);
 
     // 가입정보 찾기
     @Transactional
-    boolean findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto);
+    UserDto.FindUserInfoResponseDto findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto);
 
     // 이메일 중복확인
     @Transactional
-    boolean checkEmail(String email);
+    UserDto.CheckDuplicateDto checkEmail(UserDto.CheckEmailRequestDto checkEmailRequest);
 
     // 닉네임 중복확인
     @Transactional
-    boolean checkNickName(String nickName);
+    UserDto.CheckDuplicateDto checkNickName(UserDto.CheckNickNameRequestDto checkNickNameRequest);
 
     // 비밀번호 수정
     @Transactional
-    void editPasswd(String email, UserDto.EditPasswdRequestDto editPwRequest);
+    UserDto.EditPasswdResponseDto editPasswd(UserDto.EditPasswdRequestDto editPwRequest);
 
     // 닉네임 수정
     @Transactional
-    void editNickName(String email, UserDto.EditNickNameRequestDto editNickNameRequest);
+    UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameDto editNickNameRequest);
 
     // 프로필 이미지 이름 수정
     @Transactional
@@ -64,4 +64,8 @@ public interface UserService {
 
     // 만나이 계산
     int calculateAge(LocalDate birth);
+
+    // 만나이 계산 + 성별
+    @Transactional
+    UserDto.AgeGenderResponseDto getUserAgeGender(UserDto.AgeGenderRequestDto ageGenderRequest);
 }

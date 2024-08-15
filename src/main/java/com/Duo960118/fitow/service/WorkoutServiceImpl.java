@@ -31,8 +31,8 @@ public class WorkoutServiceImpl implements WorkoutService {
     private final WorkoutRepository workoutRepository;
 
     @Override
-    public List<WorkoutDto.WorkoutDetailDto> getAllWorkout(PageRequest pageRequest) {
-        return workoutRepository.findAll(pageRequest).stream().map(WorkoutMapper::entityToWorkoutDetailDto).collect(Collectors.toList());
+    public List<WorkoutDto.WorkoutDetailDto> getAllWorkout(Pageable pageable) {
+        return workoutRepository.findAll(pageable).stream().map(WorkoutMapper::entityToWorkoutDetailDto).collect(Collectors.toList());
     }
 
     @Override
@@ -41,12 +41,12 @@ public class WorkoutServiceImpl implements WorkoutService {
     }
 
     @Override
-    public UUID editWorkout(UUID uuid, MultipartFile multipartFile, WorkoutDto.PostWorkoutRequestDto editWorkoutRequest) {
-        WorkoutEntity workoutEntity = workoutRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("해당 운동이 존재하지 않습니다."));
+    public WorkoutDto.WorkoutDetailDto  editWorkout(WorkoutDto.PostWorkoutRequestDto editWorkoutRequest) {
+        WorkoutEntity workoutEntity = workoutRepository.findByUuidEntityUuid(editWorkoutRequest.getUuid()).orElseThrow(() -> new RuntimeException("해당 운동이 존재하지 않습니다."));
 
         // 파일명 추출
-        if (multipartFile != null) {
-            String fileName = multipartFile.getOriginalFilename();
+        if (editWorkoutRequest.getWorkoutFile() != null) {
+            String fileName = editWorkoutRequest.getWorkoutFile().getOriginalFilename();
             // 파일 확장자 추출
             String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
             String workoutMediaFileName = UUID.randomUUID() + fileExt;
@@ -54,7 +54,7 @@ public class WorkoutServiceImpl implements WorkoutService {
             // 지정된 경로에 저장
             File file = new File(workoutMediaDir + "\\" + workoutMediaFileName);
             try {
-                multipartFile.transferTo(file);
+                editWorkoutRequest.getWorkoutFile().transferTo(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -65,16 +65,16 @@ public class WorkoutServiceImpl implements WorkoutService {
         }
         workoutEntity.updateWorkoutEntity(editWorkoutRequest);
 
-        return uuid;
+        return WorkoutMapper.entityToWorkoutDetailDto(workoutEntity);
     }
 
     @Override
-    public UUID postWorkout(MultipartFile multipartFile, WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
+    public WorkoutDto.WorkoutDetailDto postWorkout(WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
 
         String workoutMediaFileName="";
         // 파일명 추출
-        if (multipartFile != null) {
-            String fileName = multipartFile.getOriginalFilename();
+        if (postWorkoutRequest.getWorkoutFile() != null) {
+            String fileName = postWorkoutRequest.getWorkoutFile() .getOriginalFilename();
             // 확장자 추출
             String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
             workoutMediaFileName = UUID.randomUUID()+ fileExt;
@@ -82,7 +82,7 @@ public class WorkoutServiceImpl implements WorkoutService {
             // 지정된 경로에 저장
             File file = new File(workoutMediaDir + File.separator + workoutMediaFileName);
             try {
-                multipartFile.transferTo(file);
+                postWorkoutRequest.getWorkoutFile() .transferTo(file);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to save media file", e);
             }
@@ -99,11 +99,11 @@ public class WorkoutServiceImpl implements WorkoutService {
                 .build();
         workoutRepository.save(workoutEntity);
 
-        return workoutEntity.getUuidEntity().getUuid();
+        return WorkoutMapper.entityToWorkoutDetailDto(workoutEntity);
     }
 
     @Override
-    public boolean deleteWorkout(UUID uuid) {
+    public void deleteWorkout(UUID uuid) {
         WorkoutEntity workoutEntity = workoutRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new RuntimeException("운동이 존재하지 않습니다."));
 
         // 영상 이름
@@ -118,7 +118,7 @@ public class WorkoutServiceImpl implements WorkoutService {
             log.warn("Profile video not deleted");
         }
 
-        return !workoutRepository.existsByUuidEntityUuid(uuid);
+//        return !workoutRepository.existsByUuidEntityUuid(uuid);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.Duo960118.fitow.component;
 import com.Duo960118.fitow.entity.BlackListedToken;
 import com.Duo960118.fitow.entity.JwtProperties;
 import com.Duo960118.fitow.entity.TokensEntity;
+import com.Duo960118.fitow.exception.NoAccessTokenException;
+import com.Duo960118.fitow.exception.NoCookieException;
 import com.Duo960118.fitow.repository.TokenBlackListRepository;
 import com.Duo960118.fitow.repository.TokensRepository;
 import com.Duo960118.fitow.service.SecurityService;
@@ -141,12 +143,12 @@ public class TokenUtil {
     public String resolveToken(HttpServletRequest request, String tokenKey) {
         Cookie[] cookies = request.getCookies(); // 모든 쿠키 가져오기
         if (cookies == null) {
-            throw new IllegalArgumentException("쿠키 없음");
+            throw new NoCookieException();
         }
 
         String token = Arrays.stream(cookies).filter((c) -> c.getName().equals(tokenKey)).findFirst().orElse(new Cookie(tokenKey, "")).getValue();
         if(token.isEmpty()){
-            throw new NoSuchElementException();
+            throw new NoAccessTokenException();
         }
 
         return URLDecoder.decode(token, StandardCharsets.UTF_8);

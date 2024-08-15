@@ -1,9 +1,7 @@
 package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.NoticeDto;
-import com.Duo960118.fitow.entity.NoticeEntity;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,15 +26,15 @@ public interface NoticeService {
 
     // 조건에 맞는 Notice 검색
     @Transactional
-    List<NoticeDto.NoticeInfoDto> searchNotice(NoticeDto.SearchNoticeDto searchNoticeDto);
+    List<NoticeDto.NoticeInfoDto> searchNotice(NoticeDto.SearchNoticeRequestDto searchNoticeRequest);
 
     // 모든 Notice를 정렬된 상태로 반환
-    @Transactional
-    List<NoticeDto.NoticeInfoDto> getNotices(Sort sort);
+//    @Transactional
+//    List<NoticeDto.NoticeInfoDto> getNotices(Sort sort);
 
     // PageRequest에 맞게 Notice들을 반환
     @Transactional
-    List<NoticeDto.NoticeInfoDto> getNoticePage(PageRequest pageRequest);
+    List<NoticeDto.NoticeInfoDto> getNoticePage(Pageable pageable);
 
     // 회원 탈퇴 시 외부키 null로 변경
     @Transactional
