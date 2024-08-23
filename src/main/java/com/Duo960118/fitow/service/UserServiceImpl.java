@@ -1,5 +1,6 @@
 package com.Duo960118.fitow.service;
 
+import com.Duo960118.fitow.entity.GenderEnum;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.exception.PasswordNotMatchesException;
@@ -10,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
                 .passwd(passwordEncoder.encode(joinRequest.getPasswd()))
                 .name(joinRequest.getName())
                 .nickName(joinRequest.getNickName())
-                .gender(joinRequest.getGender())
+                .gender(GenderEnum.fromString(joinRequest.getGender()))
                 .birth(joinRequest.getBirth())
                 .role(UserEntity.UserRoleEnum.NORMAL)
                 .build();
@@ -73,16 +73,16 @@ public class UserServiceImpl implements UserService {
 
     // 이메일 중복확인
     @Override
-    public UserDto.CheckDuplicateDto checkEmail(UserDto.CheckEmailRequestDto checkEmailRequest) {
+    public UserDto.CheckDuplicateResponseDto checkEmail(UserDto.CheckEmailRequestDto checkEmailRequest) {
         return userRepository.existsByEmail(checkEmailRequest.getEmail()) ?
-                new UserDto.CheckDuplicateDto(true) : new UserDto.CheckDuplicateDto(false);
+                new UserDto.CheckDuplicateResponseDto(true) : new UserDto.CheckDuplicateResponseDto(false);
     }
 
     // 닉네임 중복확인
     @Override
-    public UserDto.CheckDuplicateDto checkNickName(UserDto.CheckNickNameRequestDto checkNickNameRequest) {
+    public UserDto.CheckDuplicateResponseDto checkNickName(UserDto.CheckNickNameRequestDto checkNickNameRequest) {
         return userRepository.existsByNickName(checkNickNameRequest.getNickName()) ?
-                new UserDto.CheckDuplicateDto(true) : new UserDto.CheckDuplicateDto(false);
+                new UserDto.CheckDuplicateResponseDto(true) : new UserDto.CheckDuplicateResponseDto(false);
     }
 
     // 비밀번호 수정
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     // 닉네임 수정
     @Override
-    public UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameDto editNickNameRequest) {
+    public UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameRequestDto editNickNameRequest) {
         // 이메일 존재하는지 확인
         UserEntity user = this.findByEmail(editNickNameRequest.getEmail());
 
@@ -144,14 +144,14 @@ public class UserServiceImpl implements UserService {
 
     // 이메일  찾기
     @Override
-    public UserDto.EmailListDto findEmail(UserDto.FindEmailRequestDto findEmailRequest) {
-        return new UserDto.EmailListDto(userRepository.findByNameAndGenderAndBirth(findEmailRequest.getName(), findEmailRequest.getGender(), findEmailRequest.getBirth()));
+    public UserDto.EmailListResponseDto findEmail(UserDto.FindEmailRequestDto findEmailRequest) {
+        return new UserDto.EmailListResponseDto(userRepository.findByNameAndGenderAndBirth(findEmailRequest.getName(), GenderEnum.fromString(findEmailRequest.getGender()), findEmailRequest.getBirth()));
     }
 
     // 가입정보 찾기
     @Override
-    public UserDto.FindUserInfoResponseDto findUserInfo(UserDto.FindUserInfoRequestDto userInfoDto) {
-        boolean isJoined = userRepository.existsByEmailAndNameAndGenderAndBirth(userInfoDto.getEmail(), userInfoDto.getName(), userInfoDto.getGender(), userInfoDto.getBirth());
+    public UserDto.FindUserInfoResponseDto findUserInfo(UserDto.FindUserInfoRequestDto findUserInfoRequest) {
+        boolean isJoined = userRepository.existsByEmailAndNameAndGenderAndBirth(findUserInfoRequest.getEmail(), findUserInfoRequest.getName(), GenderEnum.fromString(findUserInfoRequest.getGender()), findUserInfoRequest.getBirth());
         return new UserDto.FindUserInfoResponseDto(isJoined);
     }
 

@@ -1,3 +1,4 @@
+
 package com.Duo960118.fitow.component;
 
 import com.Duo960118.fitow.entity.BlackListedToken;

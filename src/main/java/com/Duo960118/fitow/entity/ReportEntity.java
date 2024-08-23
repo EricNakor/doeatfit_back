@@ -1,6 +1,11 @@
 package com.Duo960118.fitow.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,23 +27,29 @@ public class ReportEntity {
     @Column(updatable = false)
     private long reportId;
     // 신고 카테고리
+    @NotNull(message = "{NotNull.reportCategory}")
     private ReportCategoryEnum reportCategory;
     // 신고자 유저 ID, 이메일
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "userId")
     private UserEntity userEntity;
     // 신고 제목
+    @NotBlank(message = "{NotBlank.title}")
+    @Size(min = 5, max = 100, message = "{Size.title}")
     private String title;
     // 신고 일자
     @CreatedDate
+    @PastOrPresent(message = "{PastOrPresent.reportDate}")
     private LocalDateTime reportDate;
     // 신고 내용
+    @NotBlank(message = "{NotBlank.content}")
     private String Content;
     // 신고 첨부파일
     @ElementCollection
     @CollectionTable(name = "REPORT_ATTACHMENT_FILES", joinColumns = @JoinColumn(name = "REPORT_ID"))
     private List<String> reportFiles;
     // 신고 상태
+    @NotNull(message = "{NotNull.reportStatus}")
     private ReportStatusEnum reportStatus;
     // UUID
     @Embedded
@@ -46,6 +57,7 @@ public class ReportEntity {
     // 답변
     private String reply;
     // 답변 일자
+    @PastOrPresent(message = "{PastOrPresent.replyDate}")
     private LocalDateTime replyDate;
     // 답변 첨부파일
     @ElementCollection
@@ -74,22 +86,32 @@ public class ReportEntity {
     @Getter
     public enum ReportCategoryEnum {
         INQUIRY,
-        BUG
+        BUG;
+
+        @JsonCreator
+        public static ReportCategoryEnum fromString(String str) {
+            return ReportCategoryEnum.valueOf(str);
+        }
     }
 
     @Getter
     public enum ReportStatusEnum {
         TODO,
         IN_PROGRESS,
-        RESOLVED
+        RESOLVED;
+
+        @JsonCreator
+        public static ReportStatusEnum fromString(String str) {
+            return ReportStatusEnum.valueOf(str);
+        }
     }
 
-    public void replyReport(ReportDto.ReplyReportRequestDto replyReport) {
-        if (!this.reply.equals(replyReport.getReply())) {
+    public void replyReport(ReportDto.ReplyReportRequestDto replyReportRequest) {
+        if (!this.reply.equals(replyReportRequest.getReply())) {
             this.replyDate = LocalDateTime.now();
-            this.reply = replyReport.getReply();
-            this.replyFiles = replyReport.getReplyFileNames();
+            this.reply = replyReportRequest.getReply();
+            this.replyFiles = replyReportRequest.getReplyFileNames();
         }
-        this.reportStatus = replyReport.getReportStatus();
+        this.reportStatus = ReportStatusEnum.fromString(replyReportRequest.getReportStatus());
     }
 }

@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.entity;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -14,8 +15,10 @@ public class TokensEntity {
     @Id
     private String email;
 
+    @NotBlank
     private String accessToken;
 
+    @NotBlank
     private String refreshToken;
 
     @TimeToLive

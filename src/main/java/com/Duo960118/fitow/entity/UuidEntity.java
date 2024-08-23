@@ -2,6 +2,7 @@ package com.Duo960118.fitow.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -17,12 +18,12 @@ import java.util.UUID;
 // @MappedSuperclass를 사용하면 된다.
 public class UuidEntity {
     @UuidGenerator
-    /*PK 값에 대한 생성 전략
-    @Id와 함께 엔티티 또는 매핑된 슈퍼클래스의 PK 속성 또는 필드에 적용 할 수 있음*/
-    /*public UuidGenerator() {
+    /* PK 값에 대한 생성 전략
+    @Id와 함께 엔티티 또는 매핑된 슈퍼클래스의 PK 속성 또는 필드에 적용 할 수 있음 */
+    /* public UuidGenerator() {
     \this.uuid = UUID.randomUUID();
-    \}*/
-    @Column(columnDefinition = "BINARY(16)",unique = true,updatable = false)
+    \} */
+    @Column(columnDefinition = "BINARY(16)", unique = true, updatable = false)
     /*컬럼타입을 BINARY(16)으로 하지 않으면 공백이 들어가며 원하는 동작이 이루어지지 않는다고 한다.
     @Column 어노테이션을 꼭 사용할 필요는 없으며, DB의 컬럼 타입이 BINARY(16) 이면 된다.
     **UUID 크기 최소화하기
@@ -32,6 +33,6 @@ public class UuidEntity {
     이를 개선하기 위해, CAHR(32)가 아닌 Binary형태로 변환해 BINARY(16)으로 저장하면 크기를 절반으로 줄일 수 있습니다.
     물론, DB에 Binary 타입으로 저장하게 되면, 앞으로 UUID를 조회할 땐 사람이 식별할 수 있는 값으로 변환하는 과정이 필요합니다.*/
     private UUID uuid;
-    /*UUID는 문자열로 구성되므로, 기본 키 값이 숫자일 때와 달리 인덱스를 사용할 때 성능에 영향을 미칠 수 있다.
-    또한, UUID는 고유성을 보장하지만, 순서를 보장하지 않기 때문에 순서에 의존하는 비지니스 로직에서는 추천하지 않음.*/
+    /* UUID는 문자열로 구성되므로, 기본 키 값이 숫자일 때와 달리 인덱스를 사용할 때 성능에 영향을 미칠 수 있다.
+    또한, UUID는 고유성을 보장하지만, 순서를 보장하지 않기 때문에 순서에 의존하는 비지니스 로직에서는 추천하지 않음. */
 }

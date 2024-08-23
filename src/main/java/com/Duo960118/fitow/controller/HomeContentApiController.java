@@ -1,22 +1,22 @@
 package com.Duo960118.fitow.controller;
 
 import com.Duo960118.fitow.entity.HomeContentDto;
-import com.Duo960118.fitow.entity.HomeContentEntity;
-import com.Duo960118.fitow.entity.StatusResponseDto;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.HomeContentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class HomeContentApiController {
@@ -24,13 +24,14 @@ public class HomeContentApiController {
 
     // 홈 컨텐츠 작성
     @PostMapping("/def-cms/home-contents")
-    public ApiResponse<HomeContentDto.HomeContentInfoDto> postHomeContent(@RequestBody HomeContentDto.PostHomeContentRequestDto postHomeContentRequest) {
+    public ApiResponse<HomeContentDto.HomeContentInfoDto> postHomeContent(@Valid @RequestBody HomeContentDto.PostHomeContentRequestDto postHomeContentRequest) {
         return ApiResponse.success(homeContentService.postHomeContent(postHomeContentRequest));
     }
 
     // 홈 컨텐츠 수정
     @PutMapping("/def-cms/home-contents/{uuid}")
-    public ApiResponse<HomeContentDto.HomeContentInfoDto> editHomeContent(@PathVariable("uuid") UUID uuid, @RequestBody HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
+    public ApiResponse<HomeContentDto.HomeContentInfoDto> editHomeContent(@PathVariable("uuid") UUID uuid,
+                                                                          @Valid @RequestBody HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
         editHomeContentRequest.setUuid(uuid);
         return ApiResponse.success(homeContentService.editHomeContent( editHomeContentRequest));
     }
@@ -54,15 +55,16 @@ public class HomeContentApiController {
         return ApiResponse.success(homeContentService.getHomeContentInfo(uuid));
     }
 
-    // 홈 컨텐트 카테고리 enum 요청
-    @GetMapping("/def-cms/home-contents/category-enum")
-    public ApiResponse<HomeContentEntity.HomeContentCategoryEnum[]> getHomeContentCategoryEnums() {
-        return ApiResponse.success(HomeContentEntity.HomeContentCategoryEnum.values());
-    }
-
     // 활성화 된 홈 컨텐츠 조회
     @GetMapping("home-contents")
     public ApiResponse<List<HomeContentDto.HomeContentInfoDto>> getActiveHomeContents() {
         return ApiResponse.success(homeContentService.getActiveHomeContent());
     }
+
+    // 홈 컨텐트 카테고리 enum 요청
+//    @GetMapping("/def-cms/home-contents/category-enum")
+//    public ApiResponse<HomeContentEntity.HomeContentCategoryEnum[]> getHomeContentCategoryEnums() {
+//        return ApiResponse.success(HomeContentEntity.HomeContentCategoryEnum.values());
+//    }
+
 }

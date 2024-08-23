@@ -1,6 +1,10 @@
 package com.Duo960118.fitow.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jdk.jfr.BooleanFlag;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,12 +17,13 @@ public class HomeContentEntity extends TimeStampEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Long homeContentId;
+    @NotNull(message = "{NotNull.isBeingUsed}")
     private Boolean isBeingUsed;
+    @NotNull(message = "{NotNull.homeCategory}")
     private HomeContentCategoryEnum category;
-
     @Column(unique = true)
+    @NotBlank(message = "{NotBlank.content}")
     private String content;
-
     @Embedded
     private UuidEntity uuidEntity;
 
@@ -32,7 +37,7 @@ public class HomeContentEntity extends TimeStampEntity {
     }
 
     public void updateHomeContent(HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
-        this.category = editHomeContentRequest.getCategory();
+        this.category = HomeContentCategoryEnum.fromString(editHomeContentRequest.getCategory());
         this.content = editHomeContentRequest.getContent();
         this.isBeingUsed = editHomeContentRequest.getIsBeingUsed();
     }
@@ -44,6 +49,11 @@ public class HomeContentEntity extends TimeStampEntity {
     public enum HomeContentCategoryEnum {
         HOME_INTRODUCE_1,
         HOME_INTRODUCE_2,
-        HOME_INTRODUCE_3
+        HOME_INTRODUCE_3;
+
+        @JsonCreator
+        public static HomeContentCategoryEnum fromString(String str) {
+            return HomeContentCategoryEnum.valueOf(str);
+        }
     }
 }

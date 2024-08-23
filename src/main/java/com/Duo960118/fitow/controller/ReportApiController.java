@@ -1,8 +1,12 @@
 package com.Duo960118.fitow.controller;
 
+import com.Duo960118.fitow.annotaion.Enum;
+import com.Duo960118.fitow.annotaion.File;
 import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.ReportService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -11,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,9 +25,11 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class ReportApiController {
+public class
+ReportApiController {
     private final ReportService reportService;
 
     // 신고 및 문의 리스트 - 유저
@@ -56,11 +63,11 @@ public class ReportApiController {
 
     // 신고 및 문의 작성
     @PostMapping("reports")
-    public ApiResponse<ReportDto.PostReportResponseDto> postReport(@RequestPart(value = "reportFile", required = false) List<MultipartFile> multipartFile,
-                                                                      @RequestPart(value = "postReportRequestDto") ReportDto.PostReportRequestDto postReportRequest,
+    public ApiResponse<ReportDto.PostReportResponseDto> postReport(@RequestPart(value = "reportFile", required = false) List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5)MultipartFile> multipartFile,
+                                                                   @Valid @RequestPart(value = "postReportRequestDto") ReportDto.PostReportRequestDto postReportRequest,
                                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
         postReportRequest.setEmail(customUserDetails.getUserInfo().getEmail());
-        postReportRequest.setReportStatus(ReportEntity.ReportStatusEnum.TODO);
+        postReportRequest.setReportStatus(ReportEntity.ReportStatusEnum.TODO.toString());
         postReportRequest.setReply("");
         postReportRequest.setReportFiles(multipartFile);
 //        my sql에서 빈문자열로 저장 후 프론트 작업 시 js를 활용해 if(!String)해서 default 문구 지정
@@ -69,24 +76,24 @@ public class ReportApiController {
         return ApiResponse.success(reportService.postReport(postReportRequest));
     }
 
-    // 신고 삭제
+    // 신고 및 문의 삭제
     @DeleteMapping("def-cms/reports/{uuid}")
     public ApiResponse<Object> deleteReport(@PathVariable("uuid") UUID uuid) {
         reportService.deleteReport(uuid);
         return ApiResponse.success(null);
     }
 
-    // 신고 답변
+    // 신고 및 문의 답변
     @PutMapping("def-cms/reports/reply/{uuid}")
     public ApiResponse<ReportDto.ReplyReportResponseDto> replyReport(@PathVariable("uuid") UUID uuid,
-                                                         @RequestPart(value = "replyReportDto") ReportDto.ReplyReportRequestDto replyReportRequest,
-                                                         @RequestPart(value = "replyFiles", required = false) List<MultipartFile> multipartFile) throws IOException {
+                                                         @Valid @RequestPart(value = "replyReportDto") ReportDto.ReplyReportRequestDto replyReportRequest,
+                                                         @RequestPart(value = "replyFiles", required = false) List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5)MultipartFile> multipartFile) throws IOException {
         replyReportRequest.setUuid(uuid);
         replyReportRequest.setReplyFiles(multipartFile);
         return ApiResponse.success(reportService.replyReport(replyReportRequest));
     }
 
-    // 신고 문의 리스트 - 어드민
+    // 신고 및 문의 리스트 - 어드민
     @GetMapping("def-cms/reports")
     public ApiResponse<List<ReportDto.ReportInfoDto>> reports(
             @PageableDefault(page = 0, size = 10, sort = "reportId", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -98,19 +105,19 @@ public class ReportApiController {
         return ApiResponse.success(reportService.getAllReport(pageable));
     }
 
-    // 필터 검색
+    // 신고 및 문의 검색
     @GetMapping("def-cms/reports/search")
     public ApiResponse<Page<ReportDto.ReportInfoDto>> searchReports(
-            @RequestParam(value = "status", required = false) ReportEntity.ReportStatusEnum status,
-            @RequestParam(value = "category", required = false) ReportEntity.ReportCategoryEnum category,
-            @RequestParam(value = "email", required = false) String email,
+            @Enum(enumClass = ReportEntity.ReportStatusEnum.class, message = "{Enum.reportStatus}") @RequestParam(value = "status", required = false) String status,
+            @Enum(enumClass = ReportEntity.ReportCategoryEnum.class, message = "{Enum.reportCategory}") @RequestParam(value = "category", required = false) String category,
+            @Email(message = "{Email.email}") @RequestParam(value = "email", required = false) String email,
             @PageableDefault(page = 0, size = 10, sort = "reportId", direction = Sort.Direction.DESC) Pageable pageable) {
 //            @PageableDefault(page = 0, size = 10, sort = "reportId") Pageable pageable) {
 
         ReportDto.SearchReportRequestDto searchReportRequestDto = ReportDto.SearchReportRequestDto.builder()
-                .reportCategory(category)
+                .reportCategory(category.toString())
                 .email(email)
-                .reportStatus(status)
+                .reportStatus(status.toString())
                 .pageable(pageable)
                 .build();
 

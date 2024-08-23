@@ -5,6 +5,9 @@ import com.Duo960118.fitow.exception.PasswordNotMatchesException;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.response.ErrorResponse;
 import io.jsonwebtoken.io.IOException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -13,8 +16,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -55,6 +60,14 @@ public class GlobalExceptionHandler {
         return ErrorResponse.error(PasswordNotMatchesException.errorCode, ex.getCause());
     }
 
+    // 파일 용량 초과
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ErrorResponse<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        return ErrorResponse.error(ex.getMessage(), ErrorCodeEnum.FILE_SIZE_ERROR, null);
+    }
+
+    // @Valid
+    // Java 꺼
     // request 유효성 검증 예외 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ApiResponse<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -68,6 +81,23 @@ public class GlobalExceptionHandler {
                     .append(":")
                     .append(error.getDefaultMessage())
                     .append("\n");
+        }
+        return ApiResponse.fail(errMessage);
+    }
+
+    // @Validated
+    // Spring 꺼
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ApiResponse<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        StringBuilder errMessage = new StringBuilder();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            errMessage.append("[")
+                    .append(violation.getPropertyPath())
+                    .append("]")
+                    .append(":")
+                    .append(violation.getMessage())
+                    .append("\n");
+//                    .append(Arrays.toString(ex.getStackTrace()));
         }
         return ApiResponse.fail(errMessage);
     }

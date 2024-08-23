@@ -58,7 +58,7 @@ public class UserFacade {
 
     // 닉네임 수정
     @Transactional
-    public UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameDto editNickNameRequest) {
+    public UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameRequestDto editNickNameRequest) {
         UserDto.EditNickNameResponseDto editNickNameResponse = userService.editNickName(editNickNameRequest);
         // 토큰 리프레시
         securityService.syncAuthenticationUser();
@@ -166,7 +166,7 @@ public class UserFacade {
     // 유저 롤 수정
     public UserDto.EditUserRoleResponseDto editUserRole(UserDto.EditUserRoleRequestDto editUserRoleRequest) {
         UserEntity userEntity = userService.findByEmail(editUserRoleRequest.getEmail());
-        userEntity.updateUserRole(editUserRoleRequest.getNewUserRole());
+        userEntity.updateUserRole(UserEntity.UserRoleEnum.fromString(editUserRoleRequest.getNewUserRole()));
 
         securityService.syncAuthenticationUser();
 

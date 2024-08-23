@@ -1,6 +1,10 @@
 package com.Duo960118.fitow.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,13 +33,17 @@ public class NoticeEntity extends TimeStampEntity {
     @Embedded
     private UuidEntity uuidEntity;
 
+    @NotBlank(message = "{NotBlank.title}")
+    @Size(min=5, max=100, message = "{Size.title}")
     private String title;
 
     // mediumtext : ~ 16mb
     // longtext : ~ 4gb
     @Column(columnDefinition = "mediumtext")
+    @NotBlank(message = "{NotBlank.content}")
     private String content;
 
+    @NotNull(message = "{NotBlank.noticeCategory}")
     private NoticeCategoryEnum noticeCategory;
 
     @Builder
@@ -57,12 +65,17 @@ public class NoticeEntity extends TimeStampEntity {
         }
 
         private final String value;
+
+        @JsonCreator
+        public static NoticeCategoryEnum fromValue(String str) {
+            return NoticeCategoryEnum.valueOf(str);
+        }
     }
 
-    public void updateNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest) {
+    public void updateNotice(NoticeDto.EditNoticeRequestDto editNoticeRequest) {
         this.title = editNoticeRequest.getTitle();
         this.content = editNoticeRequest.getContent();
-        this.noticeCategory = editNoticeRequest.getCategory();
+        this.noticeCategory = NoticeCategoryEnum.fromValue(editNoticeRequest.getCategory());
 
         // jpa auditing 기능에 의해 알아서 timeStampEntity의 editAt이 수정됨
     }

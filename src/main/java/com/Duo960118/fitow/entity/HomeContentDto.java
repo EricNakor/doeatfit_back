@@ -1,5 +1,8 @@
 package com.Duo960118.fitow.entity;
 
+import com.Duo960118.fitow.annotaion.Enum;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,19 +31,29 @@ public class HomeContentDto {
         }
     }
 
+    // 홈 컨텐츠 작성 요청
     @Getter
     public static class PostHomeContentRequestDto {
-        private HomeContentEntity.HomeContentCategoryEnum category;
+        @Enum(enumClass =HomeContentEntity.HomeContentCategoryEnum.class, message = "{Enum.homeCategory}")
+        @NotBlank(message = "{NotBlank.homeCategory}")
+        private String category;
+        @NotNull(message = "{NotNull.isBeingUsed}")
         private Boolean isBeingUsed;
+        @NotBlank(message = "{NotBlank.content}")
         private String content;
     }
 
+    // 홈 컨텐츠 수정 요청
     @Getter
     @Setter
     public static class EditHomeContentRequestDto {
         private UUID uuid;
-        private HomeContentEntity.HomeContentCategoryEnum category;
+        @Enum(enumClass =HomeContentEntity.HomeContentCategoryEnum.class, message = "{Enum.homeCategory}")
+        @NotBlank(message = "{Enum.homeCategory}")
+        private String category;
+        @NotNull(message = "{NotNull.isBeingUsed}")
         private Boolean isBeingUsed;
+        @NotBlank(message = "{NotBlank.content}")
         private String content;
     }
 }

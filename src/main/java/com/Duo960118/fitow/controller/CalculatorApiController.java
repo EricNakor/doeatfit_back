@@ -9,13 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @RestController
+@Validated
+@RequiredArgsConstructor
 @RequestMapping("/api/calculate")
 public class CalculatorApiController {
     private final CalculatorService calculatorService;
@@ -24,16 +26,16 @@ public class CalculatorApiController {
     // It represents an HTTP response, allowing you to customize the response status, headers, and body that your API returns to the client
     // ex. HTTP 200 ok + data{ ... }
 
-    // 일일 섭취량 계산
+    // 계산하기_일반 (일일 섭취량 계산)
     @PostMapping("normal")
-    public ApiResponse<CalculatorDto.CalcResponseDto> calculateDailyIntake(@RequestBody CalculatorDto.CalcRequestDto calcRequest, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<CalculatorDto.CalcResponseDto> calculateDailyIntake(@Valid @RequestBody CalculatorDto.CalcRequestDto calcRequest, @AuthenticationPrincipal CustomUserDetails userDetails) {
         calcRequest.setEmail(userDetails.getUsername());
         return ApiResponse.success(calculatorService.calculate(calcRequest));
     }
 
-    // 벤딩, 로딩 계산
+    // 계산하기_고급 (벤딩, 로딩 계산)
     @PostMapping("advanced")
-    public ApiResponse<CalculatorDto.CalcResponseDto> calculateAdvance( @RequestBody CalculatorDto.AdvancedCalcRequestDto calcRequest, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<CalculatorDto.CalcResponseDto> calculateAdvance(@Valid @RequestBody CalculatorDto.AdvancedCalcRequestDto calcRequest, @AuthenticationPrincipal CustomUserDetails userDetails) {
         calcRequest.setEmail(userDetails.getUsername());
         return ApiResponse.success(calculatorService.calculateAdvanced(calcRequest));
     }

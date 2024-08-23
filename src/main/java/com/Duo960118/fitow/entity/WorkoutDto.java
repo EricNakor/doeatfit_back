@@ -1,5 +1,10 @@
 package com.Duo960118.fitow.entity;
 
+import com.Duo960118.fitow.annotaion.Enum;
+import com.Duo960118.fitow.annotaion.File;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,28 +29,79 @@ public class WorkoutDto {
         private String mediaFileName;
     }
 
-    // 운동 작성 및 수정 요청 dto
+    // 운동 작성 요청 dto
     @NoArgsConstructor
     @Getter
     @Setter
     public static class PostWorkoutRequestDto {
+        @Size(min=2, max=30)
+        @NotBlank(message = "{NotBlank.workoutName}")
         private String workoutName;
-        private WorkoutEntity.DifficultyEnum workoutDifficulty;
-        private List<WorkoutEntity.MuscleEnum> agonistMuscles;
-        private List<WorkoutEntity.MuscleEnum> antagonistMuscles;
-        private List<WorkoutEntity.MuscleEnum> synergistMuscles;
-        private List<String> descriptions;
+        @Enum(enumClass = WorkoutEntity.DifficultyEnum.class, message = "올바르지 않은 운동 난이도 enum")
+        @NotBlank(message = "{NotBlank.workoutDifficulty}")
+        private String workoutDifficulty;
+        @NotEmpty(message = "{NotEmpty.agonistMuscles}")
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.agonistMuscles}") String> agonistMuscles;
+        @NotEmpty(message = "{NotEmpty.antagonistMuscles}")
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.synergistMuscles}") String> synergistMuscles;
+        @NotEmpty(message = "{NotEmpty.descriptions}")
+        private List<@NotBlank(message = "{NotBlank.description}") String> descriptions;
         private String mediaFileName;
-        private UUID uuid;
-        private MultipartFile workoutFile;
+        @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)
+        private MultipartFile mediaFile;
 
         // 왜 빌더를 이렇게 해놓았을까?
         @Builder
         public PostWorkoutRequestDto(String workoutName,
-                                     WorkoutEntity.DifficultyEnum workoutDifficulty,
-                                     List<WorkoutEntity.MuscleEnum> agonistMuscles,
-                                     List<WorkoutEntity.MuscleEnum> antagonistMuscles,
-                                     List<WorkoutEntity.MuscleEnum> synergistMuscles,
+                                     String workoutDifficulty,
+                                     List<String> agonistMuscles,
+                                     List<String> antagonistMuscles,
+                                     List<String> synergistMuscles,
+                                     List<String> descriptions,
+                                     String mediaFileName,
+                                     MultipartFile mediaFile) {
+            this.workoutName = workoutName;
+            this.workoutDifficulty = workoutDifficulty;
+            this.agonistMuscles = agonistMuscles;
+            this.antagonistMuscles = antagonistMuscles;
+            this.synergistMuscles = synergistMuscles;
+            this.descriptions = descriptions;
+            this.mediaFileName = mediaFileName;
+            this.mediaFile = mediaFile;
+        }
+    }
+
+    // 운동 작성 및 수정 요청 dto
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class EditWorkoutRequestDto {
+        @Size(min=2, max=30)
+        @NotBlank(message = "{NotBlank.workoutName}")
+        private String workoutName;
+        @Enum(enumClass = WorkoutEntity.DifficultyEnum.class, message = "{Enum.workoutDifficulty}")
+        @NotBlank(message = "{NotBlank.workoutDifficulty}")
+        private String workoutDifficulty;
+        @NotEmpty(message = "{NotEmpty.agonistMuscles}")
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.agonistMuscles}") String> agonistMuscles;
+        @NotEmpty(message = "{NotEmpty.agonistMuscles}")
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.synergistMuscles}") String> synergistMuscles;
+        @NotEmpty(message = "{NotEmpty.descriptions}")
+        private List<@NotBlank(message = "{NotBlank.description}") String> descriptions;
+        private String mediaFileName;
+        @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)
+        private MultipartFile workoutFile;
+        private UUID uuid;
+
+        // 왜 빌더를 이렇게 해놓았을까?
+        @Builder
+        public EditWorkoutRequestDto(String workoutName,
+                                     String workoutDifficulty,
+                                     List<String> agonistMuscles,
+                                     List<String> antagonistMuscles,
+                                     List<String> synergistMuscles,
                                      List<String> descriptions,
                                      String mediaFileName,
                                      UUID uuid,
@@ -62,47 +118,33 @@ public class WorkoutDto {
         }
     }
 
-//    // 운동 작성 응답 dto
-//    @Getter
-//    @RequiredArgsConstructor
-//    @Builder
-//    public static class PostWorkoutResponseDto {
-//        private final UUID uuid;
-//        private final String workoutName;
-//        private final WorkoutEntity.DifficultyEnum workoutDifficulty;
-//        private final Set<WorkoutEntity.MuscleEnum> agonistMuscles;
-//        private final Set<WorkoutEntity.MuscleEnum> antagonistMuscles;
-//        private final Set<WorkoutEntity.MuscleEnum> synergistMuscles;
-//        private final List<String> descriptions;
-//        private final String mediaFileName;
-//    }
 
     // 운동 검색 요청 dto
     @NoArgsConstructor
     @Getter
     public static class SearchWorkoutRequestDto {
-        private List<WorkoutEntity.DifficultyEnum> workoutDifficulties;
+        private List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties;
         private String workoutName;
-        private List<WorkoutEntity.BodyPartEnum> bodyPartEnums;
-        private List<WorkoutEntity.MuscleEnum> agonistMuscleEnums;
-        private List<WorkoutEntity.MuscleEnum> antagonistMuscleEnums;
-        private List<WorkoutEntity.MuscleEnum> synergistMuscleEnums;
+        private List<@Enum(enumClass = WorkoutEntity.BodyPartEnum.class,message = "{Enum.bodyParts}")String> bodyParts;
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.agonistMuscles}")String> agonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.synergistMuscles}")String> synergistMuscles;
 
         @Builder
         public SearchWorkoutRequestDto(
-                List<WorkoutEntity.DifficultyEnum> workoutDifficulties,
+                List<String> workoutDifficulties,
                 String workoutName,
-                List<WorkoutEntity.BodyPartEnum> bodyPartEnums,
-                List<WorkoutEntity.MuscleEnum> agonistMuscleEnums,
-                List<WorkoutEntity.MuscleEnum> antagonistMuscleEnums,
-                List<WorkoutEntity.MuscleEnum> synergistMuscleEnums
+                List<String> bodyParts,
+                List<String> agonistMuscles,
+                List<String> antagonistMuscles,
+                List<String> synergistMuscles
         ) {
             this.workoutDifficulties = workoutDifficulties;
             this.workoutName = workoutName;
-            this.bodyPartEnums = bodyPartEnums;
-            this.agonistMuscleEnums = agonistMuscleEnums;
-            this.antagonistMuscleEnums = antagonistMuscleEnums;
-            this.synergistMuscleEnums = synergistMuscleEnums;
+            this.bodyParts = bodyParts;
+            this.agonistMuscles = agonistMuscles;
+            this.antagonistMuscles = antagonistMuscles;
+            this.synergistMuscles = synergistMuscles;
         }
     }
 }

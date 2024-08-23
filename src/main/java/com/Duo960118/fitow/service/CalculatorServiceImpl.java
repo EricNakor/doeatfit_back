@@ -3,11 +3,8 @@ package com.Duo960118.fitow.service;
 import com.Duo960118.fitow.entity.*;
 import com.Duo960118.fitow.mapper.CalculatorMapper;
 import com.Duo960118.fitow.repository.CalculatorRepository;
-import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +31,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     // 유지 칼로리
     public double calcStandardDiet(CalculatorDto.CalcRequestDto calcRequest) {
         double result = 0.0;
-        switch (calcRequest.getActivityLevel()) {
+        switch (CalculatorEntity.ActivityLevelEnum.fromString(calcRequest.getActivityLevel())) {
             case VERY_LOW -> result = calcRequest.getBmr() * 1.2;
             case LOW -> result = calcRequest.getBmr() * 1.375;
             case NORMAL -> result = calcRequest.getBmr() * 1.55;
@@ -48,7 +45,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     public double calcGoalDiet(CalculatorDto.CalcRequestDto calcRequest) {
         double calcStandDiet = calcStandardDiet(calcRequest);
         double result = 0.0;
-        switch (calcRequest.getDietGoal()) {
+        switch (CalculatorEntity.DietGoalEnum.fromString(calcRequest.getDietGoal())) {
             case HIGH_LOSS -> result = calcStandDiet * 0.8;
             case LOSS -> result = calcStandDiet * 0.9;
             case KEEP -> result = calcStandDiet;
@@ -66,7 +63,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         // bmr 값이 없을 때
         // todo: front에서 bmr값 안적으면 0 으로 넣어서 보내기
         if (calcRequest.getBmr() == 0) {
-            int bmr = calculateGenderBmr(calcRequest.getAge(), calcRequest.getGender(), calcRequest.getWeight(), calcRequest.getHeight());
+            int bmr = calculateGenderBmr(calcRequest.getAge(), GenderEnum.fromString(calcRequest.getGender()), calcRequest.getWeight(), calcRequest.getHeight());
             calcRequest.setBmr(bmr);
         }
         double goalDiet = calcGoalDiet(calcRequest);
@@ -76,16 +73,16 @@ public class CalculatorServiceImpl implements CalculatorService {
         double fat = (goalDiet * 0.2) / 9;
 
         // 저장할 데이터 빌드
-        CalculateInfoEntity normalCalcEntity = CalculateInfoEntity.builder()
+        CalculatorEntity normalCalcEntity = CalculatorEntity.builder()
                 .userEntity(userEntity)
-                .calcCategory(CalculateInfoEntity.calcCategoryEnum.NORMAL)
+                .calcCategory(CalculatorEntity.CalcCategoryEnum.NORMAL)
                 .age(calcRequest.getAge())
-                .gender(calcRequest.getGender())
+                .gender(GenderEnum.fromString(calcRequest.getGender()))
                 .height(calcRequest.getHeight())
                 .weight(calcRequest.getWeight())
                 .bmr(calcRequest.getBmr())
-                .activityLevel(calcRequest.getActivityLevel())
-                .dietGoal(calcRequest.getDietGoal())
+                .activityLevel(CalculatorEntity.ActivityLevelEnum.fromString(calcRequest.getActivityLevel()))
+                .dietGoal(CalculatorEntity.DietGoalEnum.fromString(calcRequest.getDietGoal()))
                 .carb(carb)
                 .protein(protein)
                 .fat(fat)
@@ -102,10 +99,10 @@ public class CalculatorServiceImpl implements CalculatorService {
     public CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest ) {
         UserEntity userEntity = userService.findByEmail(calcRequest.getEmail());
         // 예외: 존재하지 않는 계산 결과
-        CalculateInfoEntity calculateEntity = calculatorRepository.findByUuidEntityUuid(calcRequest.getUuid()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 계산 결과" + calcRequest.getUuid()));
+        CalculatorEntity calculateEntity = calculatorRepository.findByUuidEntityUuid(calcRequest.getUuid()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 계산 결과" + calcRequest.getUuid()));
 
         double advancedCarb, advancedProtein, advancedFat;
-        switch (calcRequest.getCalcCategory()) {
+        switch (CalculatorEntity.CalcCategoryEnum.fromString(calcRequest.getCalcCategory())) {
             case LOADING:
                 advancedCarb = calculateEntity.getCarb() * 2;
                 advancedProtein = 0;
@@ -122,9 +119,9 @@ public class CalculatorServiceImpl implements CalculatorService {
         }
 
         // 저장할 데이터 빌드
-        CalculateInfoEntity advancedCalcEntity = CalculateInfoEntity.builder()
+        CalculatorEntity advancedCalcEntity = CalculatorEntity.builder()
                 .userEntity(userEntity)
-                .calcCategory(calcRequest.getCalcCategory())
+                .calcCategory(CalculatorEntity.CalcCategoryEnum.fromString(calcRequest.getCalcCategory()))
                 .age(calculateEntity.getAge())
                 .gender(calculateEntity.getGender())
                 .height(calculateEntity.getHeight())
@@ -146,7 +143,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     @Override
     public CalculatorDto.CalcResultDto getCalcResult(UUID uuid) {
         // 예외: 존재하지 않는 계산결과
-        CalculateInfoEntity calculatorEntity = calculatorRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new NoSuchElementException("존재하지 않는 계산결과 " + uuid));
+        CalculatorEntity calculatorEntity = calculatorRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new NoSuchElementException("존재하지 않는 계산결과 " + uuid));
 
         return CalculatorMapper.entityToCalcResultDto(calculatorEntity);
     }
@@ -174,7 +171,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     @Override
     public List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto) {
         UserEntity userEntity = userService.findByEmail(resultListPageDto.getEmail());
-        Page<CalculateInfoEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculateInfoEntity.calcCategoryEnum.NORMAL, resultListPageDto.getPageable());
+        Page<CalculatorEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculatorEntity.CalcCategoryEnum.NORMAL, resultListPageDto.getPageable());
         return calculateInfoEntity
                 .stream()
                 .map(CalculatorMapper::entityToCalcResultDto)
@@ -185,11 +182,11 @@ public class CalculatorServiceImpl implements CalculatorService {
     @Override
     @Transactional
     public void updateForeignKeysNull(Long userId){
-        List<CalculateInfoEntity> calculateInfoEntities = calculatorRepository.findAllByUserEntityUserId(userId);
+        List<CalculatorEntity> calculateInfoEntities = calculatorRepository.findAllByUserEntityUserId(userId);
 
         // 외래 키를 null로 설정
-        for (CalculateInfoEntity calculateInfoEntity : calculateInfoEntities) {
-            calculateInfoEntity.updateUserEntity(null);
+        for (CalculatorEntity calculatorEntity : calculateInfoEntities) {
+            calculatorEntity.updateUserEntity(null);
         }
     }
 }

@@ -36,7 +36,7 @@ public class SecurityConfig {
     public static final String FAVICON = "/favicon.ico";
     public static final String[] JS = {"/js/**"};
     public static final String[] ERROR = {"/error"};
-    public static final String[] API = {"/api/home-contents","/api/users/join","/api/def-cms/users"};
+    public static final String[] API = {"/api/home-contents","/api/users/join","/api/def-cms/users","/api/users/find/**"};
 
     // 인증이 필요없는 url
     public static final String[] NO_AUTH_PATHS = {"/", "/login", "/find/**", "/join", "/notices/**", "/workouts/**", "/test"};

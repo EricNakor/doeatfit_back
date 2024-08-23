@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
@@ -31,11 +32,11 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .select(workoutEntity)
                 .from(workoutEntity)
                 .where(containsWorkoutName(searchWorkoutRequest.getWorkoutName()))
-                .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties()))
-                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscleEnums()))
-                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscleEnums()))
-                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscleEnums()))
-                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyPartEnums()))
+                .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties().stream().map(WorkoutEntity.DifficultyEnum::fromString).collect(Collectors.toList())))
+                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyParts().stream().map(WorkoutEntity.BodyPartEnum::fromString).collect(Collectors.toList())))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -58,12 +59,11 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
         return queryFactory
                 .select(workoutEntity.count())
                 .from(workoutEntity)
-                .where(containsWorkoutName(searchWorkoutRequest.getWorkoutName()))
-                .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties()))
-                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscleEnums()))
-                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscleEnums()))
-                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscleEnums()))
-                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyPartEnums()));
+                .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties().stream().map(WorkoutEntity.DifficultyEnum::fromString).collect(Collectors.toList())))
+                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyParts().stream().map(WorkoutEntity.BodyPartEnum::fromString).collect(Collectors.toList())));
     }
 
     // BooleanExpression은 null 반환 시 자동으로 조건절에서 제거 된다.

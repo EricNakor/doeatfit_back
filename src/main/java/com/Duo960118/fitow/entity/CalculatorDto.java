@@ -1,5 +1,7 @@
 package com.Duo960118.fitow.entity;
 
+import com.Duo960118.fitow.annotaion.Enum;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.data.domain.Pageable;
 
@@ -13,19 +15,44 @@ public class CalculatorDto {
     @Setter
     @NoArgsConstructor
     public static class CalcRequestDto {
+        @Email(message = "{Email.email}")
+        @NotBlank(message = "{NotBlank.email}")
         private String email;
+        @PositiveOrZero(message = "{PositiveOrZero.age}")
+        @NotNull(message = "{NotNull.age}")
+        @Max(value = 150, message = "{Max.age}")
         private int age;
-        private GenderEnum gender;
+        @Enum(enumClass = GenderEnum.class, message = "{Enum.gender}")
+        @NotBlank(message = "{NotBlank.gender}")
+        private String gender;
+        @Positive(message = "{Positive.height}")
+        @NotNull(message = "{NotNull.height}")
+        @Max(value = 250, message = "{Max.height}")
         private float height;
+        @Positive(message = "{Positive.weight}")
+        @NotNull(message = "{NotNull.weight}")
+        @Max(value = 999, message = "{Max.weight}")
         private float weight;
+        @Positive(message = "{Positive.bmr}")
+        @Max(value = 4000, message = "{Max.bmr}")
         private int bmr;
-        private CalculateInfoEntity.activityLevelEnum activityLevel;
-        private CalculateInfoEntity.dietGoalEnum dietGoal;
-        private CalculateInfoEntity.calcCategoryEnum calcCategory;
+        @Enum(enumClass = CalculatorEntity.ActivityLevelEnum.class, message = "{Enum.activityLevel}")
+        @NotBlank(message = "{NotBlank.activityLevel}")
+        private String activityLevel;
+        // private CalculateInfoEntity.ActivityLevelEnum activityLevel;
+        // enum validation annotation 을 사용하기 위해
+        // DTO 내에서 String 으로 받아와야 Valid 에서 비교가 가능
+        @Enum(enumClass = CalculatorEntity.DietGoalEnum.class, message = "{Enum.dietGoal}")
+        @NotBlank(message = "{NotBlank.dietGoal}")
+        private String dietGoal;
+        @Enum(enumClass = CalculatorEntity.CalcCategoryEnum.class, message = "{Enum.calcCategory}")
+        @NotBlank(message = "{NotBlank.calcCategory}")
+        private String calcCategory;
     }
 
     // 계산 결과
-    public record CalcResponseDto(UUID uuid, double carb, double protein, double fat){}
+    public record CalcResponseDto(UUID uuid, double carb, double protein, double fat) {
+    }
 //    @Getter
 //    @RequiredArgsConstructor
 //    public static class CalcResponseDto {
@@ -50,35 +77,40 @@ public class CalculatorDto {
         private final float height;
         private final float weight;
         private final int bmr;
-        private final CalculateInfoEntity.activityLevelEnum activityLevel;
-        private final CalculateInfoEntity.dietGoalEnum dietGoal;
+        private final String activityLevel;
+        private final String dietGoal;
         private final double carb;
         private final double protein;
         private final double fat;
         private final LocalDate calcDate;
-        private final CalculateInfoEntity.calcCategoryEnum calcCategory;
+        private final String calcCategory;
     }
 
     // 로딩, 벤딩 계산값 입력 리스트
-    @Getter
-    @RequiredArgsConstructor
-    public static class AdvancedCalcListDto {
-        private final UUID uuid;
-        private final double carb;
-        private final double protein;
-        private final double fat;
-        private final int bmr;
-        private final LocalDate calcDate;
-    }
+//    @Getter
+//    @RequiredArgsConstructor
+//    public static class AdvancedCalcListDto {
+//        private final UUID uuid;
+//        private final double carb;
+//        private final double protein;
+//        private final double fat;
+//        private final int bmr;
+//        private final LocalDate calcDate;
+//    }
 
-    // 고급 계산 DTO
+    // 고급 계산 요청
     @Getter
     @Setter
     @AllArgsConstructor
     public static class AdvancedCalcRequestDto {
+        @Email(message = "{Email.email}")
+        @NotBlank(message = "{NotBlank.email}")
         private String email;
+        @NotNull(message = "{NotNull.uuid}")
         private final UUID uuid;
-        private CalculateInfoEntity.calcCategoryEnum calcCategory;
+        @Enum(enumClass = CalculatorEntity.CalcCategoryEnum.class, message = "{Enum.calcCategory}")
+        @NotBlank(message = "{NotBlank.calcCategory}")
+        private String calcCategory;
     }
 
     // 계산 결과 페이징 DTO

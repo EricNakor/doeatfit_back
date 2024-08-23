@@ -17,7 +17,9 @@ public enum ErrorCodeEnum {
     FORBIDDEN_REQUEST(HttpServletResponse.SC_FORBIDDEN, "ADMIN 회원만 접근할 수 있습니다."),
     PASSWORD_MISMATCH(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"비밀번호가 일치하지 않습니다."),
     MAIL_ERROR(1000,"메일을 보내는데 문제가 생겼습니다."),
-    IO_ERROR(1001,"파일 입출력에 문제가 생겼습니다");
+    IO_ERROR(1001,"파일 입출력에 문제가 생겼습니다"),
+    FILE_SIZE_ERROR(1002,"파일 사이즈는 50mb 이하만 지원합니다."),
+    TEST_ERROR(9999,"테스트");
 
     private final int code;
     private final String message;

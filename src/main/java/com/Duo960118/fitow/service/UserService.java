@@ -24,7 +24,7 @@ public interface UserService {
 
     // 이메일 찾기
     @Transactional
-    UserDto.EmailListDto findEmail(UserDto.FindEmailRequestDto findEmailRequest);
+    UserDto.EmailListResponseDto findEmail(UserDto.FindEmailRequestDto findEmailRequest);
 
     // 가입정보 찾기
     @Transactional
@@ -32,11 +32,11 @@ public interface UserService {
 
     // 이메일 중복확인
     @Transactional
-    UserDto.CheckDuplicateDto checkEmail(UserDto.CheckEmailRequestDto checkEmailRequest);
+    UserDto.CheckDuplicateResponseDto checkEmail(UserDto.CheckEmailRequestDto checkEmailRequest);
 
     // 닉네임 중복확인
     @Transactional
-    UserDto.CheckDuplicateDto checkNickName(UserDto.CheckNickNameRequestDto checkNickNameRequest);
+    UserDto.CheckDuplicateResponseDto checkNickName(UserDto.CheckNickNameRequestDto checkNickNameRequest);
 
     // 비밀번호 수정
     @Transactional
@@ -44,7 +44,7 @@ public interface UserService {
 
     // 닉네임 수정
     @Transactional
-    UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameDto editNickNameRequest);
+    UserDto.EditNickNameResponseDto editNickName(UserDto.EditNickNameRequestDto editNickNameRequest);
 
     // 프로필 이미지 이름 수정
     @Transactional

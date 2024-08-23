@@ -1,23 +1,30 @@
 package com.Duo960118.fitow.controller;
 
+import com.Duo960118.fitow.annotaion.Enum;
 import com.Duo960118.fitow.entity.CustomUserDetails;
 import com.Duo960118.fitow.entity.NoticeDto;
 import com.Duo960118.fitow.entity.NoticeEntity;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.NoticeService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+
 @RestController
+@Validated
 @RequiredArgsConstructor
-@RequestMapping("api")
+@RequestMapping("/api")
 public class NoticeApiController {
     private final NoticeService noticeService;
 
@@ -40,7 +47,9 @@ public class NoticeApiController {
 
     // 공지 검색
     @GetMapping("notices/search")
-    public ApiResponse<List<NoticeDto.NoticeInfoDto>> searchNotice(@RequestParam("noticeCategory") NoticeEntity.NoticeCategoryEnum noticeCategory, @RequestParam("searchString") String searchString) {
+    public ApiResponse<List<NoticeDto.NoticeInfoDto>> searchNotice(@Enum(enumClass = NoticeEntity.NoticeCategoryEnum.class, message = "{Enum.noticeCategory}")
+                                                                       @NotBlank(message = "{NotBlank.noticeCategory}") @RequestParam("noticeCategory") String noticeCategory,
+                                                                   @NotBlank(message = "{NotBlank.searchString}") @Size(min=5, max=100,message = "{Size.searchString}") @RequestParam("searchString") String searchString) {
         NoticeDto.SearchNoticeRequestDto searchNoticeRequestDto = NoticeDto.SearchNoticeRequestDto.builder()
                 .searchString(searchString)
                 .category(noticeCategory).build();
@@ -49,7 +58,8 @@ public class NoticeApiController {
 
     // 공지 작성
     @PostMapping("def-cms/notices")
-    public ApiResponse<NoticeDto.PostNoticeResponseDto> postNotice(@RequestBody NoticeDto.PostNoticeRequestDto postNoticeRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ApiResponse<NoticeDto.PostNoticeResponseDto> postNotice(@Valid @RequestBody NoticeDto.PostNoticeRequestDto postNoticeRequest,
+                                                                   @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         postNoticeRequest.setNickName(customUserDetails.getUserInfo().getNickName());
         return ApiResponse.success(new NoticeDto.PostNoticeResponseDto(noticeService.postNotice(postNoticeRequest)));
     }
@@ -64,13 +74,14 @@ public class NoticeApiController {
     // 공지 수정
     // todo: security config에 admin 권한 확인 필요
     @PutMapping("def-cms/notices/{uuid}")
-    public ApiResponse<Object> editNotice(@PathVariable("uuid") UUID uuid, @RequestBody NoticeDto.PostNoticeRequestDto editNoticeRequest) {
+    public ApiResponse<Object> editNotice(@PathVariable("uuid") UUID uuid,
+                                          @Valid @RequestBody NoticeDto.EditNoticeRequestDto editNoticeRequest) {
         editNoticeRequest.setUuid(uuid);
         noticeService.editNotice(editNoticeRequest);
         return ApiResponse.success(null);
     }
 
-    // 공지 자세히 보기
+    // 공지 한개 조회
     // @PathVariable 이란?
     //
     // 경로 변수를 표시하기 위해 메서드에 매개변수에 사용된다.

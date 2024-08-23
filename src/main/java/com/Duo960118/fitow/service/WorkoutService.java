@@ -22,7 +22,7 @@ public interface WorkoutService {
 
     // 운동 수정
     @Transactional
-    WorkoutDto.WorkoutDetailDto editWorkout(WorkoutDto.PostWorkoutRequestDto postWorkoutRequest);
+    WorkoutDto.WorkoutDetailDto editWorkout(WorkoutDto.EditWorkoutRequestDto postWorkoutRequest);
     
     // 운동 추가
     @Transactional

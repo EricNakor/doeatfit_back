@@ -59,11 +59,11 @@ public class ReportServiceImpl implements ReportService {
         }
 
         ReportEntity reportEntity = ReportEntity.builder()
-                .reportCategory(postReportRequest.getReportCategory())
+                .reportCategory(ReportEntity.ReportCategoryEnum.fromString(postReportRequest.getReportCategory()))
                 .title(postReportRequest.getTitle())
                 .userEntity(userService.findByEmail(postReportRequest.getEmail()))
                 .content(postReportRequest.getContent())
-                .reportStatus(postReportRequest.getReportStatus())
+                .reportStatus(ReportEntity.ReportStatusEnum.fromString(postReportRequest.getReportStatus()))
                 .reply(postReportRequest.getReply())
                 .reportFiles(postReportRequest.getReportFileNames())
                 .build();
@@ -147,7 +147,7 @@ public class ReportServiceImpl implements ReportService {
             replyReportRequest.setReplyFileNames(replyFileNameList);
         }
         reportEntity.replyReport(replyReportRequest);
-        return new ReportDto.ReplyReportResponseDto(replyReportRequest.getReportStatus(), replyReportRequest.getReply(), replyReportRequest.getReplyFileNames());
+        return new ReportDto.ReplyReportResponseDto(ReportEntity.ReportStatusEnum.fromString(replyReportRequest.getReportStatus()), replyReportRequest.getReply(), replyReportRequest.getReplyFileNames());
     }
 
     // Status 검색 (filter)

@@ -1,7 +1,11 @@
 package com.Duo960118.fitow.entity;
 
 
+import com.Duo960118.fitow.annotaion.Nickname;
+import com.Duo960118.fitow.annotaion.Password;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,17 +36,33 @@ public class UserEntity {
     @Column(updatable = false)
     private Long userId;
     @Column(unique = true)
+    @Email(message = "{Email.email}")
+    @NotBlank(message = "{NotBlank.email}")
     private String email;
+//    @Pattern(message = "비밀번호 형식이 올바르지 않습니다.",
+//            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]+$")
+//    @Password
+    // 인코딩 된 비밀번호가 들어가서 유효성 검증 X
+    @NotBlank(message = "{NotBlank.passwd}")
     private String passwd;
+    @NotBlank(message = "{NotBlank.name}")
+    @Size(min=2,max=70,message = "{Size.name}")
     private String name;
     @Column(unique = true)
+    @NotBlank(message = "{NotBlank.nickName}")
+    @Nickname
     private String nickName;
+    @NotNull(message = "{NotNull.gender}")
     private GenderEnum gender;
+    @PastOrPresent(message = "{PastOrPresent.birth}")
+    @NotNull(message = "{NotNull.birth}")
     private LocalDate birth;
     private String profileImg;
+    @NotNull(message = "{NotNull.role}")
     private UserRoleEnum role;
     @CreatedDate
     private LocalDate joinDate;
+    @PastOrPresent(message = "{PastOrPresent.passwdEditDate}")
     private LocalDate passwdEditDate;
 
     // 최초 가입 시 가입 일자 = 비밀번호 수정 일자
@@ -99,5 +119,10 @@ public class UserEntity {
         }
 
         private final String value;
+
+        @JsonCreator
+        public static UserRoleEnum fromString(String str) {
+            return UserRoleEnum.valueOf(str);
+        }
     }
 }

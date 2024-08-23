@@ -25,8 +25,8 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
         List<ReportEntity> fetch = queryFactory
                 .select(reportEntity)
                 .from(reportEntity)
-                .where(eqReportStatus(searchReportRequestDto.getReportStatus()))
-                .where(eqReportCategory(searchReportRequestDto.getReportCategory()))
+                .where(eqReportStatus(ReportEntity.ReportStatusEnum.fromString(searchReportRequestDto.getReportStatus())))
+                .where(eqReportCategory(ReportEntity.ReportCategoryEnum.fromString(searchReportRequestDto.getReportCategory())))
                 .where(containsEmail(searchReportRequestDto.getEmail()))
                 .offset(searchReportRequestDto.getPageable().getOffset())
                 .limit(searchReportRequestDto.getPageable().getPageSize())
@@ -35,7 +35,7 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
         // TODO : apiController 에서 sort direction desc 로 했으나 적용되지 않아 QueryDSL orderBy 추가로 해결했는데,
         //  apiController 의 PageableDefault 는 왜 작동하지 않는지 알아보자
 
-        JPAQuery<Long> countQuery = getCount(searchReportRequestDto.getReportStatus(), searchReportRequestDto.getReportCategory(), searchReportRequestDto.getEmail() );
+        JPAQuery<Long> countQuery = getCount(ReportEntity.ReportStatusEnum.fromString(searchReportRequestDto.getReportStatus()), ReportEntity.ReportCategoryEnum.fromString(searchReportRequestDto.getReportCategory()), searchReportRequestDto.getEmail() );
 
         return PageableExecutionUtils.getPage(fetch, searchReportRequestDto.getPageable(), countQuery::fetchOne);
     }

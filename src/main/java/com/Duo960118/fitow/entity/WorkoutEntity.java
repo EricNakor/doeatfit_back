@@ -233,11 +233,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -254,22 +260,30 @@ public class WorkoutEntity extends TimeStampEntity {
 
     // 운동 이름
     @Column(unique = true)
+    @Size(min=2, max=30,message = "{Size.workoutName}")
+    @NotBlank(message="{NotBlank.workoutName}")
     private String workoutName;
 
     // 운동 난이도
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "{NotNull.workoutDifficulty}")
     private DifficultyEnum workoutDifficulty;
 
     // 주동근
     @ElementCollection
     @CollectionTable(name = "AGONIST_MUSCLE_ENUMS", joinColumns = @JoinColumn(name = "WORKOUT_ID"))
     @Enumerated(EnumType.STRING)
+    @NotEmpty(message = "{NotEmpty.agonistMuscleEnums}")
     private Set<MuscleEnum> agonistMuscleEnums;
+    // 허용되는 범위
+    // NotNull :  {}, {muscle_1,....}
+    // NotEmpty : {muscle_1,...}
 
     // 길항근
     @ElementCollection
     @CollectionTable(name = "ANTAGONIST_MUSCLE_ENUMS", joinColumns = @JoinColumn(name = "WORKOUT_ID"))
-        @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
+    @NotEmpty(message = "{NotEmpty.antagonistMuscleEnums}")
     private Set<MuscleEnum> antagonistMuscleEnums;
 
     // 협응근
@@ -281,9 +295,11 @@ public class WorkoutEntity extends TimeStampEntity {
     // 운동 설명
     @ElementCollection
     @CollectionTable(name = "DESCRIPTIONS", joinColumns = @JoinColumn(name = "WORKOUT_ID"))
-    private List<String> descriptions;
+    @NotEmpty(message = "{NotEmpty.descriptions}")
+    private List<@NotBlank(message = "{NotBlank.description}") String> descriptions;
 
     // 영상 경로 or 외부 영상 링크
+    @NotBlank(message = "{NotBlank.mediaFileName}")
     private String mediaFileName;
 
     @Builder
@@ -297,12 +313,12 @@ public class WorkoutEntity extends TimeStampEntity {
         this.mediaFileName = mediaFileName;
     }
 
-    public void updateWorkoutEntity(WorkoutDto.PostWorkoutRequestDto editWorkoutRequest) {
+    public void updateWorkoutEntity(WorkoutDto.EditWorkoutRequestDto editWorkoutRequest) {
         this.workoutName = editWorkoutRequest.getWorkoutName();
-        this.workoutDifficulty = editWorkoutRequest.getWorkoutDifficulty();
-        this.agonistMuscleEnums = new HashSet<>(editWorkoutRequest.getAgonistMuscles());
-        this.antagonistMuscleEnums = new HashSet<>(editWorkoutRequest.getAntagonistMuscles());
-        this.synergistMuscleEnums = new HashSet<>(editWorkoutRequest.getSynergistMuscles());
+        this.workoutDifficulty = DifficultyEnum.valueOf(editWorkoutRequest.getWorkoutDifficulty());
+        this.agonistMuscleEnums = editWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet());
+        this.antagonistMuscleEnums = editWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet());
+        this.synergistMuscleEnums = editWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet());
         this.descriptions = editWorkoutRequest.getDescriptions();
         this.mediaFileName = editWorkoutRequest.getMediaFileName();
     }

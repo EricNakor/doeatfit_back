@@ -11,10 +11,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +39,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     }
 
     @Override
-    public WorkoutDto.WorkoutDetailDto  editWorkout(WorkoutDto.PostWorkoutRequestDto editWorkoutRequest) {
+    public WorkoutDto.WorkoutDetailDto  editWorkout(WorkoutDto.EditWorkoutRequestDto editWorkoutRequest) {
         WorkoutEntity workoutEntity = workoutRepository.findByUuidEntityUuid(editWorkoutRequest.getUuid()).orElseThrow(() -> new RuntimeException("해당 운동이 존재하지 않습니다."));
 
         // 파일명 추출
@@ -73,8 +71,8 @@ public class WorkoutServiceImpl implements WorkoutService {
 
         String workoutMediaFileName="";
         // 파일명 추출
-        if (postWorkoutRequest.getWorkoutFile() != null) {
-            String fileName = postWorkoutRequest.getWorkoutFile() .getOriginalFilename();
+        if (postWorkoutRequest.getMediaFile() != null) {
+            String fileName = postWorkoutRequest.getMediaFile() .getOriginalFilename();
             // 확장자 추출
             String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
             workoutMediaFileName = UUID.randomUUID()+ fileExt;
@@ -82,7 +80,7 @@ public class WorkoutServiceImpl implements WorkoutService {
             // 지정된 경로에 저장
             File file = new File(workoutMediaDir + File.separator + workoutMediaFileName);
             try {
-                postWorkoutRequest.getWorkoutFile() .transferTo(file);
+                postWorkoutRequest.getMediaFile() .transferTo(file);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to save media file", e);
             }
@@ -90,10 +88,10 @@ public class WorkoutServiceImpl implements WorkoutService {
 
         WorkoutEntity workoutEntity = WorkoutEntity.builder()
                 .workoutName(postWorkoutRequest.getWorkoutName())
-                .workoutDifficulty(postWorkoutRequest.getWorkoutDifficulty())
-                .agonistMuscle(new HashSet<>(postWorkoutRequest.getAgonistMuscles()))
-                .antagonistMuscle(new HashSet<>(postWorkoutRequest.getAntagonistMuscles()))
-                .synergistMuscle(new HashSet<>(postWorkoutRequest.getSynergistMuscles()))
+                .workoutDifficulty(WorkoutEntity.DifficultyEnum.valueOf(postWorkoutRequest.getWorkoutDifficulty()))
+                .agonistMuscle(postWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet()))
+                .antagonistMuscle(postWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet()))
+                .synergistMuscle(postWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet()))
                 .descriptions(postWorkoutRequest.getDescriptions())
                 .mediaFileName(workoutMediaFileName)
                 .build();

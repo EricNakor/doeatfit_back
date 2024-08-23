@@ -18,7 +18,7 @@ public interface NoticeService {
     
     // Notice 수정
     @Transactional
-    void editNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest );
+    void editNotice(NoticeDto.EditNoticeRequestDto editNoticeRequest );
 
     // notice 세부 사항
     @Transactional

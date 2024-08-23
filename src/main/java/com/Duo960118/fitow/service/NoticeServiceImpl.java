@@ -23,13 +23,14 @@ public class NoticeServiceImpl implements NoticeService {
     private final NoticeRepository noticeRepository;
     private final UserService userService;
 
+    // 공지 작성
     @Override
     public UUID postNotice(NoticeDto.PostNoticeRequestDto postNoticeRequest) {
         NoticeEntity noticeEntity = NoticeEntity.builder()
                 .userEntity(userService.findByNickName(postNoticeRequest.getNickName()))
                 .title(postNoticeRequest.getTitle())
                 .content(postNoticeRequest.getContent())
-                .noticeCategory(postNoticeRequest.getCategory())
+                .noticeCategory(NoticeEntity.NoticeCategoryEnum.fromValue(postNoticeRequest.getCategory()))
                 .build();
         this.noticeRepository.save(noticeEntity);
         return noticeEntity.getUuidEntity().getUuid();
@@ -42,7 +43,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public void editNotice(NoticeDto.PostNoticeRequestDto editNoticeRequest) {
+    public void editNotice(NoticeDto.EditNoticeRequestDto editNoticeRequest) {
         // 예외: 존재하지 않는 게시물
         NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(editNoticeRequest.getUuid()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시물"+editNoticeRequest.getUuid()));
         noticeEntity.updateNotice(editNoticeRequest);
@@ -55,8 +56,9 @@ public class NoticeServiceImpl implements NoticeService {
 
         String nickName = noticeEntity.getUserEntity().getNickName();
 
-        return new NoticeDto.NoticeDetailDto(noticeEntity.getUuidEntity().getUuid(),noticeEntity.getTitle(), noticeEntity.getContent(), noticeEntity.getNoticeCategory()
-                ,nickName, noticeEntity.getCreatedAt(), noticeEntity.getEditedAt());
+        return new NoticeDto.NoticeDetailDto(noticeEntity.getUuidEntity().getUuid(),noticeEntity.getTitle(),
+                noticeEntity.getContent(), noticeEntity.getNoticeCategory(),
+                nickName, noticeEntity.getCreatedAt(), noticeEntity.getEditedAt());
     }
 
     // stream?
@@ -65,7 +67,9 @@ public class NoticeServiceImpl implements NoticeService {
     // 스트림은 데이터 소스를 추상화하고, 데이터를 다루는데 자주 사용되는 메소드를 정의해 놓아서 데이터 소스에 상관없이 모두 같은 방식으로 다룰 수 있으므로 코드의 재사용성이 높아진다.
     @Override
     public List<NoticeDto.NoticeInfoDto>searchNotice(NoticeDto.SearchNoticeRequestDto searchNoticeRequest) {
-        return noticeRepository.findByNoticeCategoryAndTitleContaining(searchNoticeRequest.getCategory(), searchNoticeRequest.getSearchString()).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+        return noticeRepository.findByNoticeCategoryAndTitleContaining(
+                NoticeEntity.NoticeCategoryEnum.fromValue(searchNoticeRequest.getCategory()),
+                searchNoticeRequest.getSearchString()).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
     }
 
 //    @Override

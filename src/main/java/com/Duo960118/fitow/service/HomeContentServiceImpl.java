@@ -30,7 +30,7 @@ public class HomeContentServiceImpl implements HomeContentService {
 
     @Override
     public HomeContentDto.HomeContentInfoDto postHomeContent(HomeContentDto.PostHomeContentRequestDto postHomeContentRequest) {
-        List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(postHomeContentRequest.getCategory());
+        List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(HomeContentEntity.HomeContentCategoryEnum.fromString(postHomeContentRequest.getCategory()));
 
         if (postHomeContentRequest.getIsBeingUsed()) {
             // category 같은 모든 엔티티`isBeingUsed` 값을 `false`로
@@ -40,7 +40,7 @@ public class HomeContentServiceImpl implements HomeContentService {
         }
 
         HomeContentEntity homeContentEntity = HomeContentEntity.builder()
-                .category(postHomeContentRequest.getCategory())
+                .category(HomeContentEntity.HomeContentCategoryEnum.fromString(postHomeContentRequest.getCategory()))
                 .isBeingUsed(postHomeContentRequest.getIsBeingUsed())
                 .content(postHomeContentRequest.getContent())
                 .build();
@@ -52,7 +52,7 @@ public class HomeContentServiceImpl implements HomeContentService {
     @Override
     public HomeContentDto.HomeContentInfoDto editHomeContent( HomeContentDto.EditHomeContentRequestDto editHomeContentRequest) {
         if (editHomeContentRequest.getIsBeingUsed()) {
-            List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(editHomeContentRequest.getCategory());
+            List<HomeContentEntity> homeContentEntities = homeContentRepository.findByCategory(HomeContentEntity.HomeContentCategoryEnum.fromString(editHomeContentRequest.getCategory()));
 
             // 만약 빈 리스트라면 아무것도 안함
             // 모든 엔티티`isBeingUsed` 값을 `false`로

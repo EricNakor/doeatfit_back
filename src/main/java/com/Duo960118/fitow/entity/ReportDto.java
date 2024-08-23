@@ -1,5 +1,8 @@
 package com.Duo960118.fitow.entity;
 
+import com.Duo960118.fitow.annotaion.Enum;
+import com.Duo960118.fitow.annotaion.File;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,14 +17,20 @@ public class ReportDto {
     @Setter
     @NoArgsConstructor
     public static class PostReportRequestDto {
-        private ReportEntity.ReportCategoryEnum reportCategory;
+        @Enum(enumClass = ReportEntity.ReportCategoryEnum.class, message = "{Enum.reportCategory}")
+        @NotBlank(message = "{NotBlank.reportCategory}")
+        private String reportCategory;
+        @Size(min = 5, max = 100, message = "{Size.title}")
+        @NotBlank(message = "{NotBlank.title}")
         private String title;
+        @Email(message = "{Email.email}")
         private String email;
+        @NotBlank(message = "{NotBlank.content}")
         private String content;
-        private ReportEntity.ReportStatusEnum reportStatus;
+        private String reportStatus;
         private String reply;
         private List<String> reportFileNames;
-        private List<MultipartFile> reportFiles;
+        private List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5) MultipartFile> reportFiles;
     }
 
     // 신고 작성 응답
@@ -73,10 +82,13 @@ public class ReportDto {
     @Setter
     public static class ReplyReportRequestDto {
         private UUID uuid;
-        private ReportEntity.ReportStatusEnum reportStatus;
+        @Enum(enumClass = ReportEntity.ReportStatusEnum.class, message = "{Enum.reportStatus}")
+        @NotBlank(message = "{NotBlank.reportStatus}")
+        private String reportStatus;
+        @NotBlank(message = "{NotBlank.reply}")
         private String reply;
         private List<String> replyFileNames;
-        private List<MultipartFile> replyFiles;
+        private List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5) MultipartFile> replyFiles;
     }
 
     // 신고 답변 응답
@@ -95,9 +107,13 @@ public class ReportDto {
     @Builder
 //    @RequiredArgsConstructor
     public static class SearchReportRequestDto {
-        private final ReportEntity.ReportStatusEnum reportStatus;
-        private final ReportEntity.ReportCategoryEnum reportCategory;
+        @Enum(enumClass = ReportEntity.ReportStatusEnum.class, message = "{Enum.reportStatus}")
+        private final String reportStatus;
+        @Enum(enumClass = ReportEntity.ReportCategoryEnum.class, message = "{Enum.reportCategory}")
+        private final String reportCategory;
+        @Email(message = "{Email.email}")
         private final String email;
+        @NotNull(message = "{NotNull.pageable}")
         private Pageable pageable;
     }
 
@@ -106,7 +122,10 @@ public class ReportDto {
     @Setter
     @RequiredArgsConstructor
     public static class GetReportsRequestDto{
+        @Email(message = "{Email.email}")
+        @NotBlank(message = "{NotBlank.email}")
         private final String email;
+        @NotNull(message = "{NotNull.pageable}")
         private final Pageable pageable;
     }
 }

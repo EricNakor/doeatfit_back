@@ -1,13 +1,14 @@
 package com.Duo960118.fitow.controller;
 
-import com.Duo960118.fitow.entity.ApiResponseBody;
+import com.Duo960118.fitow.annotaion.Enum;
+import com.Duo960118.fitow.annotaion.File;
 import com.Duo960118.fitow.entity.WorkoutDto;
 import com.Duo960118.fitow.entity.WorkoutEntity;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.WorkoutService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -15,7 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,27 +24,27 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("api")
+@RequiredArgsConstructor
+@Validated
+@RequestMapping("/api")
 public class WorkoutApiController {
     private final WorkoutService workoutService;
 
     // 운동 추가
     @PostMapping("def-cms/workouts")
-    public ApiResponse<WorkoutDto.WorkoutDetailDto> postWorkout(@RequestPart(value = "mediaFile", required = false) MultipartFile multipartFile,
-                                                                         @RequestPart(value = "postWorkoutRequest") WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
-        postWorkoutRequest.setWorkoutFile(multipartFile);
+    public ApiResponse<WorkoutDto.WorkoutDetailDto> postWorkout(@RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5)MultipartFile multipartFile,
+                                                                         @Valid @RequestPart(value = "postWorkoutRequest") WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
+        postWorkoutRequest.setMediaFile(multipartFile);
         return ApiResponse.success(workoutService.postWorkout(postWorkoutRequest));
     }
 
     // 운동 수정
-    // 파일 업로드가 필요한 요청은
     @PutMapping("def-cms/workouts/{uuid}")
     public ApiResponse<WorkoutDto.WorkoutDetailDto> editWorkout(
             @PathVariable("uuid") UUID uuid,
-            @RequestPart(value = "mediaFile", required = false) MultipartFile multipartFile,
-            @RequestPart(value = "editWorkoutRequest") WorkoutDto.PostWorkoutRequestDto editWorkoutRequest) {
+            @RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5) MultipartFile multipartFile,
+            @Valid @RequestPart(value = "editWorkoutRequest") WorkoutDto.EditWorkoutRequestDto editWorkoutRequest) {
 
         editWorkoutRequest.setWorkoutFile(multipartFile);
         editWorkoutRequest.setUuid(uuid);
@@ -76,19 +77,20 @@ public class WorkoutApiController {
     // 운동 검색
     @GetMapping("workouts/search")
     public ApiResponse<Page<WorkoutDto.WorkoutDetailDto>> searchWorkout(@PageableDefault(size = 10, sort = "workoutId", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                           @RequestParam(value = "workoutDifficulties", required = false, defaultValue = "") List<WorkoutEntity.DifficultyEnum> workoutDifficulties,
-                                                                           @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
-                                                                           @RequestParam(value = "bodyParts", required = false, defaultValue = "") List<WorkoutEntity.BodyPartEnum> bodyPartEnums,
-                                                                           @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<WorkoutEntity.MuscleEnum> agonistMuscleEnums,
-                                                                           @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<WorkoutEntity.MuscleEnum> antagonistMuscleEnums,
-                                                                           @RequestParam(value = "synergistMuscles", required = false, defaultValue = "") List<WorkoutEntity.MuscleEnum> synergistMuscleEnums) {
+                                                                           @RequestParam(value = "workoutDifficulties", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties,
+                                                                           @Size(min=2,max=30,message = "{Size.workoutName}") @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
+                                                                           @RequestParam(value = "bodyParts", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.BodyPartEnum.class, message = "{Enum.bodyPartEnum}")String> bodyParts,
+                                                                           @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.agonistMuscles}")String> agonistMuscles,
+                                                                           @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.antagonistMuscles}")String> antagonistMuscles,
+                                                                           @RequestParam(value = "synergistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.synergistMuscles}")String> synergistMuscles) {
+
         WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest = WorkoutDto.SearchWorkoutRequestDto.builder()
                 .workoutDifficulties(workoutDifficulties)
                 .workoutName(workoutName)
-                .bodyPartEnums(bodyPartEnums)
-                .agonistMuscleEnums(agonistMuscleEnums)
-                .antagonistMuscleEnums(antagonistMuscleEnums)
-                .synergistMuscleEnums(synergistMuscleEnums)
+                .bodyParts(bodyParts)
+                .agonistMuscles(agonistMuscles)
+                .antagonistMuscles(antagonistMuscles)
+                .synergistMuscles(synergistMuscles)
                 .build();
 
         return ApiResponse.success(workoutService.searchWorkout(searchWorkoutRequest, pageable));
@@ -96,9 +98,8 @@ public class WorkoutApiController {
 
     // uuid에 해당하는 운동 하나 조회
     @GetMapping("/workouts/{uuid}")
-    public ApiResponse<WorkoutDto.WorkoutDetailDto> workoutDetail(@Valid @PathVariable("uuid") UUID uuid) {
+    public ApiResponse<WorkoutDto.WorkoutDetailDto> workoutDetail(@PathVariable("uuid") UUID uuid) {
         WorkoutDto.WorkoutDetailDto workout = workoutService.getWorkoutDetail(uuid);
-
         return ApiResponse.success(workout);
     }
 

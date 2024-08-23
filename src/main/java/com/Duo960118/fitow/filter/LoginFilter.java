@@ -2,6 +2,7 @@ package com.Duo960118.fitow.filter;
 
 import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.CustomUserDetails;
+import com.Duo960118.fitow.response.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,6 +61,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // redis에 refresh token 저장
         tokenUtil.issueRefreshToken(accessToken);
 
+        ApiResponse.success(null);
         // set status ok
         response.setStatus(200);
     }
