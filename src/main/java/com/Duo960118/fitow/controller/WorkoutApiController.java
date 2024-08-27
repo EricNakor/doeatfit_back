@@ -79,15 +79,15 @@ public class WorkoutApiController {
     public ApiResponse<Page<WorkoutDto.WorkoutDetailDto>> searchWorkout(@PageableDefault(size = 10, sort = "workoutId", direction = Sort.Direction.DESC) Pageable pageable,
                                                                            @RequestParam(value = "workoutDifficulties", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties,
                                                                            @Size(min=0,max=30,message = "{Size.workoutName}") @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
-                                                                           @RequestParam(value = "bodyParts", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.BodyPartEnum.class, message = "{Enum.bodyPartEnum}")String> bodyParts,
-                                                                           @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.agonistMuscles}")String> agonistMuscles,
-                                                                           @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.antagonistMuscles}")String> antagonistMuscles,
-                                                                           @RequestParam(value = "synergistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.synergistMuscles}")String> synergistMuscles) {
+                                                                           @RequestParam(value = "majorMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MajorMuscleEnum.class, message = "{Enum.bodyPartEnum}")String> majorMuscles,
+                                                                           @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.agonistMuscles}")String> agonistMuscles,
+                                                                           @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.antagonistMuscles}")String> antagonistMuscles,
+                                                                           @RequestParam(value = "synergistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.synergistMuscles}")String> synergistMuscles) {
 
         WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest = WorkoutDto.SearchWorkoutRequestDto.builder()
                 .workoutDifficulties(workoutDifficulties)
                 .workoutName(workoutName)
-                .bodyParts(bodyParts)
+                .majorMuscles(majorMuscles)
                 .agonistMuscles(agonistMuscles)
                 .antagonistMuscles(antagonistMuscles)
                 .synergistMuscles(synergistMuscles)

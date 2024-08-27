@@ -33,10 +33,10 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .from(workoutEntity)
                 .where(containsWorkoutName(searchWorkoutRequest.getWorkoutName()))
                 .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties().stream().map(WorkoutEntity.DifficultyEnum::fromString).collect(Collectors.toList())))
-                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyParts().stream().map(WorkoutEntity.BodyPartEnum::fromString).collect(Collectors.toList())))
+                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsBodyPartEnums(searchWorkoutRequest.getMajorMuscles().stream().map(WorkoutEntity.MajorMuscleEnum::fromString).collect(Collectors.toList())))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -60,10 +60,10 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .select(workoutEntity.count())
                 .from(workoutEntity)
                 .where(inWorkoutDifficulty(searchWorkoutRequest.getWorkoutDifficulties().stream().map(WorkoutEntity.DifficultyEnum::fromString).collect(Collectors.toList())))
-                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsBodyPartEnums(searchWorkoutRequest.getBodyParts().stream().map(WorkoutEntity.BodyPartEnum::fromString).collect(Collectors.toList())));
+                .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsBodyPartEnums(searchWorkoutRequest.getMajorMuscles().stream().map(WorkoutEntity.MajorMuscleEnum::fromString).collect(Collectors.toList())));
     }
 
     // BooleanExpression은 null 반환 시 자동으로 조건절에서 제거 된다.
@@ -87,14 +87,14 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
 
     // 주동근 검색
     // 검색 조건으로 사용된 주동근들 중 하나라도 포함하면, 그 운동을 반환 하도록 하는 조건(BooleanExpression)
-    private BooleanExpression containsAgonistMuscleEnums(List<WorkoutEntity.MuscleEnum> agonistMuscleEnums) {
-        if (ObjectUtils.isEmpty(agonistMuscleEnums)) {
+    private BooleanExpression containsAgonistMuscleEnums(List<WorkoutEntity.MinorMuscleEnum> agonistMinorMuscleEnums) {
+        if (ObjectUtils.isEmpty(agonistMinorMuscleEnums)) {
             return null;
         }
 
         BooleanExpression expression = null;
 
-        for (WorkoutEntity.MuscleEnum muscle : agonistMuscleEnums) {
+        for (WorkoutEntity.MinorMuscleEnum muscle : agonistMinorMuscleEnums) {
             if (expression == null) {
                 expression = workoutEntity.agonistMuscleEnums.contains(muscle);
             } else {
@@ -105,14 +105,14 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     }
 
     // 길항근 검색
-    private BooleanExpression containsAntagonistMuscleEnums(List<WorkoutEntity.MuscleEnum> antagonistMuscleEnums) {
-        if (ObjectUtils.isEmpty(antagonistMuscleEnums)) {
+    private BooleanExpression containsAntagonistMuscleEnums(List<WorkoutEntity.MinorMuscleEnum> antagonistMinorMuscleEnums) {
+        if (ObjectUtils.isEmpty(antagonistMinorMuscleEnums)) {
             return null;
         }
 
         BooleanExpression expression = null;
 
-        for (WorkoutEntity.MuscleEnum muscle : antagonistMuscleEnums) {
+        for (WorkoutEntity.MinorMuscleEnum muscle : antagonistMinorMuscleEnums) {
             if (expression == null) {
                 expression = workoutEntity.antagonistMuscleEnums.contains(muscle);
             } else {
@@ -123,14 +123,14 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     }
 
     // 협응근 검색
-    private BooleanExpression containsSynergistMuscleEnums(List<WorkoutEntity.MuscleEnum> synergistMuscleEnums) {
-        if (ObjectUtils.isEmpty(synergistMuscleEnums)) {
+    private BooleanExpression containsSynergistMuscleEnums(List<WorkoutEntity.MinorMuscleEnum> synergistMinorMuscleEnums) {
+        if (ObjectUtils.isEmpty(synergistMinorMuscleEnums)) {
             return null;
         }
 
         BooleanExpression expression = null;
 
-        for (WorkoutEntity.MuscleEnum muscle : synergistMuscleEnums) {
+        for (WorkoutEntity.MinorMuscleEnum muscle : synergistMinorMuscleEnums) {
             if (expression == null) {
                 expression = workoutEntity.synergistMuscleEnums.contains(muscle);
             } else {
@@ -141,23 +141,23 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     }
 
     // 신체 부위로 검색
-    private BooleanExpression containsBodyPartEnums(List<WorkoutEntity.BodyPartEnum> bodyPartEnums) {
-        if (ObjectUtils.isEmpty(bodyPartEnums)) {
+    private BooleanExpression containsBodyPartEnums(List<WorkoutEntity.MajorMuscleEnum> majorMuscleEnums) {
+        if (ObjectUtils.isEmpty(majorMuscleEnums)) {
             return null;
         }
         BooleanExpression expression = null;
 
-        for (WorkoutEntity.BodyPartEnum bodyPart : bodyPartEnums) {
+        for (WorkoutEntity.MajorMuscleEnum bodyPart : majorMuscleEnums) {
 
             // 이 bodyPartEnum을 갖는 enum만 골라 리스트에 담기
-            List<WorkoutEntity.MuscleEnum> muscleEnums = new ArrayList<>();
-            for (WorkoutEntity.MuscleEnum muscle : WorkoutEntity.MuscleEnum.values()) {
+            List<WorkoutEntity.MinorMuscleEnum> minorMuscleEnums = new ArrayList<>();
+            for (WorkoutEntity.MinorMuscleEnum muscle : WorkoutEntity.MinorMuscleEnum.values()) {
                 if (muscle.getBodyPart() == bodyPart) {
-                    muscleEnums.add(muscle);
+                    minorMuscleEnums.add(muscle);
                 }
             }
 
-            for (WorkoutEntity.MuscleEnum muscle : muscleEnums) {
+            for (WorkoutEntity.MinorMuscleEnum muscle : minorMuscleEnums) {
                 if (expression == null) {
                     // muscle를 포함하고 있다면 ok
                     expression = workoutEntity.agonistMuscleEnums.contains(muscle);

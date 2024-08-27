@@ -1,7 +1,6 @@
 package com.Duo960118.fitow.entity;
 
 import com.Duo960118.fitow.annotaion.Enum;
-import com.Duo960118.fitow.annotaion.File;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -22,9 +21,9 @@ public class WorkoutDto {
         private UUID uuid;
         private String workoutName;
         private WorkoutEntity.DifficultyEnum workoutDifficulty;
-        private Set<WorkoutEntity.MuscleEnum> agonistMuscles;
-        private Set<WorkoutEntity.MuscleEnum> antagonistMuscles;
-        private Set<WorkoutEntity.MuscleEnum> synergistMuscles;
+        private Set<WorkoutEntity.MinorMuscleEnum> agonistMuscles;
+        private Set<WorkoutEntity.MinorMuscleEnum> antagonistMuscles;
+        private Set<WorkoutEntity.MinorMuscleEnum> synergistMuscles;
         private List<String> descriptions;
         private String mediaFileName;
     }
@@ -41,14 +40,13 @@ public class WorkoutDto {
         @NotBlank(message = "{NotBlank.workoutDifficulty}")
         private String workoutDifficulty;
         @NotEmpty(message = "{NotEmpty.agonistMuscles}")
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.agonistMuscles}") String> agonistMuscles;
-        @NotEmpty(message = "{NotEmpty.antagonistMuscles}")
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.synergistMuscles}") String> synergistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class,message = "{Enum.agonistMuscles}") String> agonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class,message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class,message = "{Enum.synergistMuscles}") String> synergistMuscles;
         @NotEmpty(message = "{NotEmpty.descriptions}")
         private List<@NotBlank(message = "{NotBlank.description}") String> descriptions;
         private String mediaFileName;
-        @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)
+//        @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)
         private MultipartFile mediaFile;
 
         // 왜 빌더를 이렇게 해놓았을까?
@@ -72,7 +70,7 @@ public class WorkoutDto {
         }
     }
 
-    // 운동 작성 및 수정 요청 dto
+    // 운동 수정 요청 dto
     @NoArgsConstructor
     @Getter
     @Setter
@@ -84,14 +82,13 @@ public class WorkoutDto {
         @NotBlank(message = "{NotBlank.workoutDifficulty}")
         private String workoutDifficulty;
         @NotEmpty(message = "{NotEmpty.agonistMuscles}")
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.agonistMuscles}") String> agonistMuscles;
-        @NotEmpty(message = "{NotEmpty.agonistMuscles}")
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.synergistMuscles}") String> synergistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.agonistMuscles}") String> agonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.synergistMuscles}") String> synergistMuscles;
         @NotEmpty(message = "{NotEmpty.descriptions}")
         private List<@NotBlank(message = "{NotBlank.description}") String> descriptions;
         private String mediaFileName;
-        @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)
+//        @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)
         private MultipartFile workoutFile;
         private UUID uuid;
 
@@ -125,23 +122,23 @@ public class WorkoutDto {
     public static class SearchWorkoutRequestDto {
         private List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties;
         private String workoutName;
-        private List<@Enum(enumClass = WorkoutEntity.BodyPartEnum.class,message = "{Enum.bodyParts}")String> bodyParts;
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.agonistMuscles}")String> agonistMuscles;
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
-        private List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class,message = "{Enum.synergistMuscles}")String> synergistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MajorMuscleEnum.class,message = "{Enum.majorMuscleEnum}")String> majorMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class,message = "{Enum.agonistMuscles}")String> agonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class,message = "{Enum.antagonistMuscles}") String> antagonistMuscles;
+        private List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class,message = "{Enum.synergistMuscles}")String> synergistMuscles;
 
         @Builder
         public SearchWorkoutRequestDto(
                 List<String> workoutDifficulties,
                 String workoutName,
-                List<String> bodyParts,
+                List<String> majorMuscles,
                 List<String> agonistMuscles,
                 List<String> antagonistMuscles,
                 List<String> synergistMuscles
         ) {
             this.workoutDifficulties = workoutDifficulties;
             this.workoutName = workoutName;
-            this.bodyParts = bodyParts;
+            this.majorMuscles = majorMuscles;
             this.agonistMuscles = agonistMuscles;
             this.antagonistMuscles = antagonistMuscles;
             this.synergistMuscles = synergistMuscles;

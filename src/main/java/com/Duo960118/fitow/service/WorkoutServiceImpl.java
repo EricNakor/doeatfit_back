@@ -89,9 +89,9 @@ public class WorkoutServiceImpl implements WorkoutService {
         WorkoutEntity workoutEntity = WorkoutEntity.builder()
                 .workoutName(postWorkoutRequest.getWorkoutName())
                 .workoutDifficulty(WorkoutEntity.DifficultyEnum.valueOf(postWorkoutRequest.getWorkoutDifficulty()))
-                .agonistMuscle(postWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet()))
-                .antagonistMuscle(postWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet()))
-                .synergistMuscle(postWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MuscleEnum::fromString).collect(Collectors.toSet()))
+                .agonistMuscle(postWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toSet()))
+                .antagonistMuscle(postWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toSet()))
+                .synergistMuscle(postWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toSet()))
                 .descriptions(postWorkoutRequest.getDescriptions())
                 .mediaFileName(workoutMediaFileName)
                 .build();
