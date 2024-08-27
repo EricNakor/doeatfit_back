@@ -93,12 +93,17 @@ public class ReportServiceImpl implements ReportService {
         // 예외: 존재하지 않는 문의
         ReportEntity reportEntity = reportRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new NoSuchElementException("존재하지 않는 문의" + uuid));
 
+        String email;
+        if(reportEntity.getUserEntity()==null){
+            email="탈퇴한 사용자";
+        }
+        email=reportEntity.getUserEntity().getEmail();
         // 생성자는 파라미터 순서가 일치해야 함 > 순서수정
         return new ReportDto.ReportDetailDto(
                 reportEntity.getUuidEntity().getUuid(),
                 reportEntity.getReportCategory(),
                 reportEntity.getTitle(),
-                reportEntity.getUserEntity().getEmail(),
+                email,
                 reportEntity.getContent(),
                 reportEntity.getReportDate(),
                 reportEntity.getReportStatus(),

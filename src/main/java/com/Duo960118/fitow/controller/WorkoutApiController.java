@@ -33,7 +33,7 @@ public class WorkoutApiController {
 
     // 운동 추가
     @PostMapping("def-cms/workouts")
-    public ApiResponse<WorkoutDto.WorkoutDetailDto> postWorkout(@RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5)MultipartFile multipartFile,
+    public ApiResponse<WorkoutDto.WorkoutDetailDto> postWorkout(@RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)MultipartFile multipartFile,
                                                                          @Valid @RequestPart(value = "postWorkoutRequest") WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
         postWorkoutRequest.setMediaFile(multipartFile);
         return ApiResponse.success(workoutService.postWorkout(postWorkoutRequest));
@@ -43,7 +43,7 @@ public class WorkoutApiController {
     @PutMapping("def-cms/workouts/{uuid}")
     public ApiResponse<WorkoutDto.WorkoutDetailDto> editWorkout(
             @PathVariable("uuid") UUID uuid,
-            @RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5) MultipartFile multipartFile,
+            @RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50) MultipartFile multipartFile,
             @Valid @RequestPart(value = "editWorkoutRequest") WorkoutDto.EditWorkoutRequestDto editWorkoutRequest) {
 
         editWorkoutRequest.setWorkoutFile(multipartFile);
@@ -78,7 +78,7 @@ public class WorkoutApiController {
     @GetMapping("workouts/search")
     public ApiResponse<Page<WorkoutDto.WorkoutDetailDto>> searchWorkout(@PageableDefault(size = 10, sort = "workoutId", direction = Sort.Direction.DESC) Pageable pageable,
                                                                            @RequestParam(value = "workoutDifficulties", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties,
-                                                                           @Size(min=2,max=30,message = "{Size.workoutName}") @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
+                                                                           @Size(min=0,max=30,message = "{Size.workoutName}") @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
                                                                            @RequestParam(value = "bodyParts", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.BodyPartEnum.class, message = "{Enum.bodyPartEnum}")String> bodyParts,
                                                                            @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.agonistMuscles}")String> agonistMuscles,
                                                                            @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MuscleEnum.class, message = "{Enum.antagonistMuscles}")String> antagonistMuscles,

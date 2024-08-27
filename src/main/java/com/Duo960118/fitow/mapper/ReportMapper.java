@@ -7,6 +7,17 @@ import org.springframework.context.annotation.Bean;
 public class ReportMapper {
     @Bean
     public static ReportDto.ReportInfoDto entityToReportInfoDto(ReportEntity reportEntity) {
+        if(reportEntity.getUserEntity()==null){
+            return new ReportDto.ReportInfoDto(
+                    reportEntity.getUuidEntity().getUuid(),
+                    reportEntity.getReportCategory(),
+                    reportEntity.getTitle(),
+                    "탈퇴한 사용자",
+                    reportEntity.getReportDate(),
+                    reportEntity.getReportStatus(),
+                    reportEntity.getReplyDate()
+            );
+        }
         return new ReportDto.ReportInfoDto(
                 reportEntity.getUuidEntity().getUuid(),
                 reportEntity.getReportCategory(),

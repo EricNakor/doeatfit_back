@@ -54,7 +54,12 @@ public class NoticeServiceImpl implements NoticeService {
         // 예외: 존재하지 않는 게시물
         NoticeEntity noticeEntity = noticeRepository.findByUuidEntityUuid(uuid).orElseThrow(() -> new NoSuchElementException("존재하지 않는 게시물" + uuid));
 
-        String nickName = noticeEntity.getUserEntity().getNickName();
+        String nickName ;
+        if(noticeEntity.getUserEntity()==null) {
+            nickName = "탈퇴한 사용자";
+        }else{
+            nickName = noticeEntity.getUserEntity().getNickName();
+        }
 
         return new NoticeDto.NoticeDetailDto(noticeEntity.getUuidEntity().getUuid(),noticeEntity.getTitle(),
                 noticeEntity.getContent(), noticeEntity.getNoticeCategory(),
