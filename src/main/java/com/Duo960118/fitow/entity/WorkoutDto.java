@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -143,5 +144,12 @@ public class WorkoutDto {
             this.antagonistMuscles = antagonistMuscles;
             this.synergistMuscles = synergistMuscles;
         }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class SearchWorkoutKeywordRequestDto {
+        private final String keyword;
+        private final Pageable pageable;
     }
 }

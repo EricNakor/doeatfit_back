@@ -10,8 +10,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -24,9 +24,10 @@ import java.util.stream.Collectors;
 public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     protected final Log logger = LogFactory.getLog(this.getClass());
+
     //
     @Override
-    public Page<WorkoutEntity> findBySearchWorkoutRequest(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable) {
+    public Slice<WorkoutEntity> findBySearchWorkoutRequest(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable) {
 
         List<WorkoutEntity> fetch = queryFactory
                 .select(workoutEntity)
@@ -36,7 +37,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
                 .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
                 .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsBodyPartEnums(searchWorkoutRequest.getMajorMuscles().stream().map(WorkoutEntity.MajorMuscleEnum::fromString).collect(Collectors.toList())))
+                .where(containsMajorMucleEnums(searchWorkoutRequest.getMajorMuscles().stream().map(WorkoutEntity.MajorMuscleEnum::fromString).collect(Collectors.toList())))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -63,7 +64,7 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 .where(containsAgonistMuscleEnums(searchWorkoutRequest.getAgonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
                 .where(containsAntagonistMuscleEnums(searchWorkoutRequest.getAntagonistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
                 .where(containsSynergistMuscleEnums(searchWorkoutRequest.getSynergistMuscles().stream().map(WorkoutEntity.MinorMuscleEnum::fromString).collect(Collectors.toList())))
-                .where(containsBodyPartEnums(searchWorkoutRequest.getMajorMuscles().stream().map(WorkoutEntity.MajorMuscleEnum::fromString).collect(Collectors.toList())));
+                .where(containsMajorMucleEnums(searchWorkoutRequest.getMajorMuscles().stream().map(WorkoutEntity.MajorMuscleEnum::fromString).collect(Collectors.toList())));
     }
 
     // BooleanExpression은 null 반환 시 자동으로 조건절에서 제거 된다.
@@ -140,19 +141,19 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
         return expression;
     }
 
-    // 신체 부위로 검색
-    private BooleanExpression containsBodyPartEnums(List<WorkoutEntity.MajorMuscleEnum> majorMuscleEnums) {
+    // major muscle로 검색
+    private BooleanExpression containsMajorMucleEnums(List<WorkoutEntity.MajorMuscleEnum> majorMuscleEnums) {
         if (ObjectUtils.isEmpty(majorMuscleEnums)) {
             return null;
         }
         BooleanExpression expression = null;
 
-        for (WorkoutEntity.MajorMuscleEnum bodyPart : majorMuscleEnums) {
+        for (WorkoutEntity.MajorMuscleEnum majorMuscle : majorMuscleEnums) {
 
-            // 이 bodyPartEnum을 갖는 enum만 골라 리스트에 담기
+            // 이 MajorMuscleEnum 갖는 enum만 골라 리스트에 담기
             List<WorkoutEntity.MinorMuscleEnum> minorMuscleEnums = new ArrayList<>();
             for (WorkoutEntity.MinorMuscleEnum muscle : WorkoutEntity.MinorMuscleEnum.values()) {
-                if (muscle.getBodyPart() == bodyPart) {
+                if (muscle.getMajorMuscleEnum() == majorMuscle) {
                     minorMuscleEnums.add(muscle);
                 }
             }

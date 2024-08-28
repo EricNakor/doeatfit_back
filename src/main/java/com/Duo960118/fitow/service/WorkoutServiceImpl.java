@@ -11,6 +11,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,5 +128,58 @@ public class WorkoutServiceImpl implements WorkoutService {
         Slice<WorkoutEntity> workoutSlice = workoutRepository.findBySearchWorkoutRequest(searchWorkoutRequest, pageable);
 
         return workoutSlice.map(WorkoutMapper::entityToWorkoutDetailDto);
+    }
+
+    // 키워드 검색
+    @Override
+    public Page<WorkoutDto.WorkoutDetailDto> searchWorkout(WorkoutDto.SearchWorkoutKeywordRequestDto searchWorkoutKeywordRequest) {
+        // 운동 이름으로 찾기
+        Page<WorkoutEntity> searchResult= workoutRepository.findAllByWorkoutNameContains(searchWorkoutKeywordRequest.getKeyword(),searchWorkoutKeywordRequest.getPageable());
+
+        // 검색
+        if(searchResult.hasContent()){
+            return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
+        }
+
+        // 근육 이름으로 찾기
+        // 1. major muscle인지 확인, 맞으면 major muscle에 해당하는 minor muscle들 추가
+        // 영어, 한글
+        Set<WorkoutEntity.MinorMuscleEnum> minorMuscleEnumList= new HashSet<>();
+
+
+        // 키워드가 MajorMuscleEnum 또는 운동 이름과 일치하는지 확인
+        for( WorkoutEntity.MajorMuscleEnum majorMuscleEnum :WorkoutEntity.MajorMuscleEnum.values()){
+            if(StringUtils.containsIgnoreCase(majorMuscleEnum.toString(),searchWorkoutKeywordRequest.getKeyword(),Locale.ENGLISH) ||
+                    StringUtils.containsIgnoreCase(majorMuscleEnum.getDesc(),searchWorkoutKeywordRequest.getKeyword(),Locale.KOREAN)){
+                // MinorMuscleEnum 에서도 일치하는지 확인 후 추가
+                for(WorkoutEntity.MinorMuscleEnum minorMuscleEnum :WorkoutEntity.MinorMuscleEnum.values()) {
+                    if(minorMuscleEnum.getMajorMuscleEnum() == majorMuscleEnum){
+                        minorMuscleEnumList.add(minorMuscleEnum);
+                    }
+                }
+            }
+        }
+
+        // 검색
+        if(!minorMuscleEnumList.isEmpty()){
+            searchResult =workoutRepository.findAllByAgonistMuscleEnumsIn(minorMuscleEnumList,searchWorkoutKeywordRequest.getPageable());
+            return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
+        }
+
+        // 2. minor muscle 이라면
+        for(WorkoutEntity.MinorMuscleEnum minorMuscleEnum :WorkoutEntity.MinorMuscleEnum.values()) {
+            if(StringUtils.containsIgnoreCase(minorMuscleEnum.toString(),searchWorkoutKeywordRequest.getKeyword(),Locale.ENGLISH) ||
+                    StringUtils.containsIgnoreCase(minorMuscleEnum.getDesc(),searchWorkoutKeywordRequest.getKeyword(),Locale.KOREAN)){
+                minorMuscleEnumList.add(minorMuscleEnum);
+            }
+        }
+
+        // 검색
+        if(!minorMuscleEnumList.isEmpty()){
+            searchResult =workoutRepository.findAllByAgonistMuscleEnumsIn(minorMuscleEnumList,searchWorkoutKeywordRequest.getPageable());
+            return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
+        }
+
+        return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
     }
 }

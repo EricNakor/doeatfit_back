@@ -8,8 +8,10 @@ import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.WorkoutService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -104,6 +106,18 @@ public class WorkoutApiController {
         WorkoutDto.WorkoutDetailDto workout = workoutService.getWorkoutDetail(uuid);
         return ApiResponse.success(workout);
     }
+
+    // 운동명, 근육명으로 운동 검색
+    @GetMapping("/workouts/search_by_keyword")
+    public ApiResponse<Page<WorkoutDto.WorkoutDetailDto>> searchWorkout(@NotBlank(message = "{NotBlank.keyword}") @RequestParam(value = "keyword") String keyword,
+                                                                        @PageableDefault(size = 10, sort = "workoutId", direction = Sort.Direction.ASC)Pageable pageable) {
+        WorkoutDto.SearchWorkoutKeywordRequestDto searchWorkoutKeywordRequest = new WorkoutDto.SearchWorkoutKeywordRequestDto(keyword,pageable);
+        Page<WorkoutDto.WorkoutDetailDto> workoutPage = workoutService.searchWorkout(searchWorkoutKeywordRequest);
+        return ApiResponse.success(workoutPage);
+    }
+
+
+
 
 //    // 근육 enum 조회
 //    @GetMapping("workouts/muscle-enums")

@@ -434,12 +434,12 @@ public class WorkoutEntity extends TimeStampEntity {
 
         private final String name;
         private final String desc;
-        private final MajorMuscleEnum bodyPart;
+        private final MajorMuscleEnum majorMuscleEnum;
 
-        MinorMuscleEnum(String name, String desc, MajorMuscleEnum bodyPart) {
+        MinorMuscleEnum(String name, String desc, MajorMuscleEnum majorMuscle) {
             this.name = name;
             this.desc = desc;
-            this.bodyPart = bodyPart;
+            this.majorMuscleEnum = majorMuscle;
         }
 
         @JsonCreator

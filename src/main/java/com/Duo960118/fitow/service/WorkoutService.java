@@ -39,4 +39,9 @@ public interface WorkoutService {
     // 운동 검색
     @Transactional
     Slice<WorkoutDto.WorkoutDetailDto> searchWorkout(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable);
+
+    // 운동 키워드 검색
+    @Transactional
+    Page<WorkoutDto.WorkoutDetailDto> searchWorkout(WorkoutDto.SearchWorkoutKeywordRequestDto searchWorkoutKeywordRequest);
+
 }
