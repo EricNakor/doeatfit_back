@@ -8,12 +8,14 @@ import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.WorkoutService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +35,7 @@ public class WorkoutApiController {
 
     // 운동 추가
     @PostMapping("def-cms/workouts")
-    public ApiResponse<WorkoutDto.WorkoutDetailDto> postWorkout(@RequestPart(value = "mediaFile", required = false) @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)MultipartFile multipartFile,
+    public ApiResponse<WorkoutDto.WorkoutDetailDto> postWorkout(@RequestPart(value = "mediaFile", required = false) @NotNull(message = "{NotNull.multipartFile}") @File(allowedFileExt = {"mp4"}, fileSizeLimit = 1024 * 1024 * 50)MultipartFile multipartFile,
                                                                          @Valid @RequestPart(value = "postWorkoutRequest") WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
         postWorkoutRequest.setMediaFile(multipartFile);
         return ApiResponse.success(workoutService.postWorkout(postWorkoutRequest));
@@ -61,7 +63,7 @@ public class WorkoutApiController {
     // 운동 전체 조회
     @GetMapping("workouts")
     public ApiResponse<List<WorkoutDto.WorkoutDetailDto>> workouts(
-            @PageableDefault(page = 0, size = 10, sort = "workoutId", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10, sort = "workoutId", direction = Sort.Direction.ASC) Pageable pageable) {
 
         List<WorkoutDto.WorkoutDetailDto> result = workoutService.getAllWorkout(pageable);
 
@@ -76,13 +78,13 @@ public class WorkoutApiController {
 
     // 운동 검색
     @GetMapping("workouts/search")
-    public ApiResponse<Page<WorkoutDto.WorkoutDetailDto>> searchWorkout(@PageableDefault(size = 10, sort = "workoutId", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                           @RequestParam(value = "workoutDifficulties", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties,
-                                                                           @Size(min=0,max=30,message = "{Size.workoutName}") @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
-                                                                           @RequestParam(value = "majorMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MajorMuscleEnum.class, message = "{Enum.bodyPartEnum}")String> majorMuscles,
-                                                                           @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.agonistMuscles}")String> agonistMuscles,
-                                                                           @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.antagonistMuscles}")String> antagonistMuscles,
-                                                                           @RequestParam(value = "synergistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.synergistMuscles}")String> synergistMuscles) {
+    public ApiResponse<Slice<WorkoutDto.WorkoutDetailDto>> searchWorkout(@PageableDefault(size = 4, sort = "workoutId", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                         @RequestParam(value = "workoutDifficulties", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.DifficultyEnum.class,message = "{Enum.workoutDifficulty}") String> workoutDifficulties,
+                                                                         @Size(min=0,max=30,message = "{Size.workoutName}") @RequestParam(value = "workoutName", required = false, defaultValue = "") String workoutName,
+                                                                         @RequestParam(value = "majorMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MajorMuscleEnum.class, message = "{Enum.bodyPartEnum}")String> majorMuscles,
+                                                                         @RequestParam(value = "agonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.agonistMuscles}")String> agonistMuscles,
+                                                                         @RequestParam(value = "antagonistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.antagonistMuscles}")String> antagonistMuscles,
+                                                                         @RequestParam(value = "synergistMuscles", required = false, defaultValue = "") List<@Enum(enumClass = WorkoutEntity.MinorMuscleEnum.class, message = "{Enum.synergistMuscles}")String> synergistMuscles) {
 
         WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest = WorkoutDto.SearchWorkoutRequestDto.builder()
                 .workoutDifficulties(workoutDifficulties)

@@ -29,6 +29,11 @@ public class FileValidator implements ConstraintValidator<File, MultipartFile> {
         }
         allowedStrings.delete(allowedStrings.length() - 2, allowedStrings.length());
 
+        // 파일이 아예 없으면
+        if(file==null){
+            return true;
+        }
+
         // 빈 파일이면 false
         if (file.isEmpty()) {
             context.disableDefaultConstraintViolation();

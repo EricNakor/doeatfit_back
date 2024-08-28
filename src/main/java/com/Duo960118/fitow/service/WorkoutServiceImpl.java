@@ -9,9 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -125,8 +123,9 @@ public class WorkoutServiceImpl implements WorkoutService {
     }
 
     @Override
-    public Page<WorkoutDto.WorkoutDetailDto> searchWorkout(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable) {
-        List<WorkoutDto.WorkoutDetailDto> workoutDetails = workoutRepository.findBySearchWorkoutRequest(searchWorkoutRequest, pageable).stream().map(WorkoutMapper::entityToWorkoutDetailDto).collect(Collectors.toList());
-        return new PageImpl<>(workoutDetails);
+    public Slice<WorkoutDto.WorkoutDetailDto> searchWorkout(WorkoutDto.SearchWorkoutRequestDto searchWorkoutRequest, Pageable pageable) {
+        Slice<WorkoutEntity> workoutSlice = workoutRepository.findBySearchWorkoutRequest(searchWorkoutRequest, pageable);
+
+        return workoutSlice.map(WorkoutMapper::entityToWorkoutDetailDto);
     }
 }
