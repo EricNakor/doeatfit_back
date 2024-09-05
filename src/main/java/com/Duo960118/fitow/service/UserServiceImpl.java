@@ -9,6 +9,8 @@ import com.Duo960118.fitow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -132,8 +134,8 @@ public class UserServiceImpl implements UserService {
 
     // 모든 유저 조회
     @Override
-    public List<UserDto.UserInfoDto> getAllUser() {
-        return userRepository.findAll().stream().map(UserMapper::entityToUserInfoDto).collect(Collectors.toList());
+    public Page<UserDto.UserInfoDto> getAllUser(Pageable pageable) {
+        return userRepository.findAll(pageable).map(UserMapper::entityToUserInfoDto);
     }
 
 

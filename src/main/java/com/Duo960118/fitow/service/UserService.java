@@ -2,6 +2,8 @@ package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -56,7 +58,7 @@ public interface UserService {
 
     // 모든 유저 조회
     @Transactional
-    List<UserDto.UserInfoDto> getAllUser();
+    Page<UserDto.UserInfoDto> getAllUser(Pageable pageable);
 
     // 이메일로 유저 하나 디테일 조회
     @Transactional

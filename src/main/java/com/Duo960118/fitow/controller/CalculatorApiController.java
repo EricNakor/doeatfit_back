@@ -5,6 +5,7 @@ import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.CalculatorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -42,7 +43,7 @@ public class CalculatorApiController {
 
     // 계산 기록 전체 불러오기
     @GetMapping("history")
-    public ApiResponse<List<CalculatorDto.CalcResultDto>> getResultHistory(
+    public ApiResponse<Page<CalculatorDto.CalcResultDto>> getResultHistory(
             @PageableDefault(page = 0, size = 10, sort = "calcId", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         CalculatorDto.ResultListPageDto resultListPageDto = new CalculatorDto.ResultListPageDto(customUserDetails.getUsername(), pageable);
@@ -52,10 +53,10 @@ public class CalculatorApiController {
 
     // 로딩, 밴팅 할 값 불러오기
     @GetMapping("history/category_normal")
-    public ApiResponse<List<CalculatorDto.CalcResultDto>> getNormalResultHistory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public ApiResponse<Page<CalculatorDto.CalcResultDto>> getNormalResultHistory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                                                     @PageableDefault(page = 0, size = 10, sort = "calcId")Pageable pageable) {
         CalculatorDto.ResultListPageDto resultListPageDto = new CalculatorDto.ResultListPageDto(customUserDetails.getUsername(),pageable);
-        List<CalculatorDto.CalcResultDto> result = calculatorService.getAdvancedCalcPage(resultListPageDto);
+        Page<CalculatorDto.CalcResultDto> result = calculatorService.getAdvancedCalcPage(resultListPageDto);
 
         return ApiResponse.success(result);
     }

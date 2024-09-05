@@ -14,6 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -104,7 +108,7 @@ public class UserApiController {
 
     // 임시비밀번호 발송
     @PostMapping("users/send-temp-passwd")
-    public ApiResponse<Object> sendTempPasswd(@Valid @RequestBody UserDto.FindUserInfoRequestDto userInfoRequest) {
+    public ApiResponse<Object> sendTempPasswd(@Valid @RequestBody UserDto.SendTempPasswdRequestDto userInfoRequest) {
         userFacade.sendTempPasswd(userInfoRequest.getEmail());
         return ApiResponse.success(null);
     }
@@ -143,8 +147,8 @@ public class UserApiController {
 
     // 모든 유저정보 가져오기
     @GetMapping("def-cms/users")
-    public ApiResponse<List<UserDto.UserInfoDto>> getUserInfos() {
-        List<UserDto.UserInfoDto> users =  userService.getAllUser();
+    public ApiResponse<Page<UserDto.UserInfoDto>> getUserInfos(@PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.DESC)Pageable pageable) {
+        Page<UserDto.UserInfoDto> users =  userService.getAllUser(pageable);
 
         return ApiResponse.success(users);
     }

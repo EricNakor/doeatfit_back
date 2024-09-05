@@ -3,6 +3,7 @@ package com.Duo960118.fitow.service;
 import com.Duo960118.fitow.entity.CalculatorDto;
 import com.Duo960118.fitow.entity.GenderEnum;
 import com.Duo960118.fitow.entity.UserEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public interface CalculatorService {
     CalculatorDto.CalcResponseDto calculate(CalculatorDto.CalcRequestDto calcRequest);
 
     // 로딩, 벤딩할 값 가져오기
-    List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto);
+    Page<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto);
 
     // 로딩, 벤딩 계산
     CalculatorDto.CalcResponseDto calculateAdvanced(CalculatorDto.AdvancedCalcRequestDto calcRequest);
@@ -39,7 +40,7 @@ public interface CalculatorService {
     void deleteResult(UUID uuid);
 
     // 계산 결과 페이징 처리
-    List<CalculatorDto.CalcResultDto> getCalcResultsPage(CalculatorDto.ResultListPageDto resultListPageDto);
+    Page<CalculatorDto.CalcResultDto> getCalcResultsPage(CalculatorDto.ResultListPageDto resultListPageDto);
 
     // 회원 탈퇴 시 외부키 null로 변경
     void updateForeignKeysNull(Long userId);

@@ -2,7 +2,9 @@ package com.Duo960118.fitow.controller;
 
 import com.Duo960118.fitow.annotaion.Enum;
 import com.Duo960118.fitow.annotaion.File;
-import com.Duo960118.fitow.entity.*;
+import com.Duo960118.fitow.entity.CustomUserDetails;
+import com.Duo960118.fitow.entity.ReportDto;
+import com.Duo960118.fitow.entity.ReportEntity;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.ReportService;
 import jakarta.validation.Valid;
@@ -34,12 +36,12 @@ ReportApiController {
 
     // 신고 및 문의 리스트 - 유저
     @GetMapping("reports/my-reports")
-    public ApiResponse<List<ReportDto.ReportInfoDto>> getReports(
+    public ApiResponse<Page<ReportDto.ReportInfoDto>> getReports(
             @PageableDefault(page = 0, size = 10, sort = "reportId", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         String email = customUserDetails.getUsername();
 
-        ReportDto.GetReportsRequestDto getReportsRequest = new ReportDto.GetReportsRequestDto(email,pageable);
+        ReportDto.GetReportsRequestDto getReportsRequest = new ReportDto.GetReportsRequestDto(email, pageable);
         return ApiResponse.success(reportService.getReports(getReportsRequest));
     }
 
@@ -63,9 +65,9 @@ ReportApiController {
 
     // 신고 및 문의 작성
     @PostMapping("reports")
-    public ApiResponse<ReportDto.PostReportResponseDto> postReport(@RequestPart(value = "reportFile", required = false) List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5)MultipartFile> multipartFile,
+    public ApiResponse<ReportDto.PostReportResponseDto> postReport(@RequestPart(value = "reportFile", required = false) List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5) MultipartFile> multipartFile,
                                                                    @Valid @RequestPart(value = "postReportRequestDto") ReportDto.PostReportRequestDto postReportRequest,
-                                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
+                                                                   @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
         postReportRequest.setEmail(customUserDetails.getUserInfo().getEmail());
         postReportRequest.setReportStatus(ReportEntity.ReportStatusEnum.TODO.toString());
         postReportRequest.setReply("");
@@ -86,8 +88,8 @@ ReportApiController {
     // 신고 및 문의 답변
     @PutMapping("def-cms/reports/reply/{uuid}")
     public ApiResponse<ReportDto.ReplyReportResponseDto> replyReport(@PathVariable("uuid") UUID uuid,
-                                                         @Valid @RequestPart(value = "replyReportDto") ReportDto.ReplyReportRequestDto replyReportRequest,
-                                                         @RequestPart(value = "replyFiles", required = false) List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5)MultipartFile> multipartFile) throws IOException {
+                                                                     @Valid @RequestPart(value = "replyReportDto") ReportDto.ReplyReportRequestDto replyReportRequest,
+                                                                     @RequestPart(value = "replyFiles", required = false) List<@File(allowedFileExt = {"jpg", "jpeg", "png"}, fileSizeLimit = 1024 * 1024 * 5) MultipartFile> multipartFile) throws IOException {
         replyReportRequest.setUuid(uuid);
         replyReportRequest.setReplyFiles(multipartFile);
         return ApiResponse.success(reportService.replyReport(replyReportRequest));
@@ -95,7 +97,7 @@ ReportApiController {
 
     // 신고 및 문의 리스트 - 어드민
     @GetMapping("def-cms/reports")
-    public ApiResponse<List<ReportDto.ReportInfoDto>> reports(
+    public ApiResponse<Page<ReportDto.ReportInfoDto>> reports(
             @PageableDefault(page = 0, size = 10, sort = "reportId", direction = Sort.Direction.DESC) Pageable pageable) {
 //            @RequestParam("pageNumber") int pageNumber,
 //            @RequestParam("pageSize") int pageSize) {

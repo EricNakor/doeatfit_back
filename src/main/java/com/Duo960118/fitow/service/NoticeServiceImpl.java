@@ -7,6 +7,7 @@ import com.Duo960118.fitow.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -83,8 +84,8 @@ public class NoticeServiceImpl implements NoticeService {
 //    }
 
     @Override
-    public List<NoticeDto.NoticeInfoDto> getNoticePage(Pageable pageable) {
-        return noticeRepository.findAll(pageable).stream().map(NoticeMapper::entityToNoticeInfoDto).collect(Collectors.toList());
+    public Page<NoticeDto.NoticeInfoDto> getNoticePage(Pageable pageable) {
+        return noticeRepository.findAll(pageable).map(NoticeMapper::entityToNoticeInfoDto);
     }
 
     @Override

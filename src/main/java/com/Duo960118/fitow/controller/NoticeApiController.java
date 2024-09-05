@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -39,7 +40,7 @@ public class NoticeApiController {
 
     // 공지 전체 조회
     @GetMapping("notices")
-    public ApiResponse<List<NoticeDto.NoticeInfoDto>> notices(
+    public ApiResponse<Page<NoticeDto.NoticeInfoDto>> notices(
             @PageableDefault(page = 0, size = 10, sort = "noticeId", direction = Sort.Direction.DESC) Pageable pageable) {
 
         return ApiResponse.success(noticeService.getNoticePage(pageable));

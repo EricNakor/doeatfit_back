@@ -16,9 +16,8 @@ public interface WorkoutRepository extends JpaRepository<WorkoutEntity,Long>,Wor
     boolean existsByUuidEntityUuid(UUID uuid);
 
     // 운동 이름 으로 찾기
-    Page<WorkoutEntity> findAllByWorkoutNameContains(String keyword,Pageable pageable);
+    Page<WorkoutEntity> findAllByWorkoutNameContains(String keyword, Pageable pageable);
 
     // minor muscle로 운동 찾기
     Page<WorkoutEntity> findAllByAgonistMuscleEnumsIn(Collection<WorkoutEntity.MinorMuscleEnum> agonistMuscleEnums, Pageable pageable);
-
 }

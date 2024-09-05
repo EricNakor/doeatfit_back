@@ -25,11 +25,11 @@ public interface ReportService {
 
     // 조회 회원의 Report 리스트
     @Transactional
-    List<ReportDto.ReportInfoDto> getReports(ReportDto.GetReportsRequestDto getReportsRequest);
+    Page<ReportDto.ReportInfoDto> getReports(ReportDto.GetReportsRequestDto getReportsRequest);
 
     // admin Report 리스트
     @Transactional
-    List<ReportDto.ReportInfoDto> getAllReport(Pageable pageable);
+    Page<ReportDto.ReportInfoDto> getAllReport(Pageable pageable);
 
     // Report 답변
     @Transactional

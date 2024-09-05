@@ -57,7 +57,7 @@ public class CalculatorEntity {
     // 계산정보 엔티티 생성자
     @Builder
     public CalculatorEntity(UserEntity userEntity, int age, GenderEnum gender, float height, float weight, int bmr,
-                            ActivityLevelEnum activityLevel, DietGoalEnum dietGoal, double carb, double protein, double fat, CalcCategoryEnum calcCategory) {
+                            ActivityLevelEnum activityLevel, DietGoalEnum dietGoal, double carb, double protein, double fat, CalcCategoryEnum calcCategory, LocalDate calcDate) {
         this.userEntity = userEntity;
         this.age = age;
         this.gender = gender;
@@ -70,6 +70,7 @@ public class CalculatorEntity {
         this.protein = protein;
         this.fat = fat;
         this.calcCategory = calcCategory;
+        this.calcDate = calcDate;
     }
 
     public void updateUserEntity(UserEntity userEntity) {

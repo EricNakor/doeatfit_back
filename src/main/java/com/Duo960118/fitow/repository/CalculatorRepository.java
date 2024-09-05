@@ -13,9 +13,6 @@ public interface CalculatorRepository extends JpaRepository<CalculatorEntity, Lo
     // uuid 찾기
     Optional<CalculatorEntity> findByUuidEntityUuid(UUID uuid);
 
-    // 기록 불러오기
-    List<CalculatorEntity> findByUserEntityUserIdOrderByCalcIdDesc(Long userId);
-
     // 카테고리 값이 0인 것만 불러오기
     Page<CalculatorEntity> findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(Long userId, CalculatorEntity.CalcCategoryEnum calcCategoryEnum, Pageable pageable);
 

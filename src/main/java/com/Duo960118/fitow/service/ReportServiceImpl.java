@@ -115,14 +115,12 @@ public class ReportServiceImpl implements ReportService {
 
     // 조회한 회원의 Report 리스트, 최근 문의사항 정렬
     @Override
-    public List<ReportDto.ReportInfoDto> getReports(ReportDto.GetReportsRequestDto getReportsRequest) {
+    public Page<ReportDto.ReportInfoDto> getReports(ReportDto.GetReportsRequestDto getReportsRequest) {
         Long userId = userService.findByEmail(getReportsRequest.getEmail()).getUserId();
-        List<ReportEntity> reportEntityList = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, getReportsRequest.getPageable());
+        Page<ReportEntity> reportEntityList = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, getReportsRequest.getPageable());
 
         return reportEntityList
-                .stream()
-                .map(ReportMapper::entityToReportInfoDto)
-                .collect(Collectors.toList());
+                .map(ReportMapper::entityToReportInfoDto);
 
         // 람다 함수, stream 공부해보기
         // DB에서 가져올때 Entity로 반환이 되고
@@ -133,11 +131,9 @@ public class ReportServiceImpl implements ReportService {
 
     // admin 을 위한 전체 Report 리스트
     @Override
-    public List<ReportDto.ReportInfoDto> getAllReport(Pageable pageable) {
+    public Page<ReportDto.ReportInfoDto> getAllReport(Pageable pageable) {
         return reportRepository.findAll(pageable)
-                .stream()
-                .map(ReportMapper::entityToReportInfoDto)
-                .collect(Collectors.toList());
+                .map(ReportMapper::entityToReportInfoDto);
     }
 
     // Report 답변
@@ -184,7 +180,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public void updateForeignKeysNull(Long userId) {
         Pageable pageable = Pageable.unpaged();
-        List<ReportEntity> reportEntities = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, pageable);
+        Page<ReportEntity> reportEntities = reportRepository.findByUserEntityUserIdOrderByReportIdDesc(userId, pageable);
 
         // 외래 키를 null로 설정
         for (ReportEntity reportEntity : reportEntities) {

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -83,6 +84,7 @@ public class CalculatorServiceImpl implements CalculatorService {
                 .bmr(calcRequest.getBmr())
                 .activityLevel(CalculatorEntity.ActivityLevelEnum.fromString(calcRequest.getActivityLevel()))
                 .dietGoal(CalculatorEntity.DietGoalEnum.fromString(calcRequest.getDietGoal()))
+                .calcDate(LocalDate.now())
                 .carb(carb)
                 .protein(protein)
                 .fat(fat)
@@ -129,6 +131,7 @@ public class CalculatorServiceImpl implements CalculatorService {
                 .bmr(calculateEntity.getBmr())
                 .activityLevel(calculateEntity.getActivityLevel())
                 .dietGoal(calculateEntity.getDietGoal())
+                .calcDate(LocalDate.now())
                 .carb(advancedCarb)
                 .protein(advancedProtein)
                 .fat(advancedFat)
@@ -158,24 +161,20 @@ public class CalculatorServiceImpl implements CalculatorService {
     // 계산 결과 히스토리 페이징 처리
     // todo: 페이징처리 서비스와 히스토리 서비스 중 하나 택 1
     @Override
-    public List<CalculatorDto.CalcResultDto> getCalcResultsPage(CalculatorDto.ResultListPageDto resultListPageDto) {
+    public Page<CalculatorDto.CalcResultDto> getCalcResultsPage(CalculatorDto.ResultListPageDto resultListPageDto) {
         UserEntity userEntity = userService.findByEmail(resultListPageDto.getEmail());
 
         return calculatorRepository.findAllByUserEntityUserId(userEntity.getUserId(), resultListPageDto.getPageable())
-                .stream()
-                .map(CalculatorMapper::entityToCalcResultDto)
-                .collect(Collectors.toList());
+                .map(CalculatorMapper::entityToCalcResultDto);
     }
 
     // 로딩, 밴딩할 값 리스트
     @Override
-    public List<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto) {
+    public Page<CalculatorDto.CalcResultDto> getAdvancedCalcPage(CalculatorDto.ResultListPageDto resultListPageDto) {
         UserEntity userEntity = userService.findByEmail(resultListPageDto.getEmail());
         Page<CalculatorEntity> calculateInfoEntity = calculatorRepository.findByUserEntityUserIdAndCalcCategoryOrderByCalcIdDesc(userEntity.getUserId(), CalculatorEntity.CalcCategoryEnum.NORMAL, resultListPageDto.getPageable());
         return calculateInfoEntity
-                .stream()
-                .map(CalculatorMapper::entityToCalcResultDto)
-                .collect(Collectors.toList());
+                .map(CalculatorMapper::entityToCalcResultDto);
     }
 
     // 회원 탈퇴 시 외부키 null로 변경

@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.entity.NoticeDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public interface NoticeService {
 
     // PageRequest에 맞게 Notice들을 반환
     @Transactional
-    List<NoticeDto.NoticeInfoDto> getNoticePage(Pageable pageable);
+    Page<NoticeDto.NoticeInfoDto> getNoticePage(Pageable pageable);
 
     // 회원 탈퇴 시 외부키 null로 변경
     @Transactional

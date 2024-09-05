@@ -15,8 +15,6 @@ public class CalculatorDto {
     @Setter
     @NoArgsConstructor
     public static class CalcRequestDto {
-        @Email(message = "{Email.email}")
-        @NotBlank(message = "{NotBlank.email}")
         private String email;
         @PositiveOrZero(message = "{PositiveOrZero.age}")
         @NotNull(message = "{NotNull.age}")
@@ -45,8 +43,6 @@ public class CalculatorDto {
         @Enum(enumClass = CalculatorEntity.DietGoalEnum.class, message = "{Enum.dietGoal}")
         @NotBlank(message = "{NotBlank.dietGoal}")
         private String dietGoal;
-        @Enum(enumClass = CalculatorEntity.CalcCategoryEnum.class, message = "{Enum.calcCategory}")
-        @NotBlank(message = "{NotBlank.calcCategory}")
         private String calcCategory;
     }
 
@@ -103,8 +99,6 @@ public class CalculatorDto {
     @Setter
     @AllArgsConstructor
     public static class AdvancedCalcRequestDto {
-        @Email(message = "{Email.email}")
-        @NotBlank(message = "{NotBlank.email}")
         private String email;
         @NotNull(message = "{NotNull.uuid}")
         private final UUID uuid;

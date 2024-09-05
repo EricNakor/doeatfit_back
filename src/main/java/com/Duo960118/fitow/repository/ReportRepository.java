@@ -1,6 +1,7 @@
 package com.Duo960118.fitow.repository;
 
 import com.Duo960118.fitow.entity.ReportEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -20,7 +21,7 @@ public interface ReportRepository extends JpaRepository<ReportEntity, Long>, Rep
     Optional<ReportEntity> findByUuidEntityUuid(UUID uuid);
 
     // 조회 회원의 문의 찾기
-    List<ReportEntity> findByUserEntityUserIdOrderByReportIdDesc(Long userId, Pageable pageable);
+    Page<ReportEntity> findByUserEntityUserIdOrderByReportIdDesc(Long userId, Pageable pageable);
 
     // Status 검색 (filter)
     // Category 검색 (filter)

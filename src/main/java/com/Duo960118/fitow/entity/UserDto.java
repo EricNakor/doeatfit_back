@@ -56,10 +56,7 @@ public class UserDto {
     @Getter
     @Setter
     public static class EditPasswdRequestDto {
-        @Email(message = "{Email.email}")
-        @NotBlank(message = "{NB.e}")
         private String email;
-        @Password
         @NotBlank(message = "{NotBlank.password}")
         private String currentPasswd;
         @Password
@@ -83,8 +80,6 @@ public class UserDto {
     @Setter
     @Builder
     public static class EditNickNameRequestDto {
-        @Email(message = "{Email.email}")
-        @NotBlank(message = "{NotBlank.email}")
         private String email;
         @Nickname
         @NotBlank(message = "{NotBlank.nickName}")
@@ -143,6 +138,15 @@ public class UserDto {
         @NotNull(message = "{NotNull.birth}")
         @PastOrPresent(message = "{PastOrPresent.birth}")
         private LocalDate birth;
+    }
+
+    @Getter
+    @Setter
+    public static class SendTempPasswdRequestDto {
+        // 내부 클래스 static..? 공부해보기
+        @Email(message = "{Email.email}")
+        @NotBlank(message = "{NotBlank.email}")
+        private String email;
     }
 
     // Email 찾기 응답
