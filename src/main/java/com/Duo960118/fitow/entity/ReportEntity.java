@@ -90,6 +90,9 @@ public class ReportEntity {
 
         @JsonCreator
         public static ReportCategoryEnum fromString(String str) {
+            if(str.isEmpty()){
+                return null;
+            }
             return ReportCategoryEnum.valueOf(str);
         }
     }
@@ -102,6 +105,9 @@ public class ReportEntity {
 
         @JsonCreator
         public static ReportStatusEnum fromString(String str) {
+            if(str.isEmpty()){
+                return null;
+            }
             return ReportStatusEnum.valueOf(str);
         }
     }

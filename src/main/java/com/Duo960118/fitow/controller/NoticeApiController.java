@@ -48,12 +48,14 @@ public class NoticeApiController {
 
     // 공지 검색
     @GetMapping("notices/search")
-    public ApiResponse<List<NoticeDto.NoticeInfoDto>> searchNotice(@Enum(enumClass = NoticeEntity.NoticeCategoryEnum.class, message = "{Enum.noticeCategory}")
-                                                                       @NotBlank(message = "{NotBlank.noticeCategory}") @RequestParam("noticeCategory") String noticeCategory,
-                                                                   @NotBlank(message = "{NotBlank.searchString}") @Size(min=5, max=100,message = "{Size.searchString}") @RequestParam("searchString") String searchString) {
+    public ApiResponse<Page<NoticeDto.NoticeInfoDto>> searchNotice(@PageableDefault Pageable pageable,
+                                                                   @Enum(enumClass = NoticeEntity.NoticeCategoryEnum.class, message = "{Enum.noticeCategory}")
+                                                                   @RequestParam("noticeCategory") String noticeCategory,
+                                                                   @NotBlank(message = "{NotBlank.searchString}") @Size(min=2, max=100,message = "{Size.searchString}") @RequestParam("searchString") String searchString) {
         NoticeDto.SearchNoticeRequestDto searchNoticeRequestDto = NoticeDto.SearchNoticeRequestDto.builder()
                 .searchString(searchString)
-                .category(noticeCategory).build();
+                .category(noticeCategory)
+                .pageable(pageable).build();
         return ApiResponse.success(noticeService.searchNotice(searchNoticeRequestDto));
     }
 

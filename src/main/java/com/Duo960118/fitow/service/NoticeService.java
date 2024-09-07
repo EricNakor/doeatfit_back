@@ -27,7 +27,7 @@ public interface NoticeService {
 
     // 조건에 맞는 Notice 검색
     @Transactional
-    List<NoticeDto.NoticeInfoDto> searchNotice(NoticeDto.SearchNoticeRequestDto searchNoticeRequest);
+    Page<NoticeDto.NoticeInfoDto> searchNotice(NoticeDto.SearchNoticeRequestDto searchNoticeRequest);
 
     // 모든 Notice를 정렬된 상태로 반환
 //    @Transactional

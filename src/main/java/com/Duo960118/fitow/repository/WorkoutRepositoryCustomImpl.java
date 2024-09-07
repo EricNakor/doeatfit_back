@@ -165,7 +165,6 @@ public class WorkoutRepositoryCustomImpl implements WorkoutRepositoryCustom {
                 } else {
                     expression = expression.or(workoutEntity.agonistMuscleEnums.contains(muscle));
                 }
-                logger.info(expression.toString());
             }
         }
 

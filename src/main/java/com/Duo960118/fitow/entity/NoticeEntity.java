@@ -68,7 +68,17 @@ public class NoticeEntity extends TimeStampEntity {
 
         @JsonCreator
         public static NoticeCategoryEnum fromValue(String str) {
+            if(str.isEmpty()){
+                return null;
+            }
             return NoticeCategoryEnum.valueOf(str);
+        }
+
+        public static NoticeEntity.NoticeCategoryEnum fromJson(String str) {
+            if(str.isEmpty()){
+                return null;
+            }
+            return NoticeEntity.NoticeCategoryEnum.valueOf(str);
         }
     }
 

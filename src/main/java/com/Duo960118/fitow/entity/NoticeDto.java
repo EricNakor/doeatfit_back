@@ -3,6 +3,7 @@ package com.Duo960118.fitow.entity;
 import com.Duo960118.fitow.annotaion.Enum;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -84,5 +85,6 @@ public class NoticeDto {
         private String category;
         @Size(min=2, max=100, message = "{Size.searchString}")
         private String searchString;
+        private Pageable pageable;
     }
 }

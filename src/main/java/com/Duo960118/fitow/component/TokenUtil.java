@@ -199,7 +199,9 @@ public class TokenUtil {
     public Cookie convertAccessTokenAsCookie(String accessToken) {
         Cookie cookie = new Cookie(JwtProperties.ACCESS_TOKEN_KEY, URLEncoder.encode(accessToken, StandardCharsets.UTF_8));
         cookie.setPath("/");
-        cookie.setDomain("localhost");
+        // 이러면 localhost 로 접속해야만 쿠키 사용 가능
+        // 그래서 setDomain 없앰 
+//        cookie.setDomain("localhost");
         cookie.setHttpOnly(true);
 
         cookie.setSecure(false);  // todo: 나중에 ssl인증서를 사용할 때는 true 로 설정하여 https 통신이 아닌 경우에는 cookie 저장 안되게 해야함
