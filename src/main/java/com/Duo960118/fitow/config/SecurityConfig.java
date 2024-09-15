@@ -3,6 +3,7 @@ package com.Duo960118.fitow.config;
 import com.Duo960118.fitow.component.CustomAuthenticationEntryPoint;
 import com.Duo960118.fitow.component.CustomLogoutHandler;
 import com.Duo960118.fitow.component.CustomAccessDeniedHandler;
+import com.Duo960118.fitow.entity.JwtProperties;
 import com.Duo960118.fitow.filter.JwtFilter;
 import com.Duo960118.fitow.filter.LoginFilter;
 import com.Duo960118.fitow.component.TokenUtil;
@@ -89,7 +90,7 @@ public class SecurityConfig {
                 // Logout Handler, 로그아웃 시 redis에서 access token 제거 및 blacklist 추가
                 .logout(logoutConfigurer ->
                         logoutConfigurer
-                                //.deleteCookies(TokenProvider.ACCESS_TOKEN_KEY) // 로그아웃 후 해당 쿠키 삭제
+                                .deleteCookies(JwtProperties.ACCESS_TOKEN_KEY) // 로그아웃 후 해당 쿠키 삭제
                                 .addLogoutHandler(customLogoutHandler)
                                 .logoutSuccessHandler(customLogoutHandler)
                                 .logoutUrl("/logout")

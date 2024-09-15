@@ -4,6 +4,7 @@ import com.Duo960118.fitow.component.TokenUtil;
 import com.Duo960118.fitow.entity.CustomUserDetails;
 import com.Duo960118.fitow.entity.ErrorCodeEnum;
 import com.Duo960118.fitow.entity.JwtProperties;
+import com.Duo960118.fitow.exception.NoAccessTokenException;
 import com.Duo960118.fitow.exception.NoCookieException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -19,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
@@ -77,9 +77,9 @@ public class JwtFilter extends OncePerRequestFilter {
             //유효하지 않은 토큰
             request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.INVALID_TOKEN);
         } catch (NoCookieException e) {
-            request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.COOKIE_NOT_EXIST);
-        } catch (NoSuchElementException e){
-            request.setAttribute(JwtProperties.EXCEPTION_STRING, ErrorCodeEnum.TOKEN_NOT_EXIST);
+            request.setAttribute(JwtProperties.EXCEPTION_STRING, NoCookieException.errorCode);
+        } catch (NoAccessTokenException e){
+            request.setAttribute(JwtProperties.EXCEPTION_STRING, NoAccessTokenException.errorCode);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

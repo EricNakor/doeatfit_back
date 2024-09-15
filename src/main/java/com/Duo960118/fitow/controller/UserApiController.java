@@ -18,7 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -173,7 +175,16 @@ public class UserApiController {
         return ApiResponse.success(Response);
     }
 
-    //    // 성별 Enum
+    @GetMapping("/users/is-authenticated")
+    public ApiResponse<Object> checkAuthStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return ApiResponse.success(null);
+        }
+        return ApiResponse.fail(null);
+    }
+
+//    // 성별 Enum
 //    @GetMapping("users/gender-enum")
 //    public ApiResponse<GenderEnum[]> getGenderEnum() {
 //        return ApiResponse.success(GenderEnum.values());
