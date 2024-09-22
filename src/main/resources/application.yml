@@ -54,10 +54,10 @@ spring:
 #  report_file_dir: C:\Users\jewon\Desktop\doeatfit\images\report\
 #  reply_file_dir: C:\Users\jewon\Desktop\doeatfit\images\reply\
 #  workout_media_dir: C:\Users\jewon\Desktop\doeatfit\media\
-  profile_img_dir: \doeatfit_media\profile\
-  report_file_dir: \doeatfit_media\report\
-  reply_file_dir: \doeatfit_media\reply\
-  workout_media_dir: \doeatfit_media\media\
+  profile_img_dir: /doeatfit_media/profile/
+  report_file_dir: /doeatfit_media/report/
+  reply_file_dir: /doeatfit_media/reply/
+  workout_media_dir: /doeatfit_media/media/
   messages:
     basename: validation
     encoding: UTF-8
