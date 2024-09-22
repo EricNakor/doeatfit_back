@@ -5,8 +5,8 @@ spring:
       - classpath:/application-secret.yml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://172.30.1.3:3306/fitow
-    url: jdbc:mysql://192.168.0.102:3306/fitow
+    url: jdbc:mysql://172.30.1.3:3306/fitow
+#    url: jdbc:mysql://192.168.0.102:3306/fitow
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -29,8 +29,8 @@ spring:
           ssl.trust: smtp.gmail.com
   data:
     redis:
-#      host: 172.30.1.3
-      host: 192.168.0.102
+      host: 172.30.1.3
+#      host: 192.168.0.102
       port: 6379
   mvc:
     hiddenmethod:
@@ -45,14 +45,19 @@ spring:
       enabled: true
       max-file-size: 50MB
       max-request-size: 50MB
-#  profile_img_dir: C:\Users\ericn\Desktop\fitow\images\profile\
-#  report_file_dir: C:\Users\ericn\Desktop\fitow\images\report\
-#  reply_file_dir: C:\Users\ericn\Desktop\fitow\images\reply\
-#  workout_media_dir: C:\Users\ericn\Desktop\fitow\images\media\
-  profile_img_dir: C:\Users\jewon\Desktop\fitow\images\profile\
-  report_file_dir: C:\Users\jewon\Desktop\fitow\images\report\
-  reply_file_dir: C:\Users\jewon\Desktop\fitow\images\reply\
-  workout_media_dir: C:\Users\jewon\Desktop\fitow\media\
+#  profile_img_dir: C:\Users\ericn\Desktop\doeatfit\images\profile\
+#  profile_img_dir: C:\Users\ericn\Desktop\doeatfit\images\profile\
+#  report_file_dir: C:\Users\ericn\Desktop\doeatfit\images\report\
+#  reply_file_dir: C:\Users\ericn\Desktop\doeatfit\images\reply\
+#  workout_media_dir: C:\Users\ericn\Desktop\doeatfit\images\media\
+#  profile_img_dir: C:\Users\jewon\Desktop\doeatfit\images\profile\
+#  report_file_dir: C:\Users\jewon\Desktop\doeatfit\images\report\
+#  reply_file_dir: C:\Users\jewon\Desktop\doeatfit\images\reply\
+#  workout_media_dir: C:\Users\jewon\Desktop\doeatfit\media\
+  profile_img_dir: \doeatfit_media\profile\
+  report_file_dir: \doeatfit_media\report\
+  reply_file_dir: \doeatfit_media\reply\
+  workout_media_dir: \doeatfit_media\media\
   messages:
     basename: validation
     encoding: UTF-8
