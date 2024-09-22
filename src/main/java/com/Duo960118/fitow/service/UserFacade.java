@@ -103,7 +103,8 @@ public class UserFacade {
         userService.editProfileImgName(email, profileImgName);
 
         // 지정된 경로에 저장
-        File file = new File(uploadConfig.getProfileImgDir() + "\\" + profileImgName);
+//        File file = new File(uploadConfig.getProfileImgDir() + "\\" + profileImgName);
+        File file = new File(uploadConfig.getProfileImgDir() + File.separator + profileImgName);
         editProfileImgRequest.getProfileImgFile().transferTo(file);
 
         // contextHolder.authentication 주입
