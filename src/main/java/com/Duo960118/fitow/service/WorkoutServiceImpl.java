@@ -1,7 +1,7 @@
 package com.Duo960118.fitow.service;
 
-import com.Duo960118.fitow.entity.WorkoutEntity;
 import com.Duo960118.fitow.entity.WorkoutDto;
+import com.Duo960118.fitow.entity.WorkoutEntity;
 import com.Duo960118.fitow.mapper.WorkoutMapper;
 import com.Duo960118.fitow.repository.WorkoutRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
@@ -22,10 +24,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WorkoutServiceImpl implements WorkoutService {
+    private final WorkoutRepository workoutRepository;
     @Value("${spring.workout_media_dir}")
     private String workoutMediaDir;
-
-    private final WorkoutRepository workoutRepository;
 
     @Override
     public List<WorkoutDto.WorkoutDetailDto> getAllWorkout(Pageable pageable) {
@@ -38,7 +39,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     }
 
     @Override
-    public WorkoutDto.WorkoutDetailDto  editWorkout(WorkoutDto.EditWorkoutRequestDto editWorkoutRequest) {
+    public WorkoutDto.WorkoutDetailDto editWorkout(WorkoutDto.EditWorkoutRequestDto editWorkoutRequest) {
         WorkoutEntity workoutEntity = workoutRepository.findByUuidEntityUuid(editWorkoutRequest.getUuid()).orElseThrow(() -> new RuntimeException("해당 운동이 존재하지 않습니다."));
 
         // 파일명 추출
@@ -68,18 +69,18 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public WorkoutDto.WorkoutDetailDto postWorkout(WorkoutDto.PostWorkoutRequestDto postWorkoutRequest) {
 
-        String workoutMediaFileName="";
+        String workoutMediaFileName = "";
         // 파일명 추출
         if (postWorkoutRequest.getMediaFile() != null) {
-            String fileName = postWorkoutRequest.getMediaFile() .getOriginalFilename();
+            String fileName = postWorkoutRequest.getMediaFile().getOriginalFilename();
             // 확장자 추출
             String fileExt = Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
-            workoutMediaFileName = UUID.randomUUID()+ fileExt;
+            workoutMediaFileName = UUID.randomUUID() + fileExt;
 
             // 지정된 경로에 저장
             File file = new File(workoutMediaDir + File.separator + workoutMediaFileName);
             try {
-                postWorkoutRequest.getMediaFile() .transferTo(file);
+                postWorkoutRequest.getMediaFile().transferTo(file);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to save media file", e);
             }
@@ -109,7 +110,7 @@ public class WorkoutServiceImpl implements WorkoutService {
 
         // 영상도 삭제
         File file = new File(workoutMediaDir + workoutMediaName);
-        if (file.delete()){
+        if (file.delete()) {
             log.info("Profile video deleted");
         } else {
             log.warn("Profile video not deleted");
@@ -134,26 +135,26 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public Page<WorkoutDto.WorkoutDetailDto> searchWorkout(WorkoutDto.SearchWorkoutKeywordRequestDto searchWorkoutKeywordRequest) {
         // 운동 이름으로 찾기
-        Page<WorkoutEntity> searchResult= workoutRepository.findAllByWorkoutNameContains(searchWorkoutKeywordRequest.getKeyword(),searchWorkoutKeywordRequest.getPageable());
+        Page<WorkoutEntity> searchResult = workoutRepository.findAllByWorkoutNameContains(searchWorkoutKeywordRequest.getKeyword(), searchWorkoutKeywordRequest.getPageable());
 
         // 검색
-        if(searchResult.hasContent()){
+        if (searchResult.hasContent()) {
             return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
         }
 
         // 근육 이름으로 찾기
         // 1. major muscle인지 확인, 맞으면 major muscle에 해당하는 minor muscle들 추가
         // 영어, 한글
-        Set<WorkoutEntity.MinorMuscleEnum> minorMuscleEnumList= new HashSet<>();
+        Set<WorkoutEntity.MinorMuscleEnum> minorMuscleEnumList = new HashSet<>();
 
 
         // 키워드가 MajorMuscleEnum 또는 운동 이름과 일치하는지 확인
-        for( WorkoutEntity.MajorMuscleEnum majorMuscleEnum :WorkoutEntity.MajorMuscleEnum.values()){
-            if(StringUtils.containsIgnoreCase(majorMuscleEnum.toString(),searchWorkoutKeywordRequest.getKeyword(),Locale.ENGLISH) ||
-                    StringUtils.containsIgnoreCase(majorMuscleEnum.getDesc(),searchWorkoutKeywordRequest.getKeyword(),Locale.KOREAN)){
+        for (WorkoutEntity.MajorMuscleEnum majorMuscleEnum : WorkoutEntity.MajorMuscleEnum.values()) {
+            if (StringUtils.containsIgnoreCase(majorMuscleEnum.toString(), searchWorkoutKeywordRequest.getKeyword(), Locale.ENGLISH) ||
+                    StringUtils.containsIgnoreCase(majorMuscleEnum.getDesc(), searchWorkoutKeywordRequest.getKeyword(), Locale.KOREAN)) {
                 // MinorMuscleEnum 에서도 일치하는지 확인 후 추가
-                for(WorkoutEntity.MinorMuscleEnum minorMuscleEnum :WorkoutEntity.MinorMuscleEnum.values()) {
-                    if(minorMuscleEnum.getMajorMuscleEnum() == majorMuscleEnum){
+                for (WorkoutEntity.MinorMuscleEnum minorMuscleEnum : WorkoutEntity.MinorMuscleEnum.values()) {
+                    if (minorMuscleEnum.getMajorMuscleEnum() == majorMuscleEnum) {
                         minorMuscleEnumList.add(minorMuscleEnum);
                     }
                 }
@@ -161,22 +162,22 @@ public class WorkoutServiceImpl implements WorkoutService {
         }
 
         // 검색
-        if(!minorMuscleEnumList.isEmpty()){
-            searchResult =workoutRepository.findAllByAgonistMuscleEnumsIn(minorMuscleEnumList,searchWorkoutKeywordRequest.getPageable());
+        if (!minorMuscleEnumList.isEmpty()) {
+            searchResult = workoutRepository.findAllByAgonistMuscleEnumsIn(minorMuscleEnumList, searchWorkoutKeywordRequest.getPageable());
             return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
         }
 
         // 2. minor muscle 이라면
-        for(WorkoutEntity.MinorMuscleEnum minorMuscleEnum :WorkoutEntity.MinorMuscleEnum.values()) {
-            if(StringUtils.containsIgnoreCase(minorMuscleEnum.toString(),searchWorkoutKeywordRequest.getKeyword(),Locale.ENGLISH) ||
-                    StringUtils.containsIgnoreCase(minorMuscleEnum.getDesc(),searchWorkoutKeywordRequest.getKeyword(),Locale.KOREAN)){
+        for (WorkoutEntity.MinorMuscleEnum minorMuscleEnum : WorkoutEntity.MinorMuscleEnum.values()) {
+            if (StringUtils.containsIgnoreCase(minorMuscleEnum.toString(), searchWorkoutKeywordRequest.getKeyword(), Locale.ENGLISH) ||
+                    StringUtils.containsIgnoreCase(minorMuscleEnum.getDesc(), searchWorkoutKeywordRequest.getKeyword(), Locale.KOREAN)) {
                 minorMuscleEnumList.add(minorMuscleEnum);
             }
         }
 
         // 검색
-        if(!minorMuscleEnumList.isEmpty()){
-            searchResult =workoutRepository.findAllByAgonistMuscleEnumsIn(minorMuscleEnumList,searchWorkoutKeywordRequest.getPageable());
+        if (!minorMuscleEnumList.isEmpty()) {
+            searchResult = workoutRepository.findAllByAgonistMuscleEnumsIn(minorMuscleEnumList, searchWorkoutKeywordRequest.getPageable());
             return searchResult.map(WorkoutMapper::entityToWorkoutDetailDto);
         }
 
