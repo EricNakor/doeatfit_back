@@ -43,7 +43,7 @@ public class ReportServiceImpl implements ReportService {
             String fileRename = UUID.randomUUID() + fileExt;
             filenameList.add(fileRename);
 
-            File file = new File(savePath + "\\" + fileRename);
+            File file = new File(savePath + File.separator + fileRename);
             multipartFile.transferTo(file);
         }
         return filenameList;
@@ -143,12 +143,17 @@ public class ReportServiceImpl implements ReportService {
         ReportEntity reportEntity =
                 reportRepository.findByUuidEntityUuid(replyReportRequest.getUuid())
                         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 문의"+ replyReportRequest.getUuid()));
+
         if (replyReportRequest.getReplyFiles() != null) {
             List<String> replyFileNameList = extractFileNameList(replyReportRequest.getReplyFiles(), replyFileDir);
             replyReportRequest.setReplyFileNames(replyFileNameList);
         }
         reportEntity.replyReport(replyReportRequest);
-        return new ReportDto.ReplyReportResponseDto(ReportEntity.ReportStatusEnum.fromString(replyReportRequest.getReportStatus()), replyReportRequest.getReply(), replyReportRequest.getReplyFileNames());
+
+        return new ReportDto.ReplyReportResponseDto(
+                ReportEntity.ReportStatusEnum.fromString(replyReportRequest.getReportStatus()),
+                replyReportRequest.getReply(),
+                replyReportRequest.getReplyFileNames());
     }
 
     // Status 검색 (filter)

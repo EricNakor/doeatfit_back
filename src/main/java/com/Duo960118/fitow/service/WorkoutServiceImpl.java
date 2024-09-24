@@ -49,7 +49,7 @@ public class WorkoutServiceImpl implements WorkoutService {
             String workoutMediaFileName = UUID.randomUUID() + fileExt;
 
             // 지정된 경로에 저장
-            File file = new File(workoutMediaDir + "\\" + workoutMediaFileName);
+            File file = new File(workoutMediaDir + File.separator + workoutMediaFileName);
             try {
                 editWorkoutRequest.getWorkoutFile().transferTo(file);
             } catch (IOException e) {
