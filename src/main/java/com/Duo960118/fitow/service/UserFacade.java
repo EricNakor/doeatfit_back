@@ -87,7 +87,7 @@ public class UserFacade {
             profileImgName = uuid + fileExt;
         } else {
             // 이전 이미지 삭제
-            File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
+            File file = new File(uploadConfig.getProfileImgDir() + File.separator + user.getProfileImg());
 
             if (!file.delete()) {
                 // 예외: 프로필 이미지 삭제 실패
@@ -135,7 +135,7 @@ public class UserFacade {
 
         // 프로필 이미지 삭제
         if (user.getProfileImg() != null) {
-            File file = new File(uploadConfig.getProfileImgDir() + "\\" + user.getProfileImg());
+            File file = new File(uploadConfig.getProfileImgDir() + File.separator + user.getProfileImg());
             if (file.delete()) {
                 log.info("Profile image deleted");
             } else {
