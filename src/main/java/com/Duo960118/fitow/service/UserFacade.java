@@ -9,6 +9,7 @@ import com.Duo960118.fitow.exception.PasswordNotMatchesException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -125,7 +126,7 @@ public class UserFacade {
 
     // 프로필 이미지 불러오기
     public Resource loadProfileImg(String filename) {
-        return new FileSystemResource(uploadConfig.getProfileImgDir() + filename);
+        return new ClassPathResource(uploadConfig.getProfileImgDir() + filename);
     }
 
     // 회원탈퇴

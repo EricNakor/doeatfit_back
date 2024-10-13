@@ -42,6 +42,7 @@ public class ReportEntity {
     @PastOrPresent(message = "{PastOrPresent.reportDate}")
     private LocalDateTime reportDate;
     // 신고 내용
+    @Column(columnDefinition = "longtext")
     @NotBlank(message = "{NotBlank.content}")
     private String Content;
     // 신고 첨부파일
@@ -55,6 +56,8 @@ public class ReportEntity {
     @Embedded
     private UuidEntity uuidEntity;
     // 답변
+    @Column(columnDefinition = "longtext")
+    @NotBlank(message = "{NotBlank.content}")
     private String reply;
     // 답변 일자
     @PastOrPresent(message = "{PastOrPresent.replyDate}")

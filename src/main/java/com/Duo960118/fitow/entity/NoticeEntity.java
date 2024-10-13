@@ -39,7 +39,7 @@ public class NoticeEntity extends TimeStampEntity {
 
     // mediumtext : ~ 16mb
     // longtext : ~ 4gb
-    @Column(columnDefinition = "mediumtext")
+    @Column(columnDefinition = "longtext")
     @NotBlank(message = "{NotBlank.content}")
     private String content;
 

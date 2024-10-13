@@ -7,6 +7,7 @@ import com.Duo960118.fitow.repository.WorkoutRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -121,7 +122,7 @@ public class WorkoutServiceImpl implements WorkoutService {
 
     @Override
     public Resource loadWorkoutMedia(String filename) {
-        return new FileSystemResource(workoutMediaDir + filename);
+        return new ClassPathResource(workoutMediaDir + filename);
     }
 
     @Override
