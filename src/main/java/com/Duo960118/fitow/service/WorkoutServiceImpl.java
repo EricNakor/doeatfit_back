@@ -120,9 +120,10 @@ public class WorkoutServiceImpl implements WorkoutService {
 //        return !workoutRepository.existsByUuidEntityUuid(uuid);
     }
 
+    // 운동 영상 조회
     @Override
     public Resource loadWorkoutMedia(String filename) {
-        return new ClassPathResource(workoutMediaDir + filename);
+        return new FileSystemResource(workoutMediaDir + filename);
     }
 
     @Override

@@ -126,7 +126,7 @@ public class UserFacade {
 
     // 프로필 이미지 불러오기
     public Resource loadProfileImg(String filename) {
-        return new ClassPathResource(uploadConfig.getProfileImgDir() + filename);
+        return new FileSystemResource(uploadConfig.getProfileImgDir() + filename);
     }
 
     // 회원탈퇴
