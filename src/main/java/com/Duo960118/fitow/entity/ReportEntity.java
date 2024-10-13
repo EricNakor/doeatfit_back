@@ -56,8 +56,6 @@ public class ReportEntity {
     @Embedded
     private UuidEntity uuidEntity;
     // 답변
-    @Column(columnDefinition = "longtext")
-    @NotBlank(message = "{NotBlank.content}")
     private String reply;
     // 답변 일자
     @PastOrPresent(message = "{PastOrPresent.replyDate}")
