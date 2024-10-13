@@ -15,8 +15,6 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     private static final String regexPassword =
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{"
                     + MIN_SIZE + "," + MAX_SIZE + "}$";
-
-    //    "^(?=.*[a-z]) (?=.*[A-Z]) (?=.*\\d) (?=.*[@$!%*?&#]) [A-Za-z\\d@$!%*?&#] {8,20}$"
     @Override
     public void initialize(Password constraintAnnotation) {
     }

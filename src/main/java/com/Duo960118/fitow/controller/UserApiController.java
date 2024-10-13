@@ -1,7 +1,9 @@
 package com.Duo960118.fitow.controller;
 
 import com.Duo960118.fitow.annotaion.File;
-import com.Duo960118.fitow.entity.*;
+import com.Duo960118.fitow.entity.CustomUserDetails;
+import com.Duo960118.fitow.entity.UserDto;
+import com.Duo960118.fitow.entity.UserEntity;
 import com.Duo960118.fitow.response.ApiResponse;
 import com.Duo960118.fitow.service.UserFacade;
 import com.Duo960118.fitow.service.UserService;
@@ -18,15 +20,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 
 @RestController
@@ -50,29 +49,29 @@ public class UserApiController {
     // 이메일 중복확인
     // todo: 중복 체크 인증 여부는 front에서 체크하고, api 우회 접근 방어 로직은 back에서 >> front 작업 시 진행
     @GetMapping("users/check/duplicate/email")
-    public ApiResponse<UserDto.CheckDuplicateResponseDto> checkEmailDuplication(@Email(message = "{Email.email}") @NotBlank(message = "{NotBlank.email}") @RequestParam("email") String email ) {
+    public ApiResponse<UserDto.CheckDuplicateResponseDto> checkEmailDuplication(@Email(message = "{Email.email}") @NotBlank(message = "{NotBlank.email}") @RequestParam("email") String email) {
         UserDto.CheckEmailRequestDto checkEmailRequest = new UserDto.CheckEmailRequestDto(email);
         return ApiResponse.success(userService.checkEmail(checkEmailRequest));
     }
 
     // 닉네임 중복확인
     @GetMapping("users/check/duplicate/nickname")
-    public ApiResponse<UserDto.CheckDuplicateResponseDto> checkNickNameDuplication(@Size(min=2,max=12,message = "{Size.nickName}") @NotBlank(message = "{NotBlank.nickName}") @RequestParam("nickName") String nickName ) {
+    public ApiResponse<UserDto.CheckDuplicateResponseDto> checkNickNameDuplication(@Size(min = 2, max = 12, message = "{Size.nickName}") @NotBlank(message = "{NotBlank.nickName}") @RequestParam("nickName") String nickName) {
         UserDto.CheckNickNameRequestDto checkNickNameRequest = new UserDto.CheckNickNameRequestDto(nickName);
         return ApiResponse.success(userService.checkNickName(checkNickNameRequest));
     }
 
     // 회원탈퇴
     @DeleteMapping("users/withdraw")
-    public ApiResponse<Object>  withdraw(@RequestParam("passwd") String passwd,
-                                      @AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                      HttpServletRequest httpServletRequest) {
+    public ApiResponse<Object> withdraw(@RequestParam("passwd") String passwd,
+                                        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                        HttpServletRequest httpServletRequest) {
         // 탈퇴 후 세션 끊기
         // jwt 토큰 쓸 때는 필요 없음
         //        session.invalidate();
         // 대신 토큰 블랙 리스트 추가 및 제거
 
-        UserDto.WithDrawRequestDto withDrawRequest =  UserDto.WithDrawRequestDto.builder()
+        UserDto.WithDrawRequestDto withDrawRequest = UserDto.WithDrawRequestDto.builder()
                 .email(customUserDetails.getUsername())
                 .passwd(passwd)
                 .httpServletRequest(httpServletRequest)
@@ -84,7 +83,7 @@ public class UserApiController {
 
     // 비밀번호 수정
     @PutMapping("users/passwd")
-    public ApiResponse<UserDto.EditPasswdResponseDto>  editPasswd(@Valid @RequestBody UserDto.EditPasswdRequestDto editPasswdRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ApiResponse<UserDto.EditPasswdResponseDto> editPasswd(@Valid @RequestBody UserDto.EditPasswdRequestDto editPasswdRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         editPasswdRequest.setEmail(customUserDetails.getUsername());
         return ApiResponse.success(userFacade.editPasswd(editPasswdRequest));
     }
@@ -149,15 +148,15 @@ public class UserApiController {
 
     // 모든 유저정보 가져오기
     @GetMapping("def-cms/users")
-    public ApiResponse<Page<UserDto.UserInfoDto>> getUserInfos(@PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<UserDto.UserInfoDto> users =  userService.getAllUser(pageable);
+    public ApiResponse<Page<UserDto.UserInfoDto>> getUserInfos(@PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<UserDto.UserInfoDto> users = userService.getAllUser(pageable);
 
         return ApiResponse.success(users);
     }
 
     // 유저 자세히 보기
     @GetMapping("def-cms/users/{email}")
-    public ApiResponse<UserDto.UserInfoDto> getUserInfo(@Valid @PathVariable("email") String email){
+    public ApiResponse<UserDto.UserInfoDto> getUserInfo(@Valid @PathVariable("email") String email) {
         UserDto.UserInfoDto userInfo = userService.getUserInfo(email);
 
         if (userInfo.getProfileImg() == null) {
@@ -176,12 +175,16 @@ public class UserApiController {
     }
 
     @GetMapping("/users/is-authenticated")
-    public ApiResponse<Object> checkAuthStatus() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            return ApiResponse.success(null);
+    public ApiResponse<Object> checkAuthStatus(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.isAuthenticated()) {
+//            return ApiResponse.success(null);
+//        }
+//        return ApiResponse.fail(null);
+        if (customUserDetails != null) {
+            return ApiResponse.success(null); //인증된 상태
         }
-        return ApiResponse.fail(null);
+        return ApiResponse.fail(null); // 인증되지 않은 상태
     }
 
 //    // 성별 Enum
@@ -196,4 +199,13 @@ public class UserApiController {
 //        return ApiResponse.success(UserEntity.UserRoleEnum.values());
 //    }
 
+    @GetMapping("/users/is-admin")
+    public ApiResponse<Object> checkAdmin(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        log.info("{}", customUserDetails.getAuthorities());
+        if (customUserDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals(UserEntity.UserRoleEnum.ADMIN.getValue()))) {
+            return ApiResponse.success(null);
+        }
+        return ApiResponse.fail(null);
+    }
 }

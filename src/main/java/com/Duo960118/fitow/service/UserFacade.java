@@ -1,18 +1,17 @@
 package com.Duo960118.fitow.service;
 
 import com.Duo960118.fitow.component.TokenUtil;
+import com.Duo960118.fitow.config.UploadConfig;
 import com.Duo960118.fitow.entity.JwtProperties;
 import com.Duo960118.fitow.entity.UserDto;
 import com.Duo960118.fitow.entity.UserEntity;
-import com.Duo960118.fitow.config.UploadConfig;
+import com.Duo960118.fitow.exception.PasswordNotMatchesException;
 import lombok.RequiredArgsConstructor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,7 +90,7 @@ public class UserFacade {
 
             if (!file.delete()) {
                 // 예외: 프로필 이미지 삭제 실패
-                throw new IOException(user.getProfileImg()+" 해당 프로필 이미지를 삭제할 수 없습니다");
+                throw new IOException(user.getProfileImg() + " 해당 프로필 이미지를 삭제할 수 없습니다");
             }
 
             // 프로필사진이 !null이면 원래 uuid로 파일명 덮어씌우기
@@ -130,8 +129,11 @@ public class UserFacade {
     }
 
     // 회원탈퇴
-    public void withdraw(UserDto.WithDrawRequestDto withdrawRequest) {
+    public void withdraw(UserDto.WithDrawRequestDto withdrawRequest) throws PasswordNotMatchesException {
         UserEntity user = userService.findByEmail(withdrawRequest.getEmail());
+
+        // DB 삭제
+        userService.withdraw(withdrawRequest);
 
         // 프로필 이미지 삭제
         if (user.getProfileImg() != null) {
@@ -160,8 +162,6 @@ public class UserFacade {
         noticeService.updateForeignKeysNull(user.getUserId());
         calculatorService.updateForeignKeysNull(user.getUserId());
 
-        // DB 삭제
-        userService.withdraw(withdrawRequest);
     }
 
     // 유저 롤 수정
