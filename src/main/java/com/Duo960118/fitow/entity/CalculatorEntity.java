@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -35,7 +34,7 @@ public class CalculatorEntity {
     @NotNull(message = "{NotNull.weight}")
     @Max(value = 999, message = "{Max.weight}")
     private float weight;
-    @Positive(message = "{Positive.bmr}")
+    @PositiveOrZero(message = "{Positive.bmr}")
     @Max(value = 4000, message = "{Max.bmr}")
     private int bmr;
     @NotNull(message = "{NotNull.activityLevel}")

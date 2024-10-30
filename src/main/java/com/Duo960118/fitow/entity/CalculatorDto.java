@@ -31,7 +31,7 @@ public class CalculatorDto {
         @NotNull(message = "{NotNull.weight}")
         @Max(value = 999, message = "{Max.weight}")
         private float weight;
-        @Positive(message = "{Positive.bmr}")
+        @PositiveOrZero(message = "{Positive.bmr}")
         @Max(value = 4000, message = "{Max.bmr}")
         private int bmr;
         @Enum(enumClass = CalculatorEntity.ActivityLevelEnum.class, message = "{Enum.activityLevel}")
