@@ -44,7 +44,7 @@ public class SecurityConfig {
     public static final String[] NO_AUTH_API_PATHS = {"api/users/find/**", "/api/users/send-temp-passwd", "/api/users/join",
             "/api/email/send/auth", "/api/email/verify", "/api/users/check/**",
             "/api/workouts/**", "/api/notices/**", "/api/users/gender-enum",
-            "/api/home-contents"};
+            "/api/home-contents", "/api/verify-turnstile"};
 
     // admin 권한이 필요한 url
     public static final String[] ADMIN_AUTH_REQUIRED_PATHS = {"/def-cms/**"};
