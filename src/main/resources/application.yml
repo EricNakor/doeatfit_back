@@ -1,0 +1,64 @@
+# JPA
+spring:
+  config:
+    import:
+      - classpath:/application-secret.yml
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.68.54:3306/doeatfit
+#    최초 생성간에는 db를 만들어줘야 빌드간 테이블 생성 가능
+#    url: jdbc:mysql://192.168.0.102:3306/doeatfit
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          timeout: 50000 # SMTP 서버에 연결을 시도하고 응답을 기다리는 최대 시간이 50,000ms
+          starttls.enable: true
+          ssl.trust: smtp.gmail.com
+  data:
+    redis:
+      host: 192.168.68.54
+#      host: 192.168.0.102
+      port: 6379
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true #form태그에는 PUT, DELETE를 지원하지 않아 GET으로 처리됨. 타임리프 th:method 사용하여 처리
+  thymeleaf:
+    # thymeleaf layout
+    prefix: file:src/main/resources/templates/
+    suffix: .html
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+#  profile_img_dir: C:\Users\ericn\Desktop\doeatfit\images\profile\
+#  profile_img_dir: C:\Users\ericn\Desktop\doeatfit\images\profile\
+#  report_file_dir: C:\Users\ericn\Desktop\doeatfit\images\report\
+#  reply_file_dir: C:\Users\ericn\Desktop\doeatfit\images\reply\
+#  workout_media_dir: C:\Users\ericn\Desktop\doeatfit\images\media\
+#  profile_img_dir: C:\Users\jewon\Desktop\doeatfit\images\profile\
+#  report_file_dir: C:\Users\jewon\Desktop\doeatfit\images\report\
+#  reply_file_dir: C:\Users\jewon\Desktop\doeatfit\images\reply\
+#  workout_media_dir: C:\Users\jewon\Desktop\doeatfit\media\
+  profile_img_dir: /doeatfit_media/profile/
+  report_file_dir: /doeatfit_media/report/
+  reply_file_dir: /doeatfit_media/reply/
+  workout_media_dir: /doeatfit_media/media/
+  messages:
+    basename: validation
+    encoding: UTF-8
